@@ -12,7 +12,7 @@ def food_list_by_elf(raw_input):
     """
     return list(map(lambda x: list(map(int,x.split("\n"))),raw_input.split("\n\n")))
 def test_food_list_by_elf():
-    with open("Day 1 test input","r") as input_file:
+    with open("Day1_test_input.txt","r") as input_file:
         raw_input=input_file.read()
     assert food_list_by_elf(raw_input)==[
         [1000,2000,3000],
@@ -55,7 +55,7 @@ def test_top_thee_elf_calories():
 if __name__=="__main__":
     test_food_list_by_elf()
     test_calories_by_elf()
-    with open("Day 1 input","r") as input_file:
+    with open("Day1_input.txt","r") as input_file:
         raw_input=input_file.read()
     food_by_elf_ls = food_list_by_elf(raw_input)
     calories_by_elf_ls = calories_by_elf(food_by_elf_ls)
