@@ -127,14 +127,22 @@ def instruction_implementer(raw_input, crane_version):
             stack_diagram = step_implementer_9001(stack_diagram, curr_instruction)
     return "".join([x[0] if len(x)>0 else " " for x in stack_diagram ])
 
-def test_instruction_implementer():
+
+
+def test_instruction_implementer_9000():
     with open("Day5_test_input.txt","r") as input_file:
         raw_test_input = input_file.read()
     assert instruction_implementer(raw_test_input, '9000') == 'CMZ'
 
+def test_instruction_implementer_9001():
+    with open("Day5_test_input.txt","r") as input_file:
+        raw_test_input = input_file.read()
+    assert instruction_implementer(raw_test_input, '9001') == 'MCD'
+
 if __name__ == "__main__":
     test_data_formatter()
-    test_instruction_implementer()
+    test_instruction_implementer_9000()
+    test_instruction_implementer_9001()
 
     with open("Day5_input.txt","r") as input_file:
         raw_input = input_file.read()
