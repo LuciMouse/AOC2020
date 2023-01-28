@@ -12,25 +12,24 @@ def data_formatter(raw_input):
     #diagram: llisted from top to bottom of each stack
 
     split_diagram = [stack for stack in raw_diagram.split('\n')]
-    split_diagram = split_diagram[:-1][::-1]
-    num_stacks = len(split_diagram)
+    num_stacks = len(split_diagram[-1].replace(" ",""))
+    split_diagram = split_diagram[:-1]
+
+    itemized_diagram = [[] for x in range(num_stacks)]
     for curr_layer in split_diagram:
-        for curr_index in range(num_stacks):
-
-    substring_ls = [raw_diagram[x*num_stacks:(x+1)*num_stacks] for x in range(num_stacks)]
-    del split_diagram[len(split_diagram)-1] #drop the 1,2,3 row
-    itemized_diagram = [[y for y in list(x) if y not in {']','['}] for x in split_diagram]
-
-    # transpose the lists (need to fill with None for unequal list size
-    transposed_diagram = list(map(list,itertools.zip_longest(*itemized_diagram, fillvalue=None)))
-    transposed_diagram = [[x for x in y if x not in {None,' '}] for y in transposed_diagram] #remove None and blanks
-
+        for stack_index in range(num_stacks):
+            # each "item" is 3 char wide and are separated by a space. The crate character is the middle one
+            curr_index = 1 + stack_index*4
+            if (curr_index) <len(curr_layer):
+                curr_item = curr_layer[curr_index]
+                if curr_item != ' ':
+                    itemized_diagram[stack_index].append(curr_item)
 
     #instructions
     split_instructions = [step.split(' ') for step in raw_instructions.split('\n')]
     split_instructions = [[int(x) for x in y if x not in {'move','from','to'}] for y in split_instructions]
 
-    return ([transposed_diagram,split_instructions])
+    return ([itemized_diagram,split_instructions])
 
 def test_data_formatter():
     with open("Day5_test_input.txt","r") as input_file:
@@ -49,7 +48,7 @@ def test_data_formatter():
            ]
     ]
 
-def step_implementer(stack_diagram, curr_instruction):
+def step_implementer_9000(stack_diagram, curr_instruction):
     """
     performs the current step on the stack as diagrammed and returns the edited diagram
     :param stack_diagram: list of current state of stack
@@ -58,16 +57,47 @@ def step_implementer(stack_diagram, curr_instruction):
 
     usage examples:
 
-    >>> step_implementer([['N', 'Z'],['D', 'C', 'M'],['P']],[1,2,1])
+    >>> step_implementer_9000([['N', 'Z'],['D', 'C', 'M'],['P']],[1,2,1])
     [['D', 'N', 'Z'], ['C', 'M'], ['P']]
 
-    >>> step_implementer([['D', 'N', 'Z'], ['C', 'M'], ['P']],[3,1,3])
+    >>> step_implementer_9000([['D', 'N', 'Z'], ['C', 'M'], ['P']],[3,1,3])
     [[], ['C', 'M'], ['Z', 'N', 'D', 'P']]
 
-    >>> step_implementer([[], ['C', 'M'], ['Z', 'N', 'D', 'P']],[2,2,1])
+    >>> step_implementer_9000([[], ['C', 'M'], ['Z', 'N', 'D', 'P']],[2,2,1])
     [['M', 'C'], [], ['Z', 'N', 'D', 'P']]
 
-    >>> step_implementer([['M', 'C'], [], ['Z', 'N', 'D', 'P']],[1,1,2])
+    >>> step_implementer_9000([['M', 'C'], [], ['Z', 'N', 'D', 'P']],[1,1,2])
+    [['C'], ['M'], ['Z', 'N', 'D', 'P']]
+    """
+    for loop_index in range(curr_instruction[0]):
+        if len(stack_diagram[curr_instruction[1]-1])>0:
+            #remove item from the top of the "from stack"
+            curr_item = stack_diagram[curr_instruction[1]-1].pop(0)
+            #add to the top of the "to stack"
+            stack_diagram[curr_instruction[2]-1].insert(0,curr_item)
+        if len(stack_diagram)>9:
+            print((curr_instruction,stack_diagram))
+    return stack_diagram
+
+def step_implementer_9001(stack_diagram, curr_instruction):
+    """
+    performs the current step on the stack as diagrammed and returns the edited diagram
+    :param stack_diagram: list of current state of stack
+    :param curr_instruction: list of instruction in form [move,from,to]
+    :return: edited stack diagram
+
+    usage examples:
+
+    >>> step_implementer_9000([['N', 'Z'],['D', 'C', 'M'],['P']],[1,2,1])
+    [['D', 'N', 'Z'], ['C', 'M'], ['P']]
+
+    >>> step_implementer_9000([['D', 'N', 'Z'], ['C', 'M'], ['P']],[3,1,3])
+    [[], ['C', 'M'], ['Z', 'N', 'D', 'P']]
+
+    >>> step_implementer_9000([[], ['C', 'M'], ['Z', 'N', 'D', 'P']],[2,2,1])
+    [['M', 'C'], [], ['Z', 'N', 'D', 'P']]
+
+    >>> step_implementer_9000([['M', 'C'], [], ['Z', 'N', 'D', 'P']],[1,1,2])
     [['C'], ['M'], ['Z', 'N', 'D', 'P']]
     """
     for loop_index in range(curr_instruction[0]):
@@ -89,7 +119,7 @@ def instruction_implementer(raw_input):
     """
     stack_diagram, instruction_list = data_formatter(raw_input)
     for curr_instruction in instruction_list:
-        stack_diagram = step_implementer(stack_diagram,curr_instruction)
+        stack_diagram = step_implementer_9000(stack_diagram, curr_instruction)
     return "".join([x[0] if len(x)>0 else " " for x in stack_diagram ])
 
 def test_instruction_implementer():
