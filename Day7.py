@@ -126,9 +126,9 @@ def node_check(curr_node,node_dict,curr_item):
 
 def command_to_tree(commands_ls):
     """
-    from list of commands, makes the directory tree.
+    from list of commands, makes the directory tree (dictionary of nodes).
     :param input_filename: filename of command list
-    :return: None
+    :return: dictionary of nodes
     """
     command_index = 0
     node_dict = {'/': TreeNode(name="/", type="dir")}
@@ -144,8 +144,14 @@ def command_to_tree(commands_ls):
                     curr_node = curr_node.parent
                     command_index += 1
                 elif new_node_name in node_dict:
-                    curr_node = node_dict[new_node_name]
-                    command_index += 1
+                    # new_node_name needs to be a child of curr_node unless it's root
+                    if ((node_dict[new_node_name].parent == curr_node)|(curr_node.name=="/")):
+                        curr_node = node_dict[new_node_name]
+                        command_index += 1
+                    else:
+                        raise Exception(
+                            f"node {new_node_name} is not a child of node {curr_node.name}"
+                        )
                 else:
                     raise Exception(
                         f"node {new_node_name} is not in the records"
@@ -163,9 +169,42 @@ def command_to_tree(commands_ls):
                         curr_row="$" #in case the final command is in a "ls", breaks out of loop
 
 
-    return node_dict['/']
+    return node_dict
 
+def calculate_single_directory_size(curr_node):
+    """
+    given a directory node, calculates the size of the node
+    :param curr_node: a Treenode of type= 'dir'
+    :return: size of all contained nodes
+    """
+    if curr_node.type == 'file': #files have no children
+        return int(curr_node.size)
+    elif curr_node.children: #if it has children
+        return sum([calculate_single_directory_size(curr_child) for curr_child in curr_node.children])
+    else: #directory with no children
+        return 0
+
+
+def calculate_directory_sizes(node_dict):
+    """
+    given a dictionary of nodes, calculates the total size of all the directories
+    :param node_dict: dictionary of nodes
+    :return: dictionary of directory names and node sizes
+    """
+    # filter to only the directories and calculate sizes
+    directory_size_dict = {key:calculate_single_directory_size(value) for (key,value) in node_dict.items() if value.type =='dir'}
+    return directory_size_dict
+
+def part1_calculator(raw_data):
+    """
+    takes the raw input data and finds the sum of all directories with size < 100000
+    :param raw_data: raw input data
+    :return: sum of file sizes
+    """
+    test_command_ls = raw_data.split('\n')
+    node_dict = command_to_tree(test_command_ls)
+    directory_size_dict = calculate_directory_sizes(node_dict)
+    return sum([size for size in directory_size_dict.values() if size < 100000])
 
 if __name__ == "__main__":
-    with open('Day7_test_input.txt') as input_file:
-        print("foo")
+    print(f"file sum is {part1_calculator(data)}")
