@@ -80,83 +80,72 @@ class _TreeGenerator:
     def _add_file(self, file, prefix, connector):
         self._tree.append(f"{prefix}{connector} {file.name}")
 
-def node_check(curr_node,node_dict,curr_item):
+def add_node(curr_node, node_set, curr_item):
     """
-    checks if curr_item is already a defined node.
-    If it's defined, make sure it's consistent
-    if it's a new node, add it
+    checks if curr_item is file or directory and adds it to the set
    :param curr_node: current node in directory (for parentage)
-   :param node_dict: dictionary of mapped nodes
-   :param curr_item: item to check and maybe add
-   :return: node_dict with the new node added (if necessary)
+   :param node_set: set of mapped nodes
+   :param curr_item: item to check and add
+   :return: node_set with the new node added
     """
     if curr_item[0] == "dir":
         dir_name = curr_item[1]
-        if dir_name in node_dict:  # if it's already defined
-            #need to make a new name
-            dir_name = dir_name + str(randrange(0,10000))
 
-        # define as new node
-        node_dict[dir_name] = TreeNode(
+        node_set.add(TreeNode(
            name=dir_name,
            type='dir',
            parent=curr_node,
-           )
+           ))
 
     else:  # it's a file
         file_name = curr_item[1]
         file_size = curr_item[0]
 
-        if file_name in node_dict:  # if it's not already defined
-            # need to make a new name
-            file_name = file_name + str(randrange(0, 10000))
-        #define as new node
-        node_dict[file_name] = TreeNode(
+        node_set.add(TreeNode(
             name=file_name,
             type='file',
             parent=curr_node,
             size=file_size,
+        ))
+    return node_set
+
+def move_folder(curr_node, curr_instruction):
+    new_node_name = curr_instruction[2]
+    if new_node_name == "..":
+        curr_node = curr_node.parent
+
+    elif new_node_name in {child_node.name for child_node in
+                           curr_node.children}:  # move to child node. check to make sure new_node is a child of the current node
+        curr_node = [child_node for child_node in curr_node.children if child_node.name == new_node_name][0]
+    else:
+        raise Exception(
+            f"node {new_node_name} is not a child of node {curr_node.name}"
         )
-    return node_dict
+    return curr_node
 
 def command_to_tree(commands_ls):
     """
-    from list of commands, makes the directory tree (dictionary of nodes).
+    from list of commands, makes the directory tree (set of nodes).
     :param input_filename: filename of command list
-    :return: dictionary of nodes
+    :return: set of nodes
     """
-    command_index = 0
-    node_dict = {'/': TreeNode(name="/", type="dir")}
-    curr_node = node_dict['/']
+    command_index = 1 #first command is "cd /" which sets the current node at the root node.
+    curr_node = TreeNode(name="/", type="dir")
+    node_set = {curr_node}
 
     while command_index < len(commands_ls):
         curr_row = commands_ls[command_index]
         if curr_row[0] == '$':  # instruction
             curr_instruction = curr_row.split(" ")
             if curr_instruction[1] == "cd":
-                new_node_name = curr_instruction[2]
-                if new_node_name=="..":
-                    curr_node = curr_node.parent
-                    command_index += 1
-                elif new_node_name in node_dict:
-                    # new_node_name needs to be a child of curr_node unless it's root
-                    if ((node_dict[new_node_name].parent == curr_node)|(curr_node.name=="/")):
-                        curr_node = node_dict[new_node_name]
-                        command_index += 1
-                    else:
-                        raise Exception(
-                            f"node {new_node_name} is not a child of node {curr_node.name}"
-                        )
-                else:
-                    raise Exception(
-                        f"node {new_node_name} is not in the records"
-                    )
-            elif curr_instruction[1] == "ls":
+                curr_node = move_folder(curr_node,curr_instruction)
                 command_index += 1
+            elif curr_instruction[1] == "ls":
+                command_index += 1 #read next command
                 curr_row = commands_ls[command_index]
                 while curr_row[0] != "$":
                     curr_item = curr_row.split(" ")
-                    node_dict = node_check(curr_node,node_dict,curr_item)
+                    node_dict = add_node(curr_node, node_set, curr_item)
                     command_index += 1
                     if command_index<len(commands_ls):
                         curr_row = commands_ls[command_index]
@@ -164,7 +153,7 @@ def command_to_tree(commands_ls):
                         curr_row="$" #in case the final command is in a "ls", breaks out of loop
 
 
-    return node_dict
+    return node_set
 
 def calculate_single_directory_size(curr_node):
     """
@@ -180,15 +169,15 @@ def calculate_single_directory_size(curr_node):
         return 0
 
 
-def calculate_directory_sizes(node_dict):
+def calculate_directory_sizes(node_set):
     """
     given a dictionary of nodes, calculates the total size of all the directories
     :param node_dict: dictionary of nodes
     :return: dictionary of directory names and node sizes
     """
     # filter to only the directories and calculate sizes
-    directory_size_dict = {key:calculate_single_directory_size(value) for (key,value) in node_dict.items() if value.type =='dir'}
-    return directory_size_dict
+    directory_size_ls = [calculate_single_directory_size(node) for node in node_set if node.type =='dir']
+    return directory_size_ls
 
 def part1_calculator(raw_data):
     """
@@ -197,9 +186,30 @@ def part1_calculator(raw_data):
     :return: sum of file sizes
     """
     test_command_ls = raw_data.split('\n')
-    node_dict = command_to_tree(test_command_ls)
-    directory_size_dict = calculate_directory_sizes(node_dict)
-    return sum([size for size in directory_size_dict.values() if size < 100000])
+    node_set = command_to_tree(test_command_ls)
+    directory_size_ls = calculate_directory_sizes(node_set)
+    return sum([size for size in directory_size_ls if size < 100000])
+
+def part2_calculator(raw_data):
+    """
+        takes the raw input data and finds the smallest directory that will free up the required space
+        :param raw_data: raw input data
+        :return: size of the smallest deletable directory
+        """
+    test_command_ls = raw_data.split('\n')
+    node_set = command_to_tree(test_command_ls)
+    directory_size_ls = calculate_directory_sizes(node_set)
+    directory_size_ls.sort()
+
+    #calculate room we need
+    total_disk_size = 70000000
+    min_disk_space = 30000000
+    unused_space = total_disk_size-directory_size_ls[-1]
+    min_dir_size = min_disk_space-unused_space
+
+    big_dirs_ls = [size for size in directory_size_ls if size > min_dir_size]
+    return big_dirs_ls[0]
 
 if __name__ == "__main__":
     print(f"file sum is {part1_calculator(data)}")
+    print(f"size of smallest deletable drive is {part2_calculator(data)}")
