@@ -22,7 +22,7 @@ class TreeNode:
 
     def AddChild(self, child_node):
         # creates parent-child relationships
-        print(f"Adding {child_node.name} as child of {self.name}")
+        print(f"Adding {child_node.type} {child_node.name} as child of {self.name}")
         self.children.append(child_node)
         # if child's parent is not set, set to node
         if child_node.parent == None:
@@ -47,7 +47,7 @@ class _TreeGenerator:
         return self._tree
 
     def _tree_head(self):
-        self._tree.append(f"{self._root_node.name}")
+        self._tree.append(f"\n\n{self._root_node.name}")
         self._tree.append(self.PIPE)
 
     def _tree_body(self, root_node, prefix=""):
@@ -56,22 +56,23 @@ class _TreeGenerator:
         entries_count = len(entries)
         for index, entry in enumerate(entries):
             connector = self.ELBOW if index == entries_count - 1 else self.TEE
-            if entry.type == 'dir':
+            if (entry.type == 'dir'):
                 self._add_directory(
                     entry, index, entries_count, prefix, connector
                 )
             else:
                 self._add_file(entry, prefix, connector)
+
     def _add_directory(
             self, directory, index, entries_count, prefix, connector
     ):
         self._tree.append(f"{prefix}{connector} {directory.name}")
-        if index != entries_count -1:
+        if index != entries_count - 1:
             prefix += self.PIPE_PREFIX
         else:
             prefix += self.SPACE_PREFIX
         self._tree_body(
-            directory = directory,
+            root_node=directory,
             prefix=prefix
         )
         self._tree.append(prefix.rstrip())
@@ -79,13 +80,91 @@ class _TreeGenerator:
     def _add_file(self, file, prefix, connector):
         self._tree.append(f"{prefix}{connector} {file.name}")
 
+def node_check(curr_node,node_dict,curr_item):
+    """
+    checks if curr_item is already a defined node.
+    If it's defined, make sure it's consistent
+    if it's a new node, add it
+   :param curr_node: current node in directory (for parentage)
+   :param node_dict: dictionary of mapped nodes
+   :param curr_item: item to check and maybe add
+   :return: node_dict with the new node added (if necessary)
+    """
+    if curr_item[0] == "dir":
+        dir_name = curr_item[1]
+        if dir_name in node_dict:  # if it's already defined
+            # check to make sure parentage is correct
+            if node_dict[dir_name].parent != curr_node:
+                # raise error if it isn't
+                raise Exception(f"error: {dir_name} is supposed to be a child of {curr_node.name} but its parent in the record is {node_dict[dir_name].parent.name}")
+        else:  # define as new node
+            node_dict[dir_name] = TreeNode(
+               name=dir_name,
+               type='dir',
+               parent=curr_node,
+           )
+
+    else:  # it's a file
+        file_name = curr_item[1]
+        file_size = curr_item[0]
+
+        if file_name in node_dict:  # if it's already defined
+            # check to make sure parentage and size is correct
+            if ((node_dict[file_name].parent != curr_node) or (node_dict[file_name].size != file_size)):
+                # raise error if it isn't
+                raise Exception(
+                    f"error: {file_name} is supposed to be a child of {curr_node.name} and size {file_size} but its parent and size in the record is {node_dict[file_name].parent.name} and {node_dict[file_name].size}"
+                    )
+        else: #define as new node
+            node_dict[file_name] = TreeNode(
+                name=file_name,
+                type='file',
+                parent=curr_node,
+                size=file_size,
+            )
+    return node_dict
+
 def command_to_tree(commands_ls):
     """
     from list of commands, makes the directory tree.
     :param input_filename: filename of command list
     :return: None
     """
-    print("foo")
+    command_index = 0
+    node_dict = {'/': TreeNode(name="/", type="dir")}
+    curr_node = node_dict['/']
+
+    while command_index < len(commands_ls):
+        curr_row = commands_ls[command_index]
+        if curr_row[0] == '$':  # instruction
+            curr_instruction = curr_row.split(" ")
+            if curr_instruction[1] == "cd":
+                new_node_name = curr_instruction[2]
+                if new_node_name=="..":
+                    curr_node = curr_node.parent
+                    command_index += 1
+                elif new_node_name in node_dict:
+                    curr_node = node_dict[new_node_name]
+                    command_index += 1
+                else:
+                    raise Exception(
+                        f"node {new_node_name} is not in the records"
+                    )
+            elif curr_instruction[1] == "ls":
+                command_index += 1
+                curr_row = commands_ls[command_index]
+                while curr_row[0] != "$":
+                    curr_item = curr_row.split(" ")
+                    node_dict = node_check(curr_node,node_dict,curr_item)
+                    command_index += 1
+                    if command_index<len(commands_ls):
+                        curr_row = commands_ls[command_index]
+                    else:
+                        curr_row="$" #in case the final command is in a "ls", breaks out of loop
+
+
+    return node_dict['/']
+
 
 if __name__ == "__main__":
     with open('Day7_test_input.txt') as input_file:
