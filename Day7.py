@@ -1,5 +1,5 @@
 from aocd import data
-
+from random import randrange
 
 class TreeNode:
     def __init__(self, name, type, size=None, parent=None):
@@ -92,26 +92,31 @@ def node_check(curr_node,node_dict,curr_item):
     """
     if curr_item[0] == "dir":
         dir_name = curr_item[1]
-        if not dir_name in node_dict:  # if it's already defined
-            # define as new node
-            node_dict[dir_name] = TreeNode(
-               name=dir_name,
-               type='dir',
-               parent=curr_node,
+        if dir_name in node_dict:  # if it's already defined
+            #need to make a new name
+            dir_name = dir_name + str(randrange(0,10000))
+
+        # define as new node
+        node_dict[dir_name] = TreeNode(
+           name=dir_name,
+           type='dir',
+           parent=curr_node,
            )
 
     else:  # it's a file
         file_name = curr_item[1]
         file_size = curr_item[0]
 
-        if not file_name in node_dict:  # if it's not already defined
-            #define as new node
-            node_dict[file_name] = TreeNode(
-                name=file_name,
-                type='file',
-                parent=curr_node,
-                size=file_size,
-            )
+        if file_name in node_dict:  # if it's not already defined
+            # need to make a new name
+            file_name = file_name + str(randrange(0, 10000))
+        #define as new node
+        node_dict[file_name] = TreeNode(
+            name=file_name,
+            type='file',
+            parent=curr_node,
+            size=file_size,
+        )
     return node_dict
 
 def command_to_tree(commands_ls):
