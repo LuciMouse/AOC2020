@@ -92,12 +92,8 @@ def node_check(curr_node,node_dict,curr_item):
     """
     if curr_item[0] == "dir":
         dir_name = curr_item[1]
-        if dir_name in node_dict:  # if it's already defined
-            # check to make sure parentage is correct
-            if node_dict[dir_name].parent != curr_node:
-                # raise error if it isn't
-                raise Exception(f"error: {dir_name} is supposed to be a child of {curr_node.name} but its parent in the record is {node_dict[dir_name].parent.name}")
-        else:  # define as new node
+        if not dir_name in node_dict:  # if it's already defined
+            # define as new node
             node_dict[dir_name] = TreeNode(
                name=dir_name,
                type='dir',
@@ -108,14 +104,8 @@ def node_check(curr_node,node_dict,curr_item):
         file_name = curr_item[1]
         file_size = curr_item[0]
 
-        if file_name in node_dict:  # if it's already defined
-            # check to make sure parentage and size is correct
-            if ((node_dict[file_name].parent != curr_node) or (node_dict[file_name].size != file_size)):
-                # raise error if it isn't
-                raise Exception(
-                    f"error: {file_name} is supposed to be a child of {curr_node.name} and size {file_size} but its parent and size in the record is {node_dict[file_name].parent.name} and {node_dict[file_name].size}"
-                    )
-        else: #define as new node
+        if not file_name in node_dict:  # if it's not already defined
+            #define as new node
             node_dict[file_name] = TreeNode(
                 name=file_name,
                 type='file',
