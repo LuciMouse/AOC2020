@@ -1,3 +1,4 @@
+from aocd import data
 """
 Part1: list represents calories carried by elves.  each elf's inventory is separated by a blank line.
 Return the calories carried by the elsf with the most calories
@@ -55,9 +56,7 @@ def test_top_thee_elf_calories():
 if __name__=="__main__":
     test_food_list_by_elf()
     test_calories_by_elf()
-    with open("Day1_input.txt","r") as input_file:
-        raw_input=input_file.read()
-    food_by_elf_ls = food_list_by_elf(raw_input)
+    food_by_elf_ls = food_list_by_elf(data)
     calories_by_elf_ls = calories_by_elf(food_by_elf_ls)
 
     print(f"The total calories carried by the top elf is {top_elf_calories(calories_by_elf_ls)}")
