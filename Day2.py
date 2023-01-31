@@ -1,6 +1,8 @@
 import pandas as pd
 import functools
 
+from aocd import data
+
 opponent_identiy_dict = {
     "A":"Rock",
     "B":"Paper",
@@ -193,8 +195,8 @@ if __name__=="__main__":
     test_total_score_calculator()
     test_total_score_calculator_outcome()
 
-    with open("Day2_input.txt") as input_csv:
-        guide_df = pd.read_csv(input_csv, header = None, sep = ' ')
+
+    guide_df = pd.DataFrame([row.split(' ') for row in data.split('\n')])
     print(f"Part 1 total score: {total_score_calculator(guide_df)}")
     print(f"Part 2 total score: {total_score_calculator_outcome(guide_df)}")
 
