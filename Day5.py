@@ -1,4 +1,4 @@
-import itertools
+from aocd import data
 
 def data_formatter(raw_input):
     """
@@ -144,8 +144,6 @@ if __name__ == "__main__":
     test_instruction_implementer_9000()
     test_instruction_implementer_9001()
 
-    with open("Day5_input.txt","r") as input_file:
-        raw_input = input_file.read()
-    elf_message_1 = instruction_implementer(raw_input, '9000')
-    elf_message_2 = instruction_implementer(raw_input, '9001')
+    elf_message_1 = instruction_implementer(data, '9000')
+    elf_message_2 = instruction_implementer(data, '9001')
     print(elf_message_1, elf_message_2 )
