@@ -1,3 +1,4 @@
+from aocd import data
 def count_contained_ranges(raw_input):
     """
     counts the number of ranges that are fully contained
@@ -129,7 +130,5 @@ if __name__=="__main__":
     test_count_contained_ranges()
     test_count_overlapped_ranges()
 
-    with open("Day4_input.txt","r") as input_file:
-        raw_input=input_file.read()
-    print(f"the number of contained ranges:{count_contained_ranges(raw_input)}")
-    print(f"the number of overlapped ranges:{count_overlapped_ranges(raw_input)}")
+    print(f"the number of contained ranges:{count_contained_ranges(data)}")
+    print(f"the number of overlapped ranges:{count_overlapped_ranges(data)}")
