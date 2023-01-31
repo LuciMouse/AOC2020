@@ -1,4 +1,4 @@
-
+from aocd import data
 def badge_priority_sum(raw_input):
     split_rucksack_ls = split_into_rucksacks(raw_input)
     badge_ls = badge_finder(split_rucksack_ls)
@@ -162,7 +162,5 @@ if __name__=="__main__":
     test_rucksack_common_priority_sum()
     test_badge_priority_sum()
 
-    with open("Day3_input.txt","r") as input_file:
-        raw_input=input_file.read()
-    print(f"the sum of all common items is:{rucksack_common_priority_sum(raw_input)}")
-    print(f"the sum of all badges is:{badge_priority_sum(raw_input)}")
+    print(f"the sum of all common items is:{rucksack_common_priority_sum(data)}")
+    print(f"the sum of all badges is:{badge_priority_sum(data)}")
