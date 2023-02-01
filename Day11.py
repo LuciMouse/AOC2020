@@ -1,11 +1,12 @@
 from aocd import data
-
+from functools import reduce
 
 class monkey:
     def __init__(self, monkey_number, starting_items, operation, test_tuple=None):
         self.monkey_number = monkey_number
         self.starting_items = starting_items
         self.operation = operation
+        self.test_tuple = test_tuple
         self.test = lambda value: test_tuple[1] if value % test_tuple[0]==0 else test_tuple[2]
 
 
@@ -44,7 +45,7 @@ def monkey_turn(monkey_index,monkey_ls):
     curr_monkey.starting_items = []
     return monkey_ls
 
-def round_implementer(monkey_ls, item_count_ls):
+def round_implementer(monkey_ls, item_count_ls,test_product):
     """
     describes a round of monkey shenanigans
     :param monkey_ls: list of monkey objects
@@ -56,17 +57,26 @@ def round_implementer(monkey_ls, item_count_ls):
     return monkey_ls, item_count_ls
 
 def calculate_monkey_business(raw_input, num_rounds):
-    # calculates the level of monkey business over num_rounds of shenanigans
+    """
+    calculates the level of monkey business over num_rounds of shenanigans
+    :param raw_input: raw data
+    :param num_rounds: number of rounds to implement
+    :return: total amount of monkey business
+    """
+
     monkey_ls = []
     for unformatted_curr_monkey in raw_input.split('\n\n'):
         new_monkey = make_monkey(unformatted_curr_monkey)
         monkey_ls.append(new_monkey)
 
+    #to simplify calculation, define a test_product (product of all the test values)
+    test_product = reduce(lambda x,y: x*y,[curr_monkey.test[0] for curr_monkey in monkey_ls])
+
     item_count_ls = [0 for x in monkey_ls]
     for round_num in range(num_rounds):
         monkey_ls, item_count_ls = round_implementer(monkey_ls, item_count_ls)
-        if round_num%1000:
-            print(item_count_ls)
+        if (round_num+1)%100==0:
+            print(f"{round_num}: {item_count_ls},{[x.starting_items for x in monkey_ls]}")
     most_active_monkeys_ls = item_count_ls.copy()
     most_active_monkeys_ls.sort(reverse=True)
     return (most_active_monkeys_ls[0]*most_active_monkeys_ls[1])
