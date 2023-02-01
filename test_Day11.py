@@ -130,7 +130,7 @@ class TestCalculateMonkeyBusiness(unittest.TestCase):
             raw_input = input_file.read()
         self.assertEqual(
             2713310158,
-            Day11.calculate_monkey_business(raw_input, 20),
+            Day11.calculate_monkey_business(raw_input, 10000),
         )
 
 
