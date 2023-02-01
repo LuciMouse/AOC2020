@@ -78,8 +78,6 @@ def calculate_monkey_business(raw_input, num_rounds):
     item_count_ls = [0 for x in monkey_ls]
     for round_num in range(num_rounds):
         monkey_ls, item_count_ls = round_implementer(monkey_ls, item_count_ls,test_product )
-        if (round_num+1)%100==0:
-            print(f"{round_num}: {item_count_ls},{[x.starting_items for x in monkey_ls]}")
     most_active_monkeys_ls = item_count_ls.copy()
     most_active_monkeys_ls.sort(reverse=True)
     return (most_active_monkeys_ls[0]*most_active_monkeys_ls[1])
