@@ -39,9 +39,8 @@ def monkey_turn(monkey_index,monkey_ls):
     for curr_item in curr_monkey.starting_items:
         old = curr_item
         inspection_worry_level = eval(curr_monkey.operation)
-        post_inspection_level = inspection_worry_level//3
-        recipient_monkey = curr_monkey.test(post_inspection_level)
-        monkey_ls[recipient_monkey].starting_items.append(post_inspection_level)
+        recipient_monkey = curr_monkey.test(inspection_worry_level)
+        monkey_ls[recipient_monkey].starting_items.append(inspection_worry_level)
     curr_monkey.starting_items = []
     return monkey_ls
 
@@ -72,5 +71,5 @@ def calculate_monkey_business(raw_input, num_rounds):
 
 
 if __name__ == '__main__':
-    print(f"level of monkey business: {calculate_monkey_business(data,20)}")
+    print(f"level of monkey business: {calculate_monkey_business(data,1000)}")
 
