@@ -70,7 +70,7 @@ def calculate_monkey_business(raw_input, num_rounds):
         monkey_ls.append(new_monkey)
 
     #to simplify calculation, define a test_product (product of all the test values)
-    test_product = reduce(lambda x,y: x*y,[curr_monkey.test[0] for curr_monkey in monkey_ls])
+    test_product = reduce(lambda x,y: x*y,[curr_monkey.test_tuple[0] for curr_monkey in monkey_ls])
 
     item_count_ls = [0 for x in monkey_ls]
     for round_num in range(num_rounds):
