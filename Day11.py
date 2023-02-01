@@ -84,5 +84,5 @@ def calculate_monkey_business(raw_input, num_rounds):
 
 
 if __name__ == '__main__':
-    print(f"level of monkey business: {calculate_monkey_business(data,1000)}")
+    print(f"level of monkey business: {calculate_monkey_business(data,10000)}")
 
