@@ -29,9 +29,10 @@ def make_monkey(unformatted_data):
     new_monkey = monkey(monkey_number, starting_items, operation, test_tuple)
     return new_monkey
 
-def monkey_turn(monkey_index,monkey_ls):
+def monkey_turn(monkey_index,monkey_ls,test_product):
     """
     describes a single monkey's turn
+    :param test_product: product of all monkey test values
     :param monkey_index: index of monkey that is inspecting and throwing
     :param monkey_ls: list of all monkey objects
     :return: updated monkey_ls
@@ -39,7 +40,7 @@ def monkey_turn(monkey_index,monkey_ls):
     curr_monkey = monkey_ls[monkey_index]
     for curr_item in curr_monkey.starting_items:
         old = curr_item
-        inspection_worry_level = eval(curr_monkey.operation)
+        inspection_worry_level = eval(curr_monkey.operation)%test_product
         recipient_monkey = curr_monkey.test(inspection_worry_level)
         monkey_ls[recipient_monkey].starting_items.append(inspection_worry_level)
     curr_monkey.starting_items = []
@@ -48,12 +49,14 @@ def monkey_turn(monkey_index,monkey_ls):
 def round_implementer(monkey_ls, item_count_ls,test_product):
     """
     describes a round of monkey shenanigans
+    :param item_count_ls: list of number of objects each monkey has examined
+    :param test_product: product of all monkey test values
     :param monkey_ls: list of monkey objects
     :return: updated monkey list
     """
     for curr_index in range(len(monkey_ls)):
         item_count_ls[curr_index]+=len(monkey_ls[curr_index].starting_items)
-        monkey_ls = monkey_turn(curr_index,monkey_ls)
+        monkey_ls = monkey_turn(curr_index,monkey_ls,test_product)
     return monkey_ls, item_count_ls
 
 def calculate_monkey_business(raw_input, num_rounds):
@@ -74,7 +77,7 @@ def calculate_monkey_business(raw_input, num_rounds):
 
     item_count_ls = [0 for x in monkey_ls]
     for round_num in range(num_rounds):
-        monkey_ls, item_count_ls = round_implementer(monkey_ls, item_count_ls)
+        monkey_ls, item_count_ls = round_implementer(monkey_ls, item_count_ls,test_product )
         if (round_num+1)%100==0:
             print(f"{round_num}: {item_count_ls},{[x.starting_items for x in monkey_ls]}")
     most_active_monkeys_ls = item_count_ls.copy()
