@@ -15,16 +15,25 @@ class TestIsAcessible(unittest.TestCase):
                 (1, 2),
                 (1, 2),
                 None,
+                (0, 1),
 
             ],
             [x.coord if x else None for x in
              [
-                 Day12.is_acessible('a', (0, 1), height_map_ls, set()),  # child_elevation == 'a'
-                 Day12.is_acessible('a', (1, 0), height_map_ls, set()),  # child_elevation == 'a'
-                 Day12.is_acessible('a', (1, 2), height_map_ls, set()),  # child_elevation == 'c'
-                 Day12.is_acessible('b', (1, 2), height_map_ls, set()),  # child_elevation == 'c'
-                 Day12.is_acessible('d', (1, 2), height_map_ls, set()),  # child_elevation == 'c'
-                 Day12.is_acessible('v', (2, 4), height_map_ls, set()),  # child_elevation == 'z'
+                 Day12.is_acessible(Day12.create_node((0, 0), height_map_ls), (0, 1), height_map_ls, {}),
+                 # child_elevation == 'a'
+                 Day12.is_acessible(Day12.create_node((0, 0), height_map_ls), (1, 0), height_map_ls, {}),
+                 # child_elevation == 'a'
+                 Day12.is_acessible(Day12.create_node((0, 0), height_map_ls), (1, 2), height_map_ls, {}),
+                 # child_elevation == 'c'
+                 Day12.is_acessible(Day12.create_node((1, 1), height_map_ls), (1, 2), height_map_ls, {}),
+                 # child_elevation == 'c'
+                 Day12.is_acessible(Day12.create_node((4, 3), height_map_ls), (1, 2), height_map_ls, {}),
+                 # child_elevation == 'c'
+                 Day12.is_acessible(Day12.create_node((3, 5), height_map_ls), (2, 4), height_map_ls, {}),
+                 # child_elevation == 'z'
+                 Day12.is_acessible(Day12.create_node((0, 0), height_map_ls), (0, 1), height_map_ls,
+                                    {(0, 1): Day12.create_node((0, 1), height_map_ls)})  # child_elevation == 'a'
              ]
              ]
         )
@@ -66,7 +75,7 @@ class TestProccessNode(unittest.TestCase):
 
             [
                 (x[0].coord, tuple(x[1])) for x in
-                Day12.process_node([(curr_node, [((0, 0),'a')])], set(), height_map_ls, 40)[0]
+                Day12.process_node([(curr_node, [((0, 0), 'a')])], set(), height_map_ls, 40)[0]
             ]
         )
 
@@ -80,6 +89,15 @@ class TestMinStepsPathFinder(unittest.TestCase):
             Day12.min_steps_path_finder(raw_data)
         )
 
+
+class TestMinStepsPathFinderMultipleStart(unittest.TestCase):
+    def test_min_steps_path_finder_multiple_start(self):
+        with open("Day12_test_input.txt") as input_file:
+            raw_data = input_file.read()
+        self.assertEqual(
+            29,
+            Day12.min_steps_path_finder_multiple_start(raw_data)
+        )
 
 if __name__ == '__main__':
     unittest.main()
