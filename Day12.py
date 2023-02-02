@@ -139,7 +139,7 @@ def min_steps_path_finder(raw_data):
     curr_node_path_ls = [((0,0),'a')]  # series of nodes between this node and the start node
 
     unprocessed_node_ls = [(curr_node,curr_node_path_ls)] #list of nodes that need to be processed
-    processed_node_dict ={}
+    processed_node_dict ={curr_node.coord,curr_node}
     min_path_count = len(height_map_ls)*len(height_map_ls[0]) #inital count is all the nodes in the heightmap
     # process node
 
