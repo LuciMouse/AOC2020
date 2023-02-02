@@ -63,35 +63,30 @@ def check_children(map_node,processsed_node_dict, height_map_ls):
     curr_y_coord, curr_x_coord = map_node.coord
     curr_elevation = map_node.elevation
 
-    children_ls = []
-
+   # determine which directions need to be checked
+    coord_ls = []
     # check left
     if curr_x_coord != 0:  # if a left position exists
-        child_coord = (curr_y_coord, curr_x_coord - 1)
-        child_node = is_acessible(map_node, child_coord, height_map_ls,processsed_node_dict)
-        if child_node:
-            children_ls.append(child_node)
+        coord_ls.append((curr_y_coord, curr_x_coord - 1))
+
     # check_right
     if curr_x_coord != len(height_map_ls[0]) - 1:  # if a right position exists
-        child_coord = (curr_y_coord, curr_x_coord + 1)
-        child_node = is_acessible(map_node, child_coord, height_map_ls,processsed_node_dict)
-        if child_node:
-            children_ls.append(child_node)
+        coord_ls.append((curr_y_coord, curr_x_coord + 1))
 
     # check_up
     if curr_y_coord != 0:  # if a upper position exists
-        child_coord = (curr_y_coord - 1, curr_x_coord)
-        child_node = is_acessible(map_node, child_coord, height_map_ls,processsed_node_dict)
-        if child_node:
-            children_ls.append(child_node)
+        coord_ls.append((curr_y_coord - 1, curr_x_coord))
 
     # check_down
     if curr_y_coord != len(height_map_ls) - 1:  # if a right position exists
-        child_coord = (curr_y_coord + 1, curr_x_coord)
-        child_node = is_acessible(map_node, child_coord, height_map_ls,processsed_node_dict)
+        coord_ls.append((curr_y_coord + 1, curr_x_coord))
+
+    children_ls = []
+
+    for child_coord in coord_ls:
+        child_node = is_acessible(map_node, child_coord, height_map_ls, processsed_node_dict)
         if child_node:
             children_ls.append(child_node)
-
     return children_ls
 
 
