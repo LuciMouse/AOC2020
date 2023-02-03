@@ -61,8 +61,9 @@ def diagram_rock_path(rock_path_ls, sand_source_coord):
                 y_coord = start_node[1]
                 for x_coord in range(start, end):
                     sand_diagram_ls[y_coord][x_coord] = '#'
-            print("foo")
-
+            print(f"node {path[index]} completed")
+    #write sand source
+    sand_diagram_ls[sand_source_coord[1]][sand_source_coord[0] - zero_index_value] = '+'
     return sand_diagram_ls, zero_index_value
 
 
