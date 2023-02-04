@@ -79,6 +79,12 @@ def drop_sand(sand_diagram_ls, sand_coord, zero_index_value):
 
     while down_space:  # drop down as far as possible
         drop_coord = (sand_coord[0], sand_coord[1] + 1)
+        if (
+                (drop_coord[0] - zero_index_value >= len(sand_diagram_ls[0])) or
+                (drop_coord[0] - zero_index_value < 0) or
+                (drop_coord[1] > len(sand_diagram_ls) - 1)
+        ):  # off the grid, cave is full
+            return (-1, -1), True
         if sand_diagram_ls[drop_coord[1]][drop_coord[0] - zero_index_value] == '.':
             sand_coord = drop_coord
         elif sand_diagram_ls[drop_coord[1]][drop_coord[0] - zero_index_value] in {'#', 'o'}:  # hits rock or sand
@@ -120,7 +126,12 @@ def add_sand(sand_diagram_ls, sand_source_coord, zero_index_value):
     sand_count = 0
 
     while not full:
-        rest_posn, full = drop_sand(sand_diagram_ls, sand_source_coord, zero_index_value)
+        if sand_count==1136:
+            print("foo")
+        try:
+            rest_posn, full = drop_sand(sand_diagram_ls, sand_source_coord, zero_index_value)
+        except IndexError:
+            print (sand_count)
         if not full:
             sand_diagram_ls[rest_posn[1]][rest_posn[0] - zero_index_value] = 'o'
             sand_count += 1
