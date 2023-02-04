@@ -42,10 +42,10 @@ def diagram_rock_path(rock_path_ls, sand_source_coord):
             end_node = path[index + 1]
             if start_node[0] == end_node[0]:  # vertical
                 if start_node[1] < end_node[1]:
-                    start = start_node[1] + 1
+                    start = start_node[1]
                     end = end_node[1] + 1
                 else:
-                    start = end_node[1] + 1
+                    start = end_node[1]
                     end = start_node[1] + 1
                 x_coord = start_node[0] - zero_index_value
                 for y_coord in range(start, end):
@@ -53,11 +53,11 @@ def diagram_rock_path(rock_path_ls, sand_source_coord):
             elif start_node[1] == end_node[1]:
                 # horizontal
                 if start_node[0] < end_node[0]:
-                    start = start_node[0] + 1 - zero_index_value
+                    start = start_node[0] - zero_index_value
                     end = end_node[0] + 1 - zero_index_value
                 else:
                     start = end_node[0] - zero_index_value
-                    end = start_node[0] - zero_index_value
+                    end = start_node[0] + 1 - zero_index_value
                 y_coord = start_node[1]
                 for x_coord in range(start, end):
                     sand_diagram_ls[y_coord][x_coord] = '#'
@@ -126,7 +126,7 @@ def add_sand(sand_diagram_ls, sand_source_coord, zero_index_value):
     sand_count = 0
 
     while not full:
-        if sand_count==1136:
+        if sand_count==1330:
             print("foo")
         try:
             rest_posn, full = drop_sand(sand_diagram_ls, sand_source_coord, zero_index_value)
