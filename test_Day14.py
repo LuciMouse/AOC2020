@@ -25,8 +25,51 @@ class TestDiagramRockPath(unittest.TestCase):
                 (500, 0)
             )
         )
+class TestDropSand(unittest.TestCase):
+    def test_drop_sand(self):
+        self.assertEqual(
+            ((500, 8), False),
+            Day14.drop_sand(
+                [
+                    [*'......+...'],
+                    [*'..........'],
+                    [*'..........'],
+                    [*'..........'],
+                    [*'....#...##'],
+                    [*'....#...#.'],
+                    [*'..###...#.'],
+                    [*'........#.'],
+                    [*'........#.'],
+                    [*'#########.'],
+                ],
+                (500,0),
+                494
+            )
+        )
 
-class TestFindDecoderKey(unittest.TestCase):
+class TestAddSand(unittest.TestCase):
+    def test_add_sand(self):
+        self.assertEqual(
+            24,
+            Day14.add_sand(
+                [
+                    [*'......+...'],
+                    [*'..........'],
+                    [*'..........'],
+                    [*'..........'],
+                    [*'....#...##'],
+                    [*'....#...#.'],
+                    [*'..###...#.'],
+                    [*'........#.'],
+                    [*'........#.'],
+                    [*'#########.'],
+                ],
+                (500,0),
+                494
+            )
+        )
+
+class TestSandCounter(unittest.TestCase):
     def test_sand_counter(self):
         with open("Day14_test_input.txt") as input_file:
             raw_data = input_file.read()
