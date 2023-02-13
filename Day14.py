@@ -137,7 +137,7 @@ def drop_sand_floor(defined_nodes_dict, sand_coord, index_values_dict):
     while down_space:  # drop down as far as possible
         drop_coord = (sand_coord[0], sand_coord[1] + 1)
         if ((drop_coord in defined_nodes_dict["rock_nodes"].union(defined_nodes_dict["sand_nodes"])) or
-                (drop_coord[1] == index_values_dict["max_y"]+2)):  # hits rock or sand
+                (drop_coord[1] == index_values_dict["max_y"] + 2)):  # hits rock or sand
             down_space = False  # try diagonal directions
         else:
             sand_coord = drop_coord
@@ -146,13 +146,13 @@ def drop_sand_floor(defined_nodes_dict, sand_coord, index_values_dict):
     drop_coord = (sand_coord[0] - 1, sand_coord[1] + 1)
     if ((drop_coord not in defined_nodes_dict["rock_nodes"].union(
             defined_nodes_dict["sand_nodes"])) and
-            (not drop_coord[1] == index_values_dict["max_y"]+2)):  # drop down one spot
+            (not drop_coord[1] == index_values_dict["max_y"] + 2)):  # drop down one spot
         return drop_sand_floor(defined_nodes_dict, drop_coord, index_values_dict)  # and remodel
     else:  # hits rock or sand or floor
         drop_coord = (sand_coord[0] + 1, sand_coord[1] + 1)  # try down and to the right
         if ((drop_coord not in defined_nodes_dict["rock_nodes"].union(
                 defined_nodes_dict["sand_nodes"])) and
-                (not drop_coord[1] == index_values_dict["max_y"]+2)):  # drop down one spot
+                (not drop_coord[1] == index_values_dict["max_y"] + 2)):  # drop down one spot
             return drop_sand_floor(defined_nodes_dict, drop_coord, index_values_dict)  # and remodel
         else:  # hits rock or sand or floor
             if sand_coord == next(iter(defined_nodes_dict["origin_node"])):
@@ -190,7 +190,8 @@ def add_sand(defined_nodes_dict, sand_source_coord, index_values_dict, has_floor
 
     else:
         while not full:
-            if sand_count == 93:
+            if sand_count % 20000 == 0:
+                print(sand_count)
                 visualize_cave(defined_nodes_dict)
             try:
                 rest_posn, full = drop_sand_floor(defined_nodes_dict, sand_source_coord, index_values_dict)
@@ -198,6 +199,8 @@ def add_sand(defined_nodes_dict, sand_source_coord, index_values_dict, has_floor
                 print(sand_count)
             if not full:
                 defined_nodes_dict["sand_nodes"].add(rest_posn)
+                # remove sand that's under the new sand to limit the size of the set
+                defined_nodes_dict["sand_nodes"].discard((rest_posn[0], rest_posn[1] + 2))
             sand_count += 1
         return sand_count
 
