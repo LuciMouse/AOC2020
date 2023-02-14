@@ -212,13 +212,13 @@ def beacon_exclusion(raw_input, y_row):
     """
     locations_tuple = parse_input(raw_input)
 
-    row_locations_tuple = crossing_locations(locations_tuple, y_row) #limit to only postions that cross y_row
+    row_locations_tuple = crossing_locations(locations_tuple, y_row)  # limit to only postions that cross y_row
 
     excluded_positions_set = set()
 
     for curr_position in row_locations_tuple:
         excluded_positions_set = excluded_positions_set.union(
-        exclude_positions(curr_position, y_row)
+            exclude_positions(curr_position, y_row)
         )
 
     return len(excluded_positions_set) - 1
@@ -233,19 +233,26 @@ def find_tuning_frequency(raw_input, max_value):
     """
     locations_tuple = parse_input(raw_input)
 
-
-
-    #check each row
-    for row_num in range(max_value+1):
-        for curr_position in locations_tuple:
-            excluded_positions_set = set()
-            excluded_positions_set = { x for x in exclude_positions(curr_position, excluded_positions_set, row_num)}
-            if len(excluded_positions_set)>1:
-                print("foo")
-
-
-    return tuning_frequency
+    # check each row
+    for row_num in range(max_value + 1):
+        row_locations_tuple = crossing_locations(locations_tuple, row_num)
+        excluded_positions_set = set()
+        for curr_position in row_locations_tuple:
+            excluded_positions_set = excluded_positions_set.union(
+                exclude_positions(curr_position, row_num)
+            )
+        filtered_exclusion_position_set = {position for position in excluded_positions_set if
+                                           ((position[0] <= max_value) and (position[1] <= max_value) and (
+                                                   position[0] >= 0) and (position[1]) >= 0)}
+        if len(filtered_exclusion_position_set) <= max_value:  # there's a position missing from the set
+            x_posn = list(
+                {x for x in range(max_value + 1)}.difference(
+                    {position[0] for position in filtered_exclusion_position_set})
+            )[0]
+            tuning_frequency = (x_posn * 4000000) + row_num
+            return tuning_frequency
 
 
 if __name__ == '__main__':
     print(f"There are {beacon_exclusion(data, 2000000)} positions on row y=2000000 that cannot contain a beacon")
+    print(f"The tuning frequency of the distress beacon is {find_tuning_frequency(data, 4000000)}")
