@@ -215,6 +215,43 @@ def crossing_locations(locations_tuple, y_row):
     crossing_locations_tuple = tuple([x for x in locations_tuple if is_crossing(x, y_row)])
     return crossing_locations_tuple
 
+def is_overlapping_range(range_1, range_2):
+    """
+    determines if two ranges are overlapping
+    :param range_1: first range to compare
+    :param range_2: second range to compare
+    :return: bool if ranges are overlapping
+
+    >>> is_overlapping_range((12,12),(12,14))
+    True
+
+    >>> is_overlapping_range((12,12),(10,12))
+    True
+
+    >>> is_overlapping_range((12,16),(10,14))
+    True
+
+    >>> is_overlapping_range((12,16),(14,18))
+    True
+
+    >>> is_overlapping_range((12,16),(12,14))
+    True
+
+    >>> is_overlapping_range((12,16),(16,18))
+    True
+
+    >>> is_overlapping_range((12,16),(10,12))
+    True
+
+    >>> is_overlapping_range((10,13),(14,18))
+    False
+    """
+    if (range_1[0] >= range_2[0]) and (range_1[0] <= range_2[1]):
+        return True
+    elif (range_1[1] >= range_2[0]) and (range_1[1] <= range_2[1]):
+        return True
+    else:
+        return False
 
 def beacon_exclusion(raw_input, y_row):
     """
@@ -231,6 +268,9 @@ def beacon_exclusion(raw_input, y_row):
 
     for curr_pair in row_locations_tuple:
         new_range = exclude_positions(curr_pair, y_row)
+        #does this new range overlap a range in the set?
+
+        print("foo")
 
     return len(excluded_positions_set) - 1
 
