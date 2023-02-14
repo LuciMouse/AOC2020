@@ -7,16 +7,16 @@ class TestParseInput(unittest.TestCase):
             raw_data = input_file.read()
         self.assertEqual(
             {
-                'AA': {'flow_rate': 0, 'child valves': ['DD', 'II', 'BB']},
-                'BB': {'flow_rate': 13, 'child valves': ['CC', 'AA']},
-                'CC': {'flow_rate': 2, 'child valves': ['DD', 'BB']},
-                'DD': {'flow_rate': 20, 'child valves': ['CC', 'AA', 'EE']},
-                'EE': {'flow_rate': 3, 'child valves': ['FF', 'DD']},
-                'FF': {'flow_rate': 0, 'child valves': ['EE', 'GG']},
-                'GG': {'flow_rate': 0, 'child valves': ['FF', 'HH']},
-                'HH': {'flow_rate': 22, 'child valves': ['GG']},
-                'II': {'flow_rate': 0, 'child valves': ['AA', 'JJ']},
-                'JJ': {'flow_rate': 21, 'child valves': ['II']},
+                'AA': {'flow_rate': 0, 'child_valves': ['DD', 'II', 'BB']},
+                'BB': {'flow_rate': 13, 'child_valves': ['CC', 'AA']},
+                'CC': {'flow_rate': 2, 'child_valves': ['DD', 'BB']},
+                'DD': {'flow_rate': 20, 'child_valves': ['CC', 'AA', 'EE']},
+                'EE': {'flow_rate': 3, 'child_valves': ['FF', 'DD']},
+                'FF': {'flow_rate': 0, 'child_valves': ['EE', 'GG']},
+                'GG': {'flow_rate': 0, 'child_valves': ['FF', 'HH']},
+                'HH': {'flow_rate': 22, 'child_valves': ['GG']},
+                'II': {'flow_rate': 0, 'child_valves': ['AA', 'JJ']},
+                'JJ': {'flow_rate': 21, 'child_valves': ['II']},
              },
             Day16.parse_input(raw_data)
         )
