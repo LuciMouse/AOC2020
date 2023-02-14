@@ -88,39 +88,28 @@ def excluded_row_positions(center_posn, horiz_distance):
     return excluded_positions_set
 
 
-def find_excluded_positions(sensor_tuple, manhattan_distance):
+def find_excluded_positions(sensor_tuple, manhattan_distance, y_row):
     """
     given a sensor locations, returns the set of all positions that are within a specified distance from it
     :param sensor_tuple: location of sensor
     :param manhattan_distance: distance from sensor
     :return: set of all positions within manhattan_distance from sensor_tuple
 
-    >>> find_excluded_positions((0,11),3) == { (0, 8), (-1, 9), (0, 9),(1, 9),(-2, 10),(-1, 10),(0, 10),(1, 10),(2, 10),(-3, 11),(-2, 11),(-1, 11),(0, 11),(1, 11),(2, 11),(3, 11),(-2, 12),(-1, 12),(0, 12),(1, 12),(2, 12),(-1, 13),(0, 13),(1, 13),(0, 14),}
+    >>> find_excluded_positions((0,11),3,10) == { (-2, 10),(-1, 10),(0, 10),(1, 10),(2, 10)}
     True
     """
 
     sensor_x = sensor_tuple[0]
     sensor_y = sensor_tuple[1]
 
-    excluded_positions_set = set()
+    #calculate distance between y_row and sensor
+    y_dist = abs(sensor_y - y_row)
 
-    # calculate in two parts (split vertically)
-
-    for index in range(manhattan_distance + 1):  # up
-        excluded_positions_set = excluded_positions_set.union(
-            excluded_row_positions(
-                (sensor_x, sensor_y - index),
-                manhattan_distance - index
+    excluded_positions_set = excluded_row_positions(
+                (sensor_x, y_row),
+                manhattan_distance - y_dist
             )
-        )
 
-    for index in range(1, manhattan_distance + 1):  # down
-        excluded_positions_set = excluded_positions_set.union(
-            excluded_row_positions(
-                (sensor_x, sensor_y + index),
-                manhattan_distance - index
-            )
-        )
     return excluded_positions_set
 
 
@@ -132,7 +121,7 @@ def exclude_positions(location_tuple, excluded_positions_set, y_row):
     :param excluded_positions_set: current set of excluded positions
     :return: updated excluded_positions_set
 
-    >>> exclude_positions(((0,11),(2,10)),set()) ==  { (0, 8), (-1, 9), (0, 9),(1, 9),(-2, 10),(-1, 10),(0, 10),(1, 10),(2, 10),(-3, 11),(-2, 11),(-1, 11),(0, 11),(1, 11),(2, 11),(3, 11),(-2, 12),(-1, 12),(0, 12),(1, 12),(2, 12),(-1, 13),(0, 13),(1, 13),(0, 14),}
+    >>> exclude_positions(((0,11),(2,10)),set(),10) ==  { (-2, 10),(-1, 10),(0, 10),(1, 10),(2, 10)}
     True
     """
     sensor_tuple = location_tuple[0]
@@ -140,7 +129,7 @@ def exclude_positions(location_tuple, excluded_positions_set, y_row):
 
     manhattan_distance = find_manhattan_distance(sensor_tuple, beacon_tuple)
     excluded_positions_set = excluded_positions_set.union(
-        find_excluded_positions(sensor_tuple, manhattan_distance)
+        find_excluded_positions(sensor_tuple, manhattan_distance, y_row)
     )
     return excluded_positions_set
 
