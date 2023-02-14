@@ -113,7 +113,7 @@ def find_excluded_positions(sensor_tuple, manhattan_distance, y_row):
     return excluded_positions_set
 
 
-def exclude_positions(location_tuple, excluded_positions_set, y_row):
+def exclude_positions(location_tuple, y_row):
     """
     given a sensor/beacon location, determines all positions that cannot contain a beacon that are within y_row
     :param y_row: row to limit positions to
@@ -128,9 +128,8 @@ def exclude_positions(location_tuple, excluded_positions_set, y_row):
     beacon_tuple = location_tuple[1]
 
     manhattan_distance = find_manhattan_distance(sensor_tuple, beacon_tuple)
-    excluded_positions_set = excluded_positions_set.union(
-        find_excluded_positions(sensor_tuple, manhattan_distance, y_row)
-    )
+    excluded_positions_set = find_excluded_positions(sensor_tuple, manhattan_distance, y_row)
+
     return excluded_positions_set
 
 
@@ -213,12 +212,14 @@ def beacon_exclusion(raw_input, y_row):
     """
     locations_tuple = parse_input(raw_input)
 
-    row_locations_tuple = crossing_locations(locations_tuple, y_row)
+    row_locations_tuple = crossing_locations(locations_tuple, y_row) #limit to only postions that cross y_row
 
     excluded_positions_set = set()
 
     for curr_position in row_locations_tuple:
-        excluded_positions_set = exclude_positions(curr_position, excluded_positions_set, y_row)
+        excluded_positions_set = excluded_positions_set.union(
+        exclude_positions(curr_position, y_row)
+        )
 
     return len(excluded_positions_set) - 1
 
@@ -232,7 +233,16 @@ def find_tuning_frequency(raw_input, max_value):
     """
     locations_tuple = parse_input(raw_input)
 
-    row_locations_tuple = crossing_locations(locations_tuple, y_row)
+
+
+    #check each row
+    for row_num in range(max_value+1):
+        for curr_position in locations_tuple:
+            excluded_positions_set = set()
+            excluded_positions_set = { x for x in exclude_positions(curr_position, excluded_positions_set, row_num)}
+            if len(excluded_positions_set)>1:
+                print("foo")
+
 
     return tuning_frequency
 
