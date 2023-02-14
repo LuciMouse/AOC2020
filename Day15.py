@@ -102,13 +102,13 @@ def find_excluded_positions(sensor_tuple, manhattan_distance, y_row):
     sensor_x = sensor_tuple[0]
     sensor_y = sensor_tuple[1]
 
-    #calculate distance between y_row and sensor
+    # calculate distance between y_row and sensor
     y_dist = abs(sensor_y - y_row)
 
     excluded_positions_set = excluded_row_positions(
-                (sensor_x, y_row),
-                manhattan_distance - y_dist
-            )
+        (sensor_x, y_row),
+        manhattan_distance - y_dist
+    )
 
     return excluded_positions_set
 
@@ -183,10 +183,12 @@ def is_crossing(curr_tuple, y_row):
         return True
     else:
         manhattan_distance = find_manhattan_distance(*curr_tuple)
-        if (sensor_tuple_y-manhattan_distance <= y_row) and (sensor_tuple_y+manhattan_distance >= y_row): #y_row is within manhattan_distance from the sensor
+        if (sensor_tuple_y - manhattan_distance <= y_row) and (
+                sensor_tuple_y + manhattan_distance >= y_row):  # y_row is within manhattan_distance from the sensor
             return True
-        else: #sensor pair does not cross y_row
+        else:  # sensor pair does not cross y_row
             return False
+
 
 def crossing_locations(locations_tuple, y_row):
     """
@@ -198,8 +200,9 @@ def crossing_locations(locations_tuple, y_row):
     >>> crossing_locations((((2, 18), (-2, 15)),((9, 16), (10, 16)), ((13, 2), (15, 3)),((12, 14), (10, 16)),((10, 20), (10, 16)),((14, 17), (10, 16)),((8, 7), (2, 10)),((2, 0), (2, 10)),((0, 11), (2, 10)),((20, 14), (25, 17)),((17, 20), (21, 22)),((16, 7), (15, 3)),((14, 3), (15, 3)),((20, 1), (15, 3))),10)
     (((12, 14), (10, 16)), ((8, 7), (2, 10)), ((2, 0), (2, 10)), ((0, 11), (2, 10)), ((20, 14), (25, 17)), ((16, 7), (15, 3)))
     """
-    crossing_locations_tuple = tuple([x for x in locations_tuple if is_crossing(x,y_row)])
+    crossing_locations_tuple = tuple([x for x in locations_tuple if is_crossing(x, y_row)])
     return crossing_locations_tuple
+
 
 def beacon_exclusion(raw_input, y_row):
     """
@@ -217,8 +220,21 @@ def beacon_exclusion(raw_input, y_row):
     for curr_position in row_locations_tuple:
         excluded_positions_set = exclude_positions(curr_position, excluded_positions_set, y_row)
 
-    row_positions = {x for x in excluded_positions_set if x[1] == y_row}
-    return len(row_positions) - 1
+    return len(excluded_positions_set) - 1
+
+
+def find_tuning_frequency(raw_input, max_value):
+    """
+    given
+    :param max_value: maximum value for either x or y coordinate
+    :param raw_input: raw input of sensor and beacon locations
+    :return: tuning frequency
+    """
+    locations_tuple = parse_input(raw_input)
+
+    row_locations_tuple = crossing_locations(locations_tuple, y_row)
+
+    return tuning_frequency
 
 
 if __name__ == '__main__':

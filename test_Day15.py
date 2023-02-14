@@ -33,8 +33,19 @@ class TestBeaconExclusion(unittest.TestCase):
             raw_input = input_file.read()
         self.assertEqual(
             26,
-            Day15.beacon_exclusion(raw_input,10)
+            Day15.beacon_exclusion(raw_input, 10)
         )
+
+
+class TestFindTuningFrequency(unittest.TestCase):
+    def test_find_tuning_frequency(self):
+        with open("Day15_test_input.txt") as input_file:
+            raw_input = input_file.read()
+        self.assertEqual(
+            56000011,
+            Day15.find_tuning_frequency(raw_input, 20)
+        )
+
 
 if __name__ == '__main__':
     unittest.main()
