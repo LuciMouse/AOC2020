@@ -373,10 +373,12 @@ def find_tuning_frequency(raw_input, max_value):
 
     # check each row
     for row_num in range(max_value + 1):
+        if row_num%10000 == 0:
+            print(row_num)
         row_locations_tuple = crossing_locations(locations_tuple, row_num)
         excluded_ranges_set = set()
         for curr_pair in row_locations_tuple:
-            new_range = exclude_positions(curr_pair, row_num)
+            new_range = exclude_positions(curr_pair, row_num, max_value)
             # does this new range_tuple overlap a range_tuple in the set? if so, collapse
             excluded_ranges_set = range_collapse(new_range, excluded_ranges_set)
 
