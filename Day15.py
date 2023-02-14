@@ -85,7 +85,7 @@ def excluded_row_positions(center_posn, horiz_distance, max_value=None):
 
     if max_value:
         range_min = 0 if center_x_posn - horiz_distance < 0 else center_x_posn - horiz_distance
-        range_max = max_value  if center_x_posn + horiz_distance + 1 > max_value else center_x_posn + horiz_distance
+        range_max = max_value if center_x_posn + horiz_distance + 1 > max_value else center_x_posn + horiz_distance
         return range_min, range_max
 
     else:
@@ -215,6 +215,7 @@ def crossing_locations(locations_tuple, y_row):
     crossing_locations_tuple = tuple([x for x in locations_tuple if is_crossing(x, y_row)])
     return crossing_locations_tuple
 
+
 def is_overlapping_range(range_1, range_2):
     """
     determines if two ranges are overlapping
@@ -275,6 +276,7 @@ def is_overlapping_range(range_1, range_2):
     else:
         return False
 
+
 def extend_ranges(new_range, overlapping_ranges):
     """
     extends the ranges in overlapping ranges by new_range
@@ -291,6 +293,7 @@ def extend_ranges(new_range, overlapping_ranges):
         range_max = curr_range[1] if curr_range[1] >= new_range[1] else new_range[1]
         processed_ranges.add((range_min, range_max))
     return processed_ranges
+
 
 def range_collapse(new_range, excluded_ranges_set):
     """
@@ -318,15 +321,16 @@ def range_collapse(new_range, excluded_ranges_set):
     True
     """
     overlapping_ranges = {range_tuple for range_tuple in excluded_ranges_set if
-                         is_overlapping_range(new_range, range_tuple)}
+                          is_overlapping_range(new_range, range_tuple)}
     non_overlapping_ranges = excluded_ranges_set.difference(overlapping_ranges)
     if overlapping_ranges:
         # extend the existing ranges by new_range
         processed_ranges = extend_ranges(new_range, overlapping_ranges)
         # do any of the extended ranges overlap with each other?
-        overlapping_processed_ranges = {range_tuple for range_tuple in processed_ranges if sum({is_overlapping_range(range_1, range_tuple) for range_1 in processed_ranges.difference({range_tuple})})>0}
+        overlapping_processed_ranges = {range_tuple for range_tuple in processed_ranges if sum(
+            {is_overlapping_range(range_1, range_tuple) for range_1 in processed_ranges.difference({range_tuple})}) > 0}
         while overlapping_processed_ranges:
-            curr_range = next(iter(overlapping_processed_ranges)) #first item in set
+            curr_range = next(iter(overlapping_processed_ranges))  # first item in set
             processed_ranges = extend_ranges(curr_range, overlapping_processed_ranges.difference({curr_range}))
             overlapping_processed_ranges = {range_tuple for range_tuple in processed_ranges if sum(
                 {is_overlapping_range(range_1, range_tuple) for range_1 in
@@ -335,6 +339,7 @@ def range_collapse(new_range, excluded_ranges_set):
     else:
         excluded_ranges_set.add(new_range)
         return excluded_ranges_set
+
 
 def beacon_exclusion(raw_input, y_row):
     """
@@ -351,13 +356,10 @@ def beacon_exclusion(raw_input, y_row):
 
     for curr_pair in row_locations_tuple:
         new_range = exclude_positions(curr_pair, y_row)
-        #does this new range_tuple overlap a range_tuple in the set? if so, collapse
+        # does this new range_tuple overlap a range_tuple in the set? if so, collapse
         excluded_ranges_set = range_collapse(new_range, excluded_ranges_set)
 
-
-
-
-    return sum([x[1]-x[0] for x in excluded_ranges_set])
+    return sum([x[1] - x[0] for x in excluded_ranges_set])
 
 
 def find_tuning_frequency(raw_input, max_value):
@@ -372,17 +374,15 @@ def find_tuning_frequency(raw_input, max_value):
     # check each row
     for row_num in range(max_value + 1):
         row_locations_tuple = crossing_locations(locations_tuple, row_num)
-        excluded_positions_set = set()
-        for curr_position in row_locations_tuple:
-            excluded_positions_set = excluded_positions_set.union(
-                exclude_positions(curr_position, row_num, max_value)
-            )
+        excluded_ranges_set = set()
+        for curr_pair in row_locations_tuple:
+            new_range = exclude_positions(curr_pair, row_num)
+            # does this new range_tuple overlap a range_tuple in the set? if so, collapse
+            excluded_ranges_set = range_collapse(new_range, excluded_ranges_set)
 
-        if len(excluded_positions_set) <= max_value:  # there's a position missing from the set
-            x_posn = list(
-                {x for x in range(max_value + 1)}.difference(
-                    {position[0] for position in excluded_positions_set})
-            )[0]
+        if len(excluded_ranges_set) > 1:  # the range is discontinuous
+            sorted_range = sorted(excluded_ranges_set)
+            x_posn = sorted_range[0][1]+1
             tuning_frequency = (x_posn * 4000000) + row_num
             return tuning_frequency
 
