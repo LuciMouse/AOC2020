@@ -373,7 +373,7 @@ def find_tuning_frequency(raw_input, max_value):
 
     # check each row
     for row_num in range(max_value + 1):
-        if row_num%10000 == 0:
+        if row_num % 100000 == 0:
             print(row_num)
         row_locations_tuple = crossing_locations(locations_tuple, row_num)
         excluded_ranges_set = set()
@@ -384,7 +384,7 @@ def find_tuning_frequency(raw_input, max_value):
 
         if len(excluded_ranges_set) > 1:  # the range is discontinuous
             sorted_range = sorted(excluded_ranges_set)
-            x_posn = sorted_range[0][1]+1
+            x_posn = sorted_range[0][1] + 1
             tuning_frequency = (x_posn * 4000000) + row_num
             return tuning_frequency
 
