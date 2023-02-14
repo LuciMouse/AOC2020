@@ -63,9 +63,10 @@ def find_manhattan_distance(sensor_tuple, beacon_tuple):
     return manhattan_distance
 
 
-def excluded_row_positions(center_posn, horiz_distance):
+def excluded_row_positions(center_posn, horiz_distance, max_value=None):
     """
     Finds the excluded positions in a row given the center position and the distance from the center
+    :param max_value: maximum acceptable x value.  also sets the minimum value ot 0.  If omitted, allows all values
     :param center_posn: center position of the row
     :param horiz_distance: distance from the center to exclude
     :return: set of excluded positions in the row
@@ -76,14 +77,23 @@ def excluded_row_positions(center_posn, horiz_distance):
     >>> excluded_row_positions((0,10), 2) == {(-2, 10),(-1, 10),(0, 10),(1, 10), (2, 10) }
     True
 
+    >>> excluded_row_positions((0,10), 2, 1) == {(0, 10),(1, 10)}
+    True
+
     """
     center_x_posn = center_posn[0]
     center_y_posn = center_posn[1]
 
     excluded_positions_set = set()
 
-    for x_posn in range(center_x_posn - horiz_distance, center_x_posn + horiz_distance + 1):
-        excluded_positions_set.add((x_posn, center_y_posn))
+    if max_value:
+        range_min = 0 if center_x_posn - horiz_distance < 0 else center_x_posn - horiz_distance
+        range_max = max_value + 1 if center_x_posn + horiz_distance + 1 > max_value else center_x_posn + horiz_distance + 1
+        for x_posn in range(range_min, range_max):
+            excluded_positions_set.add((x_posn, center_y_posn))
+    else:
+        for x_posn in range(center_x_posn - horiz_distance, center_x_posn + horiz_distance + 1):
+            excluded_positions_set.add((x_posn, center_y_posn))
 
     return excluded_positions_set
 
