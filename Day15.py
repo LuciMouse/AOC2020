@@ -243,6 +243,24 @@ def is_overlapping_range(range_1, range_2):
     >>> is_overlapping_range((12,16),(10,12))
     True
 
+    >>> is_overlapping_range((4,16),(10,12))
+    True
+
+    >>> is_overlapping_range((12,16),(13,14))
+    True
+
+    >>> is_overlapping_range((11,11),(10,12))
+    True
+
+    >>> is_overlapping_range((12,16),(14,14))
+    True
+
+    >>> is_overlapping_range((12,16),(14,16))
+    True
+
+    >>> is_overlapping_range((12,16),(12,18))
+    True
+
     >>> is_overlapping_range((10,13),(14,18))
     False
     """
@@ -250,8 +268,73 @@ def is_overlapping_range(range_1, range_2):
         return True
     elif (range_1[1] >= range_2[0]) and (range_1[1] <= range_2[1]):
         return True
+    elif (range_1[0] >= range_2[0]) and (range_1[1] <= range_2[1]):
+        return True
+    elif (range_1[1] >= range_2[1]) and (range_1[0] <= range_2[0]):
+        return True
     else:
         return False
+
+def extend_ranges(new_range, overlapping_ranges):
+    """
+    extends the ranges in overlapping ranges by new_range
+    :param new_range: single range that overlaps each range in overlapping ranges
+    :param overlapping_ranges: set of ranges that overlap new_range
+    :return: set of ranges extended by new_range
+
+    >>> extend_ranges((5,10),{(1,5),(10,20),(2,7),(8,15)}) == {(1, 10), (5, 20), (2, 10), (5, 15)}
+    True
+    """
+    processed_ranges = set()
+    for curr_range in overlapping_ranges:
+        range_min = curr_range[0] if curr_range[0] <= new_range[0] else new_range[0]
+        range_max = curr_range[1] if curr_range[1] >= new_range[1] else new_range[1]
+        processed_ranges.add((range_min, range_max))
+    return processed_ranges
+
+def range_collapse(new_range, excluded_ranges_set):
+    """
+    given a range and a set of ranges, collapses overlapping ranges into single ranges
+    :param new_range: new range to consider adding to set of ranges
+    :param excluded_ranges_set: set of previously defined ranges
+    :return: updated excluded_ranges_set
+
+    >>> range_collapse((5, 10), {(1, 2), (15, 20)})== {(1, 2), (15, 20), (5, 10)}
+    True
+
+    >>> range_collapse((5, 10), {(1, 5), (15, 20)})== {(1, 10), (15, 20)}
+    True
+
+    >>> range_collapse((20, 30), {(1, 2), (15, 20)})== {(1, 2), (15, 30)}
+    True
+
+    >>> range_collapse((17, 30), {(1, 2), (15, 20)})== {(1, 2), (15, 30)}
+    True
+
+    >>> range_collapse((3, 17), {(1, 2), (15, 20)})== {(1, 2), (3, 20)}
+    True
+
+    >>> range_collapse((3, 17), {(1, 5), (15, 20)})== {(1, 20)}
+    True
+    """
+    overlapping_ranges = {range_tuple for range_tuple in excluded_ranges_set if
+                         is_overlapping_range(new_range, range_tuple)}
+    non_overlapping_ranges = excluded_ranges_set.difference(overlapping_ranges)
+    if overlapping_ranges:
+        # extend the existing ranges by new_range
+        processed_ranges = extend_ranges(new_range, overlapping_ranges)
+        # do any of the extended ranges overlap with each other?
+        overlapping_processed_ranges = {range_tuple for range_tuple in processed_ranges if sum({is_overlapping_range(range_1, range_tuple) for range_1 in processed_ranges.difference({range_tuple})})>0}
+        while overlapping_processed_ranges:
+            curr_range = next(iter(overlapping_processed_ranges)) #first item in set
+            processed_ranges = extend_ranges(curr_range, overlapping_processed_ranges.difference({curr_range}))
+            overlapping_processed_ranges = {range_tuple for range_tuple in processed_ranges if sum(
+                {is_overlapping_range(range_1, range_tuple) for range_1 in
+                 processed_ranges.difference({range_tuple})}) > 0}
+        return processed_ranges.union(non_overlapping_ranges)
+    else:
+        excluded_ranges_set.add(new_range)
+        return excluded_ranges_set
 
 def beacon_exclusion(raw_input, y_row):
     """
@@ -268,11 +351,13 @@ def beacon_exclusion(raw_input, y_row):
 
     for curr_pair in row_locations_tuple:
         new_range = exclude_positions(curr_pair, y_row)
-        #does this new range overlap a range in the set?
+        #does this new range_tuple overlap a range_tuple in the set? if so, collapse
+        excluded_ranges_set = range_collapse(new_range, excluded_ranges_set)
 
-        print("foo")
 
-    return len(excluded_positions_set) - 1
+
+
+    return sum([x[1]-x[0] for x in excluded_ranges_set])
 
 
 def find_tuning_frequency(raw_input, max_value):
