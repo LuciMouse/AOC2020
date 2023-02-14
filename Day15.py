@@ -131,11 +131,11 @@ def exclude_positions(location_tuple, y_row, max_value=None):
     :param location_tuple: location to analyze
     :return: range of excluded positions in the row
 
-    >>> exclude_positions(((0,11),(2,10)),10) ==  (-2, 2)
-    True
+    >>> exclude_positions(((0,11),(2,10)),10)
+    (-2, 2)
 
-    >>> exclude_positions(((0,11),(2,10)),10, 1) ==  (0,1)
-    True
+    >>> exclude_positions(((0,11),(2,10)),10, 1)
+    (0, 1)
     """
     sensor_tuple = location_tuple[0]
     beacon_tuple = location_tuple[1]
