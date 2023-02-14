@@ -98,14 +98,19 @@ def excluded_row_positions(center_posn, horiz_distance, max_value=None):
     return excluded_positions_set
 
 
-def find_excluded_positions(sensor_tuple, manhattan_distance, y_row):
+def find_excluded_positions(sensor_tuple, manhattan_distance, y_row, max_value=None):
     """
     given a sensor locations, returns the set of all positions that are within a specified distance from it
+    :param max_value: maximum acceptable x value.  also sets the minimum value ot 0.  If omitted, allows all values
+    :param y_row: row to limit positions to
     :param sensor_tuple: location of sensor
     :param manhattan_distance: distance from sensor
     :return: set of all positions within manhattan_distance from sensor_tuple
 
     >>> find_excluded_positions((0,11),3,10) == { (-2, 10),(-1, 10),(0, 10),(1, 10),(2, 10)}
+    True
+
+    >>> find_excluded_positions((0,10), 2, 10, 1) == {(0, 10),(1, 10)}
     True
     """
 
@@ -117,7 +122,8 @@ def find_excluded_positions(sensor_tuple, manhattan_distance, y_row):
 
     excluded_positions_set = excluded_row_positions(
         (sensor_x, y_row),
-        manhattan_distance - y_dist
+        manhattan_distance - y_dist,
+        max_value
     )
 
     return excluded_positions_set
