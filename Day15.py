@@ -65,53 +65,46 @@ def find_manhattan_distance(sensor_tuple, beacon_tuple):
 
 def excluded_row_positions(center_posn, horiz_distance, max_value=None):
     """
-    Finds the excluded positions in a row given the center position and the distance from the center
+    Finds range of  excluded positions in a row given the center position and the distance from the center
     :param max_value: maximum acceptable x value.  also sets the minimum value ot 0.  If omitted, allows all values
     :param center_posn: center position of the row
     :param horiz_distance: distance from the center to exclude
-    :return: set of excluded positions in the row
+    :return: range of excluded positions in the row
 
     >>> excluded_row_positions((0,8),0)
-    {(0, 8)}
+    (0, 0)
 
-    >>> excluded_row_positions((0,10), 2) == {(-2, 10),(-1, 10),(0, 10),(1, 10), (2, 10) }
-    True
+    >>> excluded_row_positions((0,10), 2)
+    (-2, 2)
 
-    >>> excluded_row_positions((0,10), 2, 1) == {(0, 10),(1, 10)}
-    True
+    >>> excluded_row_positions((0,10), 2, 1)
+    (0, 1)
 
     """
     center_x_posn = center_posn[0]
-    center_y_posn = center_posn[1]
-
-    excluded_positions_set = set()
 
     if max_value:
         range_min = 0 if center_x_posn - horiz_distance < 0 else center_x_posn - horiz_distance
-        range_max = max_value + 1 if center_x_posn + horiz_distance + 1 > max_value else center_x_posn + horiz_distance + 1
-        for x_posn in range(range_min, range_max):
-            excluded_positions_set.add((x_posn, center_y_posn))
+        range_max = max_value  if center_x_posn + horiz_distance + 1 > max_value else center_x_posn + horiz_distance
+        return range_min, range_max
+
     else:
-        for x_posn in range(center_x_posn - horiz_distance, center_x_posn + horiz_distance + 1):
-            excluded_positions_set.add((x_posn, center_y_posn))
-
-    return excluded_positions_set
+        return center_x_posn - horiz_distance, center_x_posn + horiz_distance
 
 
-def find_excluded_positions(sensor_tuple, manhattan_distance, y_row, max_value=None):
+def find_excluded_range(sensor_tuple, manhattan_distance, y_row, max_value=None):
     """
-    given a sensor locations, returns the set of all positions that are within a specified distance from it
+    given a sensor locations, returns the range of positions that are within a specified distance from it
     :param max_value: maximum acceptable x value.  also sets the minimum value ot 0.  If omitted, allows all values
     :param y_row: row to limit positions to
     :param sensor_tuple: location of sensor
     :param manhattan_distance: distance from sensor
-    :return: set of all positions within manhattan_distance from sensor_tuple
+    :return: range of min,max values that should be excluded
 
-    >>> find_excluded_positions((0,11),3,10) == { (-2, 10),(-1, 10),(0, 10),(1, 10),(2, 10)}
+    >>> find_excluded_range((0,11),3,10) == (-2, 2)
     True
 
-    >>> find_excluded_positions((0,10), 2, 10, 1) == {(0, 10),(1, 10)}
-    True
+    >>> find_excluded_range((0,10), 2, 10, 1) == (0, 1)
     """
 
     sensor_x = sensor_tuple[0]
@@ -120,36 +113,36 @@ def find_excluded_positions(sensor_tuple, manhattan_distance, y_row, max_value=N
     # calculate distance between y_row and sensor
     y_dist = abs(sensor_y - y_row)
 
-    excluded_positions_set = excluded_row_positions(
+    excluded_position_range = excluded_row_positions(
         (sensor_x, y_row),
         manhattan_distance - y_dist,
         max_value
     )
 
-    return excluded_positions_set
+    return excluded_position_range
 
 
 def exclude_positions(location_tuple, y_row, max_value=None):
     """
-    given a sensor/beacon location, determines all positions that cannot contain a beacon that are within y_row
+    given a sensor/beacon location, determines the range of positions that cannot contain a beacon that are within y_row
     :param y_row: row to limit positions to
     :param max_value: maximum acceptable x value.  also sets the minimum value ot 0.  If omitted, allows all values
     :param location_tuple: location to analyze
-    :return: updated excluded_positions_set
+    :return: range of excluded positions in the row
 
-    >>> exclude_positions(((0,11),(2,10)),10) ==  { (-2, 10),(-1, 10),(0, 10),(1, 10),(2, 10)}
+    >>> exclude_positions(((0,11),(2,10)),10) ==  (-2, 2)
     True
 
-    >>> exclude_positions(((0,11),(2,10)),10, 1) ==  {(0, 10),(1, 10)}
+    >>> exclude_positions(((0,11),(2,10)),10, 1) ==  (0,1)
     True
     """
     sensor_tuple = location_tuple[0]
     beacon_tuple = location_tuple[1]
 
     manhattan_distance = find_manhattan_distance(sensor_tuple, beacon_tuple)
-    excluded_positions_set = find_excluded_positions(sensor_tuple, manhattan_distance, y_row, max_value)
+    excluded_range = find_excluded_range(sensor_tuple, manhattan_distance, y_row, max_value)
 
-    return excluded_positions_set
+    return excluded_range
 
 
 def is_crossing(curr_tuple, y_row):
@@ -231,14 +224,12 @@ def beacon_exclusion(raw_input, y_row):
     """
     locations_tuple = parse_input(raw_input)
 
-    row_locations_tuple = crossing_locations(locations_tuple, y_row)  # limit to only postions that cross y_row
+    row_locations_tuple = crossing_locations(locations_tuple, y_row)  # limit to only positions that cross y_row
 
-    excluded_positions_set = set()
+    excluded_ranges_set = set()
 
-    for curr_position in row_locations_tuple:
-        excluded_positions_set = excluded_positions_set.union(
-            exclude_positions(curr_position, y_row)
-        )
+    for curr_pair in row_locations_tuple:
+        new_range = exclude_positions(curr_pair, y_row)
 
     return len(excluded_positions_set) - 1
 
