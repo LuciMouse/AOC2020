@@ -101,10 +101,11 @@ def find_excluded_range(sensor_tuple, manhattan_distance, y_row, max_value=None)
     :param manhattan_distance: distance from sensor
     :return: range of min,max values that should be excluded
 
-    >>> find_excluded_range((0,11),3,10) == (-2, 2)
-    True
+    >>> find_excluded_range((0,11),3,10)
+    (-2, 2)
 
-    >>> find_excluded_range((0,10), 2, 10, 1) == (0, 1)
+    >>> find_excluded_range((0,10), 2, 10, 1)
+    (0, 1)
     """
 
     sensor_x = sensor_tuple[0]
