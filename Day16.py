@@ -37,6 +37,57 @@ def parse_input(raw_data):
     return valve_dict
 
 
+def make_valve_dist_dict(valve_dict):
+    """
+    creates a dictionary  to store distances between working valves
+    :param valve_dict: dictionary of valves
+    :return: the dictionary containing edges with distance = 1
+    """
+    # dictionary to store distances between working valves
+    valve_dist_dict = {}
+
+    # only add working valves
+    for key, value in valve_dict.items():
+        if value['flow_rate'] > 0:
+            valve_dist_dict[key] = {}
+            for curr_child in value["child_valves"]:
+                if valve_dict[curr_child]['flow_rate'] > 0:
+                    valve_dist_dict[key][curr_child] = 1
+    return valve_dist_dict
+
+
+def distance_to_valve(start_node_name, target_valve_name, valve_dict, valve_dist_dict):
+    """
+    determines the distance between valves
+
+    passing back the dictionary value to allow for testing. Otherwise, would leave as global variable
+    :param start_node_name: name of the start node
+    :param target_valve_name: name of the target valve
+    :return: number of steps in between the two nodes and updated dictionary (if start_node_name was a node with an active valve)
+    """
+    if start_node_name in valve_dist_dict:  # if the distance is in the dictionary, return it
+        if target_valve_name in valve_dist_dict[start_node_name]:  # if it's already in the distance dictionary
+            return valve_dist_dict[start_node_name][target_valve_name], valve_dist_dict
+
+    # otherwise, calculate the distance and save it to the dictionary
+    numsteps = 0
+    nodes_ls = [start_node_name]
+    node_found = False
+    while not node_found:
+        new_node_ls = []
+        # walk through child nodes
+        for node_name in nodes_ls:
+            if target_valve_name in valve_dict[node_name]["child_valves"]:
+                node_found = True
+            else:
+                new_node_ls += valve_dict[node_name]["child_valves"]
+        numsteps += 1
+        nodes_ls = new_node_ls
+    if start_node_name in valve_dist_dict:
+        valve_dist_dict[start_node_name][target_valve_name] = numsteps
+    return numsteps, valve_dist_dict
+
+
 def max_pressure_release(raw_data):
     """
     determines the maximum pressure you can release in 30 minutes
@@ -45,81 +96,35 @@ def max_pressure_release(raw_data):
     """
     valve_dict = parse_input(raw_data)
 
-    paths_ls = [{
-        'curr_valve': 'AA',
-        'curr_total_pressure': 0,
-        'path_ls': ['AA'],
-        'open_valves_ls': []
-    }]
+    # find highest value valves and visit them in order
+    sorted_valves_by_flow_rate_ls = sorted(
+        valve_dict.items(),
+        key=lambda x: x[1]["flow_rate"],
+        reverse=True
+    )
 
-    for curr_time in range(30):
-        new_paths_ls = []
-        for curr_path in paths_ls:
-            curr_valve = curr_path['curr_valve']
-            if (valve_dict[curr_valve]['flow_rate'] != 0) and (curr_valve not in curr_path['open_valves_ls']): #if there's a valve to open
-                step_pressure = sum([valve_dict[valve]["flow_rate"] for valve in curr_path['open_valves_ls']])
-                total_pressure = curr_path['curr_total_pressure'] + step_pressure
-                curr_open_valves_ls = curr_path['open_valves_ls']+[curr_valve]
-                same_curr_valve_paths = [x for x in new_paths_ls if x["curr_valve"] == curr_valve]
-                if same_curr_valve_paths: #if there are other paths that end at the same curr_valve
-                    #keep the one with the highest curr_total_pressure
-                    future_step_pressure = sum([valve_dict[valve]["flow_rate"] for valve in curr_open_valves_ls])
-                    future_total_pressure = curr_path['curr_total_pressure'] + future_step_pressure
-                    paths_to_remove_ls = [x for x in same_curr_valve_paths if x["curr_total_pressure"]<future_total_pressure]
-                    if paths_to_remove_ls: #replace existing path with new path
-                        new_paths_ls.remove(paths_to_remove_ls[0])
-                        new_paths_ls.append(
-                            {
-                                'curr_valve': curr_valve,
-                                'curr_total_pressure': total_pressure,
-                                'path_ls': curr_path['path_ls']+[curr_valve],
-                                'open_valves_ls': curr_open_valves_ls,
-                            }
-                        )
-                else:
-                    new_paths_ls.append(
-                        {
-                            'curr_valve': curr_valve,
-                            'curr_total_pressure': curr_path['curr_total_pressure'] + step_pressure,
-                            'path_ls': curr_path['path_ls']+[curr_valve],
-                            'open_valves_ls': curr_path['open_valves_ls']+[curr_valve],
-                        }
-                    )
-            # add child valves
-            for curr_child in valve_dict[curr_valve]['child_valves']:
-                step_pressure = sum([valve_dict[valve]["flow_rate"] for valve in curr_path['open_valves_ls']])
-                total_pressure = curr_path['curr_total_pressure'] + step_pressure
-                same_curr_valve_paths = [x for x in new_paths_ls if x["curr_valve"] == curr_child]
-                if same_curr_valve_paths:  # if there are other paths that end at the same curr_child
-                    # keep the one with the highest curr_total_pressure
-                    paths_to_remove_ls = [x for x in same_curr_valve_paths if
-                                          x["curr_total_pressure"] < total_pressure]
-                    if paths_to_remove_ls: #replace existing path with new path
-                        new_paths_ls.remove(paths_to_remove_ls[0])
-                        new_paths_ls.append(
-                            {
-                                'curr_valve': curr_child,
-                                'curr_total_pressure': total_pressure,
-                                'path_ls': curr_path['path_ls']+[curr_child],
-                                'open_valves_ls': curr_path['open_valves_ls'].copy()
-                            }
-                        )
-                else:
-                    new_paths_ls.append(
-                        {
-                            'curr_valve': curr_child,
-                            'curr_total_pressure': total_pressure,
-                            'path_ls': curr_path['path_ls']+[curr_child],
-                            'open_valves_ls': curr_path['open_valves_ls']
-                        }
-                    )
+    # dictionary to store distances between working valves
+    valve_dist_dict = make_valve_dist_dict(valve_dict)
 
-        paths_ls = new_paths_ls
+    total_time = 30
 
-    pressure_ls = [x["curr_total_pressure"] for x in paths_ls]
-    max_pressure = max(pressure_ls)
+    # move from AA to first node
+    curr_node = "AA"
+    next_node = sorted_valves_by_flow_rate_ls[0][0]
+    time_left = total_time - distance_to_valve(curr_node, next_node, valve_dict, valve_dist_dict)[0]
+    curr_node = next_node
+    open_valves = [curr_node]
 
-    return  max_pressure
+    curr_total_pressure = 0
+
+    for index,curr_valve in sorted_valves_by_flow_rate_ls[1:].items():
+        next_node = curr_valve[0]
+        #can we get to the next valve in time?
+        time_to_valve = distance_to_valve(curr_node, next_node, valve_dict, valve_dist_dict)[0]
+        if  time_to_valve> time_left:
+
+
+    return max_pressure
 
 
 if __name__ == '__main__':

@@ -1,5 +1,7 @@
 import unittest
+import copy
 import Day16
+
 
 class TestParseInput(unittest.TestCase):
     def test_parse_input(self):
@@ -17,9 +19,77 @@ class TestParseInput(unittest.TestCase):
                 'HH': {'flow_rate': 22, 'child_valves': ['GG']},
                 'II': {'flow_rate': 0, 'child_valves': ['AA', 'JJ']},
                 'JJ': {'flow_rate': 21, 'child_valves': ['II']},
-             },
+            },
             Day16.parse_input(raw_data)
         )
+
+
+class TestMakeValveDistDict(unittest.TestCase):
+    def test_make_valvue_dist_dict(self):
+        with open("Day16_test_input.txt") as input_file:
+            raw_data = input_file.read()
+        valve_dict = Day16.parse_input(raw_data)
+        self.assertEqual(
+            {
+                'BB': {'CC': 1},
+                'CC': {'DD': 1, 'BB': 1},
+                'DD': {'CC': 1, 'EE': 1},
+                'EE': {'DD': 1}, 'HH': {},
+                'JJ': {}
+            },
+            Day16.make_valve_dist_dict(valve_dict)
+        )
+
+
+class TestDistanceToValve(unittest.TestCase):
+    def test_distance_to_valve(self):
+        with open("Day16_test_input.txt") as input_file:
+            raw_data = input_file.read()
+        valve_dict = Day16.parse_input(raw_data)
+        valve_dist_dict = Day16.make_valve_dist_dict(valve_dict)
+
+        #need to use deepcopy since the dictionary can get edited
+        self.assertEqual(
+            [
+                (1, {
+                    'BB': {'CC': 1},
+                    'CC': {'DD': 1, 'BB': 1},
+                    'DD': {'CC': 1, 'EE': 1},
+                    'EE': {'DD': 1}, 'HH': {},
+                    'JJ': {}
+                }),
+                (1, {
+                    'BB': {'CC': 1},
+                    'CC': {'DD': 1, 'BB': 1},
+                    'DD': {'CC': 1, 'EE': 1},
+                    'EE': {'DD': 1}, 'HH': {},
+                    'JJ': {}
+                }),
+                (2, {
+                    'BB': {'CC': 1, 'DD': 2},
+                    'CC': {'DD': 1, 'BB': 1},
+                    'DD': {'CC': 1, 'EE': 1},
+                    'EE': {'DD': 1},
+                    'HH': {},
+                    'JJ': {}
+                }),
+                (5, {
+                    'BB': {'CC': 1},
+                    'CC': {'DD': 1, 'BB': 1, 'HH': 5},
+                    'DD': {'CC': 1, 'EE': 1},
+                    'EE': {'DD': 1},
+                    'HH': {},
+                    'JJ': {}
+                }),
+            ],
+            [
+                Day16.distance_to_valve("DD", "CC", valve_dict, copy.deepcopy(valve_dist_dict)),#in dictionary
+                Day16.distance_to_valve("AA", "DD", valve_dict, copy.deepcopy(valve_dist_dict)),#in child_valves
+                Day16.distance_to_valve("BB", "DD", valve_dict, copy.deepcopy(valve_dist_dict)),#need to step
+                Day16.distance_to_valve("CC", "HH", valve_dict, copy.deepcopy(valve_dist_dict)),  # need to step
+            ]
+        )
+
 
 class TestMaxPressureRelease(unittest.TestCase):
     def test_max_pressure_release(self):
@@ -29,6 +99,7 @@ class TestMaxPressureRelease(unittest.TestCase):
             1651,
             Day16.max_pressure_release(raw_data)
         )
+
 
 if __name__ == '__main__':
     unittest.main()
