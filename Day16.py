@@ -52,7 +52,7 @@ def make_valve_dist_dict(valve_dict):
             valve_dist_dict[key] = {}
             for curr_child in value["child_valves"]:
                 if valve_dict[curr_child]['flow_rate'] > 0:
-                    valve_dist_dict[key][curr_child] = 1
+                    valve_dist_dict[key][curr_child] = 2 #takes an extra minute to open valve
     return valve_dist_dict
 
 
@@ -84,8 +84,10 @@ def distance_to_valve(start_node_name, target_valve_name, valve_dict, valve_dist
         numsteps += 1
         nodes_ls = new_node_ls
     if start_node_name in valve_dist_dict:
-        valve_dist_dict[start_node_name][target_valve_name] = numsteps
-    return numsteps, valve_dist_dict
+        # takes an extra minute to open valve
+        valve_dist_dict[start_node_name][target_valve_name] = numsteps+1
+
+    return numsteps+1, valve_dist_dict
 
 
 def max_pressure_release(raw_data):
@@ -98,7 +100,7 @@ def max_pressure_release(raw_data):
 
     # find highest value valves and visit them in order
     sorted_valves_by_flow_rate_ls = sorted(
-        valve_dict.items(),
+        {key:value for key,value in valve_dict.items() if value["flow_rate"]>0}.items(),
         key=lambda x: x[1]["flow_rate"],
         reverse=True
     )
@@ -113,18 +115,29 @@ def max_pressure_release(raw_data):
     next_node = sorted_valves_by_flow_rate_ls[0][0]
     time_left = total_time - distance_to_valve(curr_node, next_node, valve_dict, valve_dist_dict)[0]
     curr_node = next_node
-    open_valves = [curr_node]
+    open_valves_ls = [curr_node]
 
     curr_total_pressure = 0
 
-    for index,curr_valve in sorted_valves_by_flow_rate_ls[1:].items():
+    for curr_valve in sorted_valves_by_flow_rate_ls[1:]:
+        # can we get to the next valve in time?
         next_node = curr_valve[0]
-        #can we get to the next valve in time?
         time_to_valve = distance_to_valve(curr_node, next_node, valve_dict, valve_dist_dict)[0]
-        if  time_to_valve> time_left:
+        if time_to_valve < time_left:
+            # release pressure
+            step_pressure = sum([valve_dict[valve]["flow_rate"] for valve in open_valves_ls])
+            curr_total_pressure = curr_total_pressure + (step_pressure * time_to_valve)
+            #move to node
+            curr_node = next_node
+            open_valves_ls.append(curr_valve[0])
+            time_left -= time_to_valve
+
+    #if all valves are visited, purge for remaining time
+    step_pressure = sum([valve_dict[valve]["flow_rate"] for valve in open_valves_ls])
+    curr_total_pressure = curr_total_pressure + (step_pressure * time_left)
 
 
-    return max_pressure
+    return curr_total_pressure
 
 
 if __name__ == '__main__':

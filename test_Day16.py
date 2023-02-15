@@ -31,10 +31,10 @@ class TestMakeValveDistDict(unittest.TestCase):
         valve_dict = Day16.parse_input(raw_data)
         self.assertEqual(
             {
-                'BB': {'CC': 1},
-                'CC': {'DD': 1, 'BB': 1},
-                'DD': {'CC': 1, 'EE': 1},
-                'EE': {'DD': 1}, 'HH': {},
+                'BB': {'CC': 2},
+                'CC': {'DD': 2, 'BB': 2},
+                'DD': {'CC': 2, 'EE': 2},
+                'EE': {'DD': 2}, 'HH': {},
                 'JJ': {}
             },
             Day16.make_valve_dist_dict(valve_dict)
@@ -51,33 +51,35 @@ class TestDistanceToValve(unittest.TestCase):
         #need to use deepcopy since the dictionary can get edited
         self.assertEqual(
             [
-                (1, {
-                    'BB': {'CC': 1},
-                    'CC': {'DD': 1, 'BB': 1},
-                    'DD': {'CC': 1, 'EE': 1},
-                    'EE': {'DD': 1}, 'HH': {},
-                    'JJ': {}
-                }),
-                (1, {
-                    'BB': {'CC': 1},
-                    'CC': {'DD': 1, 'BB': 1},
-                    'DD': {'CC': 1, 'EE': 1},
-                    'EE': {'DD': 1}, 'HH': {},
-                    'JJ': {}
-                }),
                 (2, {
-                    'BB': {'CC': 1, 'DD': 2},
-                    'CC': {'DD': 1, 'BB': 1},
-                    'DD': {'CC': 1, 'EE': 1},
-                    'EE': {'DD': 1},
+                    'BB': {'CC': 2},
+                    'CC': {'DD': 2, 'BB': 2},
+                    'DD': {'CC': 2, 'EE': 2},
+                    'EE': {'DD': 2},
                     'HH': {},
                     'JJ': {}
                 }),
-                (5, {
-                    'BB': {'CC': 1},
-                    'CC': {'DD': 1, 'BB': 1, 'HH': 5},
-                    'DD': {'CC': 1, 'EE': 1},
-                    'EE': {'DD': 1},
+                (2, {
+                    'BB': {'CC': 2},
+                    'CC': {'DD': 2, 'BB': 2},
+                    'DD': {'CC': 2, 'EE': 2},
+                    'EE': {'DD': 2},
+                    'HH': {},
+                    'JJ': {}
+                }),
+                (3, {
+                    'BB': {'CC': 2, 'DD': 3},
+                    'CC': {'DD': 2, 'BB': 2},
+                    'DD': {'CC': 2, 'EE': 2},
+                    'EE': {'DD': 2},
+                    'HH': {},
+                    'JJ': {}
+                }),
+                (6, {
+                    'BB': {'CC': 2},
+                    'CC': {'DD': 2, 'BB': 2, 'HH': 6},
+                    'DD': {'CC': 2, 'EE': 2},
+                    'EE': {'DD': 2},
                     'HH': {},
                     'JJ': {}
                 }),
