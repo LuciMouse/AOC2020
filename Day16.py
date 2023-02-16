@@ -1,5 +1,4 @@
 from aocd import data
-from itertools import permutations
 
 
 def parse_valve(valve_string):
@@ -55,11 +54,7 @@ def make_valve_dist_dict(valve_dict):
                 if valve_dict[curr_child]['flow_rate'] > 0:
                     valve_dist_dict[key][curr_child] = 2 #takes an extra minute to open valve and a minute for it be effective
 
-    # do permutations to determine distances between all valves
-    perm = permutations(valve_dict.keys(), 2)
-    for start_node_name, target_valve_name in perm:
-        distance_to_valve(start_node_name, target_valve_name, valve_dict, valve_dist_dict)
-        #edited in place so no need to return
+
     return valve_dist_dict
 
 
@@ -107,20 +102,21 @@ def max_pressure_release(raw_data):
     """
     valve_dict = parse_input(raw_data)
 
-    # find highest value valves and visit them in order
-    sorted_valves_by_flow_rate_ls = sorted(
-        {key:value for key,value in valve_dict.items() if value["flow_rate"]>0}.items(),
-        key=lambda x: x[1]["flow_rate"],
-        reverse=True
-    )
-
     # dictionary to store distances between working valves
     valve_dist_dict = make_valve_dist_dict(valve_dict)
 
     total_time = 30
 
-    # move from AA to first node
+    # what's the highest value valve to move to?
+
     curr_node = "AA"
+    time_left = total_time
+    #for each valve, determine the flow rate * amount of time left for that valve to flow, Need to use function since "AA" is not a valve with flow rate
+
+    valve_values = []
+
+    # move from AA to first node
+
     next_node = sorted_valves_by_flow_rate_ls[0][0]
     time_left = total_time - distance_to_valve(curr_node, next_node, valve_dict, valve_dist_dict)[0]
     curr_node = next_node
