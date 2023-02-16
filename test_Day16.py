@@ -130,7 +130,32 @@ class TestCalculateValveValue(unittest.TestCase):
                 Day16.calculate_valve_value("DD", "BB", 30, valve_dict, valve_dist_dict)
             ]
         )
-
+class TestCalculatePathPressure(unittest.TestCase):
+    def test_calculate_path_pressure(self):
+        with open("Day16_test_input.txt") as input_file:
+            raw_data = input_file.read()
+        valve_dict = Day16.parse_input(raw_data)
+        valve_dist_dict = Day16.make_valve_dist_dict(valve_dict)
+        self.assertEqual(
+            [
+                1533,
+                1651,
+            ],
+            [
+                Day16.calculate_path_pressure(
+                    ['DD', 'JJ', 'HH', 'BB'],
+                    30,
+                    valve_dict,
+                    valve_dist_dict,
+                ),
+                Day16.calculate_path_pressure(
+                    ['DD', 'BB', 'JJ', 'HH','EE','CC'],
+                    30,
+                    valve_dict,
+                    valve_dist_dict,
+                )
+            ]
+        )
 
 class TestMaxPressureRelease(unittest.TestCase):
     def test_max_pressure_release(self):

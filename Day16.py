@@ -1,4 +1,5 @@
 from aocd import data
+from itertools import permutations
 
 
 def parse_valve(valve_string):
@@ -126,6 +127,33 @@ def highest_accessible_node(sorted_valve_values, time_left):
             return curr_valve
     return None
 
+def calculate_path_pressure(path_ls, total_time, valve_dict, valve_dist_dict):
+    """
+
+    :param path_ls:
+    :param total_time:
+    :param valve_dict:
+    :param valve_dist_dict:
+    :return:
+    """
+    total_pressure = 0
+    time_left = total_time
+    open_valves_ls = []
+    curr_node = "AA"
+    for valve in path_ls:
+        valve_activation_time = distance_to_valve(curr_node, valve, valve_dict, valve_dist_dict)[0]
+        if valve_activation_time <= time_left:
+            # release pressure
+            step_pressure = sum([valve_dict[valve_name]["flow_rate"] for valve_name in open_valves_ls])
+            total_pressure += step_pressure * valve_activation_time
+            # move to node
+            curr_node = valve
+            open_valves_ls.append(valve)
+            time_left -= valve_activation_time
+    # purge for the rest of the time
+    step_pressure = sum([valve_dict[valve_name]["flow_rate"] for valve_name in open_valves_ls])
+    total_pressure += step_pressure * time_left
+    return total_pressure,open_valves_ls
 
 def max_pressure_release(raw_data):
     """
@@ -139,18 +167,31 @@ def max_pressure_release(raw_data):
     valve_dist_dict = make_valve_dist_dict(valve_dict)
 
     total_time = 30
-
-    # what's the closest valve to move to?
-
     curr_node = "AA"
-    time_left = total_time
-    open_valves_ls = []
-    curr_total_pressure = 0
+
 
     valves_sorted_by_flow_rate_ls = sorted(valve_dist_dict, key = lambda x:valve_dict[x]["flow_rate"], reverse = True)
     max_flow_rate = valve_dict[valves_sorted_by_flow_rate_ls[0]]["flow_rate"]
     high_flow_valves ={x for x in valve_dist_dict if valve_dict[x]["flow_rate"]>max_flow_rate/2}
     low_flow_valves =set(valve_dist_dict).difference(high_flow_valves)
+
+    high_flow_permute = permutations(high_flow_valves)
+    low_flow_permute = permutations(low_flow_valves)
+
+    path_ls = []
+    for high_path in high_flow_permute:
+        for low_path in low_flow_permute:
+            path_ls.append(high_path+low_path)
+
+    max_pressure = 0
+    for curr_path in path_ls:
+        curr_total_pressure,open_valves_ls = calculate_path_pressure(curr_path, total_time, valve_dict, valve_dist_dict)
+
+
+        if curr_total_pressure>max_pressure:
+            max_pressure = curr_total_pressure
+            max_pressure_path = open_valves_ls
+
     while time_left >0:
         # for each valve, determine the highest valve to move to,
         sorted_valve_values = sorted(
