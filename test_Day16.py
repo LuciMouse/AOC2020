@@ -31,64 +31,65 @@ class TestMakeValveDistDict(unittest.TestCase):
         valve_dict = Day16.parse_input(raw_data)
         self.assertEqual(
             {
-                'BB': {'CC': 2},
-                'CC': {'DD': 2, 'BB': 2},
-                'DD': {'CC': 2, 'EE': 2},
-                'EE': {'DD': 2}, 'HH': {},
+                'BB': {'CC': 3},
+                'CC': {'DD': 3, 'BB': 3},
+                'DD': {'CC': 3, 'EE': 3},
+                'EE': {'DD': 3},
+                'HH': {},
                 'JJ': {}
             },
             Day16.make_valve_dist_dict(valve_dict)
         )
 
 
-class TestDistanceToValve(unittest.TestCase):
-    def test_distance_to_valve(self):
+class TestTimeToOpenValve(unittest.TestCase):
+    def test_time_to_open_valve(self):
         with open("Day16_test_input.txt") as input_file:
             raw_data = input_file.read()
         valve_dict = Day16.parse_input(raw_data)
         valve_dist_dict = Day16.make_valve_dist_dict(valve_dict)
 
-        #need to use deepcopy since the dictionary can get edited
+        # need to use deepcopy since the dictionary can get edited
         self.assertEqual(
             [
-                (2, {
-                    'BB': {'CC': 2},
-                    'CC': {'DD': 2, 'BB': 2},
-                    'DD': {'CC': 2, 'EE': 2},
-                    'EE': {'DD': 2},
-                    'HH': {},
-                    'JJ': {}
-                }),
-                (2, {
-                    'BB': {'CC': 2},
-                    'CC': {'DD': 2, 'BB': 2},
-                    'DD': {'CC': 2, 'EE': 2},
-                    'EE': {'DD': 2},
+                (3, {
+                    'BB': {'CC': 3},
+                    'CC': {'DD': 3, 'BB': 3},
+                    'DD': {'CC': 3, 'EE': 3},
+                    'EE': {'DD': 3},
                     'HH': {},
                     'JJ': {}
                 }),
                 (3, {
-                    'BB': {'CC': 2, 'DD': 3},
-                    'CC': {'DD': 2, 'BB': 2},
-                    'DD': {'CC': 2, 'EE': 2},
-                    'EE': {'DD': 2},
+                    'BB': {'CC': 3},
+                    'CC': {'DD': 3, 'BB': 3},
+                    'DD': {'CC': 3, 'EE': 3},
+                    'EE': {'DD': 3},
                     'HH': {},
                     'JJ': {}
                 }),
-                (6, {
-                    'BB': {'CC': 2},
-                    'CC': {'DD': 2, 'BB': 2, 'HH': 6},
-                    'DD': {'CC': 2, 'EE': 2},
-                    'EE': {'DD': 2},
+                (4, {
+                    'BB': {'CC': 3, 'DD': 4},
+                    'CC': {'DD': 3, 'BB': 3},
+                    'DD': {'CC': 3, 'EE': 3},
+                    'EE': {'DD': 3},
+                    'HH': {},
+                    'JJ': {}
+                }),
+                (7, {
+                    'BB': {'CC': 3},
+                    'CC': {'DD': 3, 'BB': 3, 'HH': 7},
+                    'DD': {'CC': 3, 'EE': 3},
+                    'EE': {'DD': 3},
                     'HH': {},
                     'JJ': {}
                 }),
             ],
             [
-                Day16.distance_to_valve("DD", "CC", valve_dict, copy.deepcopy(valve_dist_dict)),#in dictionary
-                Day16.distance_to_valve("AA", "DD", valve_dict, copy.deepcopy(valve_dist_dict)),#in child_valves
-                Day16.distance_to_valve("BB", "DD", valve_dict, copy.deepcopy(valve_dist_dict)),#need to step
-                Day16.distance_to_valve("CC", "HH", valve_dict, copy.deepcopy(valve_dist_dict)),  # need to step
+                Day16.time_to_open_valve("DD", "CC", valve_dict, copy.deepcopy(valve_dist_dict)),  # in dictionary
+                Day16.time_to_open_valve("AA", "DD", valve_dict, copy.deepcopy(valve_dist_dict)),  # in child_valves
+                Day16.time_to_open_valve("BB", "DD", valve_dict, copy.deepcopy(valve_dist_dict)),  # need to step
+                Day16.time_to_open_valve("CC", "HH", valve_dict, copy.deepcopy(valve_dist_dict)),  # need to step
             ]
         )
 
