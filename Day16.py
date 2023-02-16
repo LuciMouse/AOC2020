@@ -175,8 +175,8 @@ def max_pressure_release(raw_data):
     high_flow_valves ={x for x in valve_dist_dict if valve_dict[x]["flow_rate"]>max_flow_rate/2}
     low_flow_valves =set(valve_dist_dict).difference(high_flow_valves)
 
-    high_flow_permute = permutations(high_flow_valves)
-    low_flow_permute = permutations(low_flow_valves)
+    high_flow_permute = list(permutations(high_flow_valves))
+    low_flow_permute = list(permutations(low_flow_valves))
 
     path_ls = []
     for high_path in high_flow_permute:
@@ -192,43 +192,7 @@ def max_pressure_release(raw_data):
             max_pressure = curr_total_pressure
             max_pressure_path = open_valves_ls
 
-    while time_left >0:
-        # for each valve, determine the highest valve to move to,
-        sorted_valve_values = sorted(
-            [
-                (node_name,
-                 calculate_valve_value(
-                     curr_node,
-                     node_name,
-                     time_left,
-                     valve_dict,
-                     valve_dist_dict
-                 )
-                 ) for node_name in set(valve_dist_dict.keys()).difference(set(open_valves_ls))
-            ],
-            key=lambda x: x[1][0],
-            reverse = True
-        )
-
-        if sorted_valve_values:  # there are still unvisited valves
-            most_valuable_accessible_valve = highest_accessible_node(sorted_valve_values, time_left)
-            if most_valuable_accessible_valve: #can reach node in time
-                next_node = most_valuable_accessible_valve
-                # release pressure
-                step_pressure = sum([valve_dict[valve_name]["flow_rate"] for valve_name in open_valves_ls])
-                curr_total_pressure += step_pressure * next_node[1][1]
-                # move to node
-                curr_node = next_node[0]
-                open_valves_ls.append(next_node[0])
-                time_left -= next_node[1][1]
-            else:
-                break #none of the remaining nodes can be reached in time
-        else: #all valves have been opened
-            break
-    #purge for the rest of the time
-    step_pressure = sum([valve_dict[valve_name]["flow_rate"] for valve_name in open_valves_ls])
-    curr_total_pressure += step_pressure * time_left
-    return curr_total_pressure
+    return max_pressure
 
 
 if __name__ == '__main__':
