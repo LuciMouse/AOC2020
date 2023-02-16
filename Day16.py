@@ -146,6 +146,11 @@ def max_pressure_release(raw_data):
     time_left = total_time
     open_valves_ls = []
     curr_total_pressure = 0
+
+    valves_sorted_by_flow_rate_ls = sorted(valve_dist_dict, key = lambda x:valve_dict[x]["flow_rate"], reverse = True)
+    max_flow_rate = valve_dict[valves_sorted_by_flow_rate_ls[0]]["flow_rate"]
+    high_flow_valves ={x for x in valve_dist_dict if valve_dict[x]["flow_rate"]>max_flow_rate/2}
+    low_flow_valves =set(valve_dist_dict).difference(high_flow_valves)
     while time_left >0:
         # for each valve, determine the highest valve to move to,
         sorted_valve_values = sorted(
