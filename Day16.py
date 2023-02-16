@@ -148,26 +148,27 @@ def max_pressure_release(raw_data):
     curr_total_pressure = 0
     while time_left >0:
         # for each valve, determine the highest valve to move to,
-
-        sorted_valve_distances = sorted(
+        sorted_valve_values = sorted(
             [
                 (node_name,
-                 distance_to_valve(
+                 calculate_valve_value(
                      curr_node,
                      node_name,
+                     time_left,
                      valve_dict,
                      valve_dist_dict
-                 )[0]
+                 )
                  ) for node_name in set(valve_dist_dict.keys()).difference(set(open_valves_ls))
             ],
-            key=lambda x: x[1]
+            key=lambda x: x[1][0],
+            reverse = True
         )
 
-        if sorted_valve_distances:  # there are still unvisited valves
-            smallest_distance = sorted_valve_distances[0][1]
+        if sorted_valve_values:  # there are still unvisited valves
+            smallest_distance = sorted_valve_values[0][1]
             if smallest_distance <= time_left: #can reach in time
                 closest_nodes_sorted_by_flow_ls = sorted(
-                    [x for x in sorted_valve_distances if x[1]==smallest_distance],
+                    [x for x in sorted_valve_values if x[1]==smallest_distance],
                     key = lambda x: valve_dict[x[0]]["flow_rate"],
                     reverse = True
                 )
@@ -178,7 +179,7 @@ def max_pressure_release(raw_data):
                 # move to node
                 curr_node = next_node[0]
                 open_valves_ls.append(next_node[0])
-                time_left -= sorted_valve_distances[0][1]
+                time_left -= sorted_valve_values[0][1]
             else:
                 break #none of the remaining nodes can be reached in time
         else: #all valves have been opened
