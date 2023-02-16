@@ -1,4 +1,5 @@
 from aocd import data
+from itertools import permutations
 
 
 def parse_valve(valve_string):
@@ -53,6 +54,12 @@ def make_valve_dist_dict(valve_dict):
             for curr_child in value["child_valves"]:
                 if valve_dict[curr_child]['flow_rate'] > 0:
                     valve_dist_dict[key][curr_child] = 2 #takes an extra minute to open valve and a minute for it be effective
+
+    # do permutations to determine distances between all valves
+    perm = permutations(valve_dict.keys(), 2)
+    for start_node_name, target_valve_name in perm:
+        distance_to_valve(start_node_name, target_valve_name, valve_dict, valve_dist_dict)
+        #edited in place so no need to return
     return valve_dist_dict
 
 
@@ -83,12 +90,10 @@ def distance_to_valve(start_node_name, target_valve_name, valve_dict, valve_dist
                 new_node_ls += valve_dict[node_name]["child_valves"]
         numsteps += 1
         nodes_ls = new_node_ls
-
+    # takes an extra minute to open valve
     time_count = numsteps + 1
 
     if start_node_name in valve_dist_dict:
-        # takes an extra minute to open valve and a minute for it to be effective
-
         valve_dist_dict[start_node_name][target_valve_name] = time_count
 
     return time_count, valve_dist_dict
