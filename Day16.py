@@ -107,7 +107,7 @@ def calculate_valve_value(start_node_name, target_valve_name, minutes_left, valv
     """
 
     distance = distance_to_valve(start_node_name, target_valve_name, valve_dict, valve_dist_dict)[0]
-    active_time = minutes_left - distance - 1 #takes a minute for valve to activate
+    active_time = minutes_left - (distance*2) - 1 #takes a minute for valve to activate
     value = active_time * valve_dict[target_valve_name]["flow_rate"]
     return value, distance
 
