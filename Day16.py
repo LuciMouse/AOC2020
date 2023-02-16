@@ -147,7 +147,7 @@ def max_pressure_release(raw_data):
     open_valves_ls = []
     curr_total_pressure = 0
     while time_left >0:
-        # for each valve, determine the closest valve to move to, In the case of a tie, pick the one with the highest flow_rate
+        # for each valve, determine the highest valve to move to,
 
         sorted_valve_distances = sorted(
             [
