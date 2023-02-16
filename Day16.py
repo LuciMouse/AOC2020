@@ -155,6 +155,7 @@ def calculate_path_pressure(path_ls, total_time, valve_dict, valve_dist_dict):
     total_pressure += step_pressure * time_left
     return total_pressure,open_valves_ls
 
+
 def max_pressure_release(raw_data):
     """
     determines the maximum pressure you can release in 30 minutes
@@ -167,8 +168,6 @@ def max_pressure_release(raw_data):
     valve_dist_dict = make_valve_dist_dict(valve_dict)
 
     total_time = 30
-    curr_node = "AA"
-
 
     valves_sorted_by_flow_rate_ls = sorted(valve_dist_dict, key = lambda x:valve_dict[x]["flow_rate"], reverse = True)
     max_flow_rate = valve_dict[valves_sorted_by_flow_rate_ls[0]]["flow_rate"]
