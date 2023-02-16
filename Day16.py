@@ -52,11 +52,11 @@ def make_valve_dist_dict(valve_dict):
             valve_dist_dict[key] = {}
             for curr_child in value["child_valves"]:
                 if valve_dict[curr_child]['flow_rate'] > 0:
-                    valve_dist_dict[key][curr_child] = 3 #takes an extra minute to open valve and a minute for it be effective
+                    valve_dist_dict[key][curr_child] = 2 #takes an extra minute to open valve and a minute for it be effective
     return valve_dist_dict
 
 
-def time_to_open_valve(start_node_name, target_valve_name, valve_dict, valve_dist_dict):
+def distance_to_valve(start_node_name, target_valve_name, valve_dict, valve_dist_dict):
     """
     determines the distance between valves
 
@@ -84,12 +84,12 @@ def time_to_open_valve(start_node_name, target_valve_name, valve_dict, valve_dis
         numsteps += 1
         nodes_ls = new_node_ls
 
-    time_count = numsteps + 2
+    time_count = numsteps + 1
 
     if start_node_name in valve_dist_dict:
         # takes an extra minute to open valve and a minute for it to be effective
 
-        valve_dist_dict[start_node_name][target_valve_name] = numsteps+2
+        valve_dist_dict[start_node_name][target_valve_name] = time_count
 
     return time_count, valve_dist_dict
 
@@ -117,7 +117,7 @@ def max_pressure_release(raw_data):
     # move from AA to first node
     curr_node = "AA"
     next_node = sorted_valves_by_flow_rate_ls[0][0]
-    time_left = total_time - time_to_open_valve(curr_node, next_node, valve_dict, valve_dist_dict)[0]
+    time_left = total_time - distance_to_valve(curr_node, next_node, valve_dict, valve_dist_dict)[0]
     curr_node = next_node
     open_valves_ls = [curr_node]
 
@@ -126,7 +126,7 @@ def max_pressure_release(raw_data):
     for curr_valve in sorted_valves_by_flow_rate_ls[1:]:
         # can we get to the next valve in time?
         next_node = curr_valve[0]
-        time_to_valve = time_to_open_valve(curr_node, next_node, valve_dict, valve_dist_dict)[0]
+        time_to_valve = distance_to_valve(curr_node, next_node, valve_dict, valve_dist_dict)[0]
         if time_to_valve < time_left:
             # release pressure
             step_pressure = sum([valve_dict[valve]["flow_rate"] for valve in open_valves_ls])
