@@ -129,12 +129,13 @@ def highest_accessible_node(sorted_valve_values, time_left):
 
 def calculate_path_pressure(path_ls, total_time, valve_dict, valve_dist_dict):
     """
-
-    :param path_ls:
-    :param total_time:
-    :param valve_dict:
-    :param valve_dist_dict:
-    :return:
+    given a single path of valves, calculates the total pressure released by following the path
+    :param path_ls:valve order
+    :param total_time:maximum number of minutes to exhaust
+    :param valve_dict:dictionary of valve parameters
+    :param valve_dist_dict:dictionary of the distances between valves
+    :return: total amount of pressure vented over total_time by following path_ls, and the valves that got opened
+        (not all valves in valve_ls get opened if we run out of time)
     """
     total_pressure = 0
     time_left = total_time
@@ -153,7 +154,16 @@ def calculate_path_pressure(path_ls, total_time, valve_dict, valve_dist_dict):
     # purge for the rest of the time
     step_pressure = sum([valve_dict[valve_name]["flow_rate"] for valve_name in open_valves_ls])
     total_pressure += step_pressure * time_left
-    return total_pressure,open_valves_ls
+    return total_pressure, open_valves_ls
+
+def create_path_generator(high_flow_valves_set, low_flow_valves_set):
+    """
+    creates a generator of valve orders (a "path") where the high_flow_valves always preceed the low_flow_valves.
+    within each valve set, generator creates the full permutation of possible orders
+    :param high_flow_valves_set: set of valves that need to go first
+    :param low_flow_valves_set: set of valves that need to be at the end of the list
+    :return: generator that yields paths
+    """
 
 
 def max_pressure_release(raw_data):
