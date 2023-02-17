@@ -45,7 +45,7 @@ class TestDrawChamber(unittest.TestCase):
                 (5, 3),
             }
         )
-        top_layer = [(x, -1) for x in range(7)]  # points that form the "path" of blocking rock
+        top_layer = {(x, -1) for x in range(7)}  # points that form the "path" of blocking rock
         chamber_ls = Day17.draw_chamber(curr_rock, top_layer)
         for row in chamber_ls:
             print(row)
