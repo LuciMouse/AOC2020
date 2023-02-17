@@ -33,7 +33,7 @@ def make_rock_generator():
     rocks_ls = []
 
     rocks_ls.append(
-        FallingRock(
+        lambda: FallingRock(
             '-',
             {
                 (0, 0),
@@ -45,7 +45,7 @@ def make_rock_generator():
     )
 
     rocks_ls.append(
-        FallingRock(
+        lambda: FallingRock(
             '+',
 
             {
@@ -59,7 +59,7 @@ def make_rock_generator():
     )
 
     rocks_ls.append(
-        FallingRock(
+        lambda: FallingRock(
             'L',
 
             {
@@ -73,7 +73,7 @@ def make_rock_generator():
     )
 
     rocks_ls.append(
-        FallingRock(
+        lambda: FallingRock(
             'I',
 
             {
