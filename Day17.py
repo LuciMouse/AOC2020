@@ -24,22 +24,6 @@ class FallingRock:
         self.coord_set = coord_set
 
 
-class RockGen:
-    """
-    generator function that returns rock objects
-    """
-
-    def __init__(self, name, coord_set):
-        self.name = name
-        self.coord_set = coord_set
-
-    def __iter__(self):
-        yield FallingRock(
-            self.name,
-            self.coord_set
-        )
-
-
 def make_rock_generator():
     """
     creates an infinite generator that returns the four rock objects
