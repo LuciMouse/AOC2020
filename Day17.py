@@ -172,10 +172,10 @@ def model_falling_rocks(raw_input, num_rocks):
                 else:  # blocked
                     # comes to rest
                     falling = False
-                    top_point = max([x[1] for x in curr_rock.coord_set])
                     top_layer = top_layer.union(curr_rock.coord_set)
+                    top_point = max([x[1] for x in top_layer])
 
-    return top_point
+    return top_point+1
 
 
 if __name__ == '__main__':
