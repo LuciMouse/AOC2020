@@ -197,7 +197,7 @@ def max_pressure_release(raw_data):
     num_processed = 0
     for curr_path in path_gen:
         num_processed+=1
-        if num_processed%1000:
+        if num_processed%100000==0:
             print (num_processed)
         curr_total_pressure, open_valves_ls = calculate_path_pressure(curr_path, total_time, valve_dict,
                                                                       valve_dist_dict)
