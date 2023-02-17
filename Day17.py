@@ -179,4 +179,4 @@ def model_falling_rocks(raw_input, num_rocks):
 
 
 if __name__ == '__main__':
-    print(f"{data[4]}")
+    print(f"height of final tower is {model_falling_rocks(data,2022)}")
