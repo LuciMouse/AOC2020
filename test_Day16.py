@@ -156,6 +156,25 @@ class TestCalculatePathPressure(unittest.TestCase):
                 )
             ]
         )
+class TestCreatePathGenerator(unittest.TestCase):
+    def test_create_path_generator(self):
+        self.assertEqual(
+            set(Day16.create_path_generator({'BB', 'HH', 'DD'}, {'CC', 'EE'})),
+            {
+                ('BB', 'HH', 'DD', 'CC', 'EE'),
+                ('BB', 'HH', 'DD', 'EE', 'CC'),
+                ('HH', 'DD', 'BB', 'CC', 'EE'),
+                ('HH', 'DD', 'BB', 'EE', 'CC'),
+                ('DD', 'BB', 'HH', 'CC', 'EE'),
+                ('DD', 'BB', 'HH', 'EE', 'CC'),
+                ('DD', 'HH', 'BB', 'CC', 'EE'),
+                ('DD', 'HH', 'BB', 'EE', 'CC'),
+                ('HH', 'BB', 'DD', 'CC', 'EE'),
+                ('HH', 'BB', 'DD', 'EE', 'CC'),
+                ('BB', 'DD', 'HH', 'CC', 'EE'),
+                ('BB', 'DD', 'HH', 'EE', 'CC'),
+            }
+        )
 
 class TestMaxPressureRelease(unittest.TestCase):
     def test_max_pressure_release(self):

@@ -1,5 +1,5 @@
 from aocd import data
-from itertools import permutations
+from itertools import permutations, product
 
 
 def parse_valve(valve_string):
@@ -108,7 +108,7 @@ def calculate_valve_value(start_node_name, target_valve_name, minutes_left, valv
     """
 
     distance = distance_to_valve(start_node_name, target_valve_name, valve_dict, valve_dist_dict)[0]
-    active_time = minutes_left - (distance*1.5) - 1 #takes a minute for valve to activate
+    active_time = minutes_left - (distance * 1.5) - 1  # takes a minute for valve to activate
     value = active_time * valve_dict[target_valve_name]["flow_rate"]
     return value, distance
 
@@ -126,6 +126,7 @@ def highest_accessible_node(sorted_valve_values, time_left):
         if curr_valve[1][1] <= time_left:
             return curr_valve
     return None
+
 
 def calculate_path_pressure(path_ls, total_time, valve_dict, valve_dist_dict):
     """
@@ -156,6 +157,7 @@ def calculate_path_pressure(path_ls, total_time, valve_dict, valve_dist_dict):
     total_pressure += step_pressure * time_left
     return total_pressure, open_valves_ls
 
+
 def create_path_generator(high_flow_valves_set, low_flow_valves_set):
     """
     creates a generator of valve orders (a "path") where the high_flow_valves always preceed the low_flow_valves.
@@ -163,7 +165,12 @@ def create_path_generator(high_flow_valves_set, low_flow_valves_set):
     :param high_flow_valves_set: set of valves that need to go first
     :param low_flow_valves_set: set of valves that need to be at the end of the list
     :return: generator that yields paths
+
+    >>>
     """
+    product_gen = product(permutations(high_flow_valves_set), permutations(low_flow_valves_set))
+    for curr_product in product_gen:
+        yield curr_product[0] + curr_product[1]
 
 
 def max_pressure_release(raw_data):
@@ -179,25 +186,20 @@ def max_pressure_release(raw_data):
 
     total_time = 30
 
-    valves_sorted_by_flow_rate_ls = sorted(valve_dist_dict, key = lambda x:valve_dict[x]["flow_rate"], reverse = True)
+    valves_sorted_by_flow_rate_ls = sorted(valve_dist_dict, key=lambda x: valve_dict[x]["flow_rate"], reverse=True)
     max_flow_rate = valve_dict[valves_sorted_by_flow_rate_ls[0]]["flow_rate"]
-    high_flow_valves ={x for x in valve_dist_dict if valve_dict[x]["flow_rate"]>max_flow_rate/2}
-    low_flow_valves =set(valve_dist_dict).difference(high_flow_valves)
+    high_flow_valves_set = {x for x in valve_dist_dict if valve_dict[x]["flow_rate"] > max_flow_rate / 2}
+    low_flow_valves_set = set(valve_dist_dict).difference(high_flow_valves_set)
 
-    high_flow_permute = list(permutations(high_flow_valves))
-    low_flow_permute = list(permutations(low_flow_valves))
-
-    path_ls = []
-    for high_path in high_flow_permute:
-        for low_path in low_flow_permute:
-            path_ls.append(high_path+low_path)
+    path_gen = create_path_generator(high_flow_valves_set, low_flow_valves_set)
 
     max_pressure = 0
-    for curr_path in path_ls:
-        curr_total_pressure,open_valves_ls = calculate_path_pressure(curr_path, total_time, valve_dict, valve_dist_dict)
 
+    for curr_path in path_gen:
+        curr_total_pressure, open_valves_ls = calculate_path_pressure(curr_path, total_time, valve_dict,
+                                                                      valve_dist_dict)
 
-        if curr_total_pressure>max_pressure:
+        if curr_total_pressure > max_pressure:
             max_pressure = curr_total_pressure
             max_pressure_path = open_valves_ls
 
