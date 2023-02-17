@@ -158,9 +158,6 @@ def model_falling_rocks(raw_input, num_rocks):
         falling = True
         next_step_gen = itertools.cycle(["jet", "fall"])
         while falling:
-            for row in draw_chamber(curr_rock, top_layer):
-                print(row)
-            print('\n\n')
             next_action = next(next_step_gen)
             if next_action == "jet":
                 next_jet_pattern = next(jet_pattern_gen)
