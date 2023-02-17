@@ -194,14 +194,18 @@ def max_pressure_release(raw_data):
     path_gen = create_path_generator(high_flow_valves_set, low_flow_valves_set)
 
     max_pressure = 0
-
+    num_processed = 0
     for curr_path in path_gen:
+        num_processed+=1
+        if num_processed%1000:
+            print num_processed
         curr_total_pressure, open_valves_ls = calculate_path_pressure(curr_path, total_time, valve_dict,
                                                                       valve_dist_dict)
 
         if curr_total_pressure > max_pressure:
             max_pressure = curr_total_pressure
             max_pressure_path = open_valves_ls
+            print(max_pressure, max_pressure_path)
 
     return max_pressure
 
