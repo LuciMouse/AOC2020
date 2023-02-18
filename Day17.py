@@ -282,9 +282,6 @@ def model_falling_rocks(raw_input, num_rocks):
                     rock_nodes = rock_nodes.union(curr_rock.coord_set)
                     top_point = max([x[1] for x in rock_nodes])
 
-                    for row in draw_chamber(curr_rock, rock_nodes):
-                        print(row)
-
                     # can we get rid of some nodes?
 
                     # define  "roof" (top layer of rock
