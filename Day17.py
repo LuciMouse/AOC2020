@@ -286,88 +286,13 @@ def model_falling_rocks(raw_input, num_rocks):
                         print(row)
 
                     # can we get rid of some nodes?
-                    # rocks with rocks to left, right, and top can be removed
-                    # look only where the last rock landed
-                    y_min = min([x[1] for x in curr_rock.coord_set]) - 1
-                    y_max = max([x[1] for x in curr_rock.coord_set])
-
-                    rocks_to_investigate_set = {x for x in rock_nodes if (x[1] <= y_max) and (x[1] >= y_min)}
-                    rocks_to_remove = set()
-                    for investigate_rock in rocks_to_investigate_set:
-                        curr_x, curr_y = investigate_rock
-                        if not {(curr_x - 1, curr_y), (curr_x, curr_y + 1), (curr_x + 1, curr_y)}.difference(
-                                rock_nodes):  # all three adjacent nodes are rocks
-                            rocks_to_remove.add(investigate_rock)
-                    rock_nodes = rock_nodes.difference(rocks_to_remove)
 
                     # define  "roof" (top layer of rock
                     roof_ls = [max([x[1] for x in [y for y in rock_nodes if y[0] == x_coord]]) for x_coord in range(7)]
-                    top_layer = find_top_layer(rock_nodes, roof_ls, roof_ls[0])
-                    # what rows were affected by the new rock?
-                    y_min = min([x[1] for x in curr_rock.coord_set])
-                    y_max = max([x[1] for x in curr_rock.coord_set])
-                    air_nodes = air_nodes.union(
-                        {
-                            (x_coord, y_coord) for x_coord in range(7) for y_coord in range(y_min, y_max + 1)
-                        }.difference(
-                            rock_nodes
-                        )
-                    )
-                    if 0 in [x[0] for x in curr_rock.coord_set]:  # left side sealed
-                        # define right wall of open space
-                        # what's the bottom of the right side (both sides cannot be blocked at the same time
-                        edge_floor = min([x[1] for x in [y for y in rock_nodes if y[0] == 6]])
-                        airgap_set = {(6, y) for y in range(edge_floor + 1, top_point + 1)}
-                        has_air = True
-                        save_nodes = set()
-                        x_coord = 5
-                        while has_air:
-                            has_air = False
-                            # check for air gap in column
-                            prev_air_nodes_set = {x for x in airgap_set if x[0] == x_coord + 1}
-                            curr_air_nodes_set = set()
-                            for air_node in prev_air_nodes_set:
-                                if (x_coord, air_node[1]) in rock_nodes:  # defined as rock:
-                                    save_nodes.add(
-                                        (x_coord, air_node[1]))  # can't delete this node because it touches airgap
-                                else:  # it's air
-                                    curr_air_nodes_set.add(air_node)
-                            # check vertical connection of air nodes
-                            air_nodes_to_test = list(curr_air_nodes_set)
-                            while air_nodes_to_test:
-                                new_air_nodes_ls = []
-                                for air_node in air_nodes_to_test:
-                                    # look up
-                                    up_node = (air_node[0], air_node[1] - 1)
-                                    if up_node not in rock_nodes:
-                                        curr_air_nodes_set.add(up_node)
-                                        new_air_nodes_ls.append(up_node)
-                                    # look down
-                                    down_node = (air_node[0], air_node[1] + 1)
-                                    if down_node not in rock_nodes:
-                                        curr_air_nodes_set.add(down_node)
-                                        new_air_nodes_ls.append(down_node)
-                                    else:
-                                        save_nodes.add(down_node)  # is a floor
+                    #drop all nodes lower than the lowest roof
 
-                            x_coord -= 1
-
-                    elif 6 in [x[0] for x in curr_rock.coord_set]:
-                        # define left wall of open space
-                        # what's the bottom of the right side (both sides cannot be blocked at the same time
-                        edge_floor = min([x[1] for x in [y for y in rock_nodes if y[0] == 0]])
-                        airgap_set = {(0, y) for y in range(edge_floor + 1, top_point + 1)}
-                        has_air = True
-                        save_nodes = set()
-                        x_coord = 0
-                        while has_air:
-                            has_air = False
-                            for y_coord in range(top_point + 1, edge_floor + 1, -1):
-                                if not (x_coord, y_coord) in rock_nodes:  # not defined as stone
-                                    airgap_set.add((x_coord, y_coord))
-                                    has_air = True
-                                elif ((x_coord - 1, y_coord) in airgap_set) or ((x_coord, y_coord + 1) in airgap_set):
-                                    save_nodes.add((x_coord, y_coord))  # can't delete this node
+                    lowest_roof = min(roof_ls)
+                    rock_nodes = {x for x in rock_nodes if x[1] >= lowest_roof}
 
     return top_point + 1
 
