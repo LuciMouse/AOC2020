@@ -61,15 +61,22 @@ class TestDrawChamber(unittest.TestCase):
             chamber_ls
         )
 
-
 class TestModelFallingRocks(unittest.TestCase):
-    def test_model_falling_rocks(self):
+    def test_model_falling_rocks_part1(self):
         with open("Day17_test_input.txt") as input_file:
             raw_input = input_file.read()
 
         self.assertEqual(
             3068,
             Day17.model_falling_rocks(raw_input, 2022)
+        )
+    def test_model_falling_rocks_part2(self):
+        with open("Day17_test_input.txt") as input_file:
+            raw_input = input_file.read()
+
+        self.assertEqual(
+            1514285714288,
+            Day17.model_falling_rocks(raw_input, 1000000000000)
         )
 
 

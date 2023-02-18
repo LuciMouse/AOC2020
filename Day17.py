@@ -32,51 +32,51 @@ def make_rock_generator():
     # create the five rock types
     rock_type_ls = [
         ('-',
-                {
-                    (0, 0),
-                    (1, 0),
-                    (2, 0),
-                    (3, 0),
-                }
-                ),
+         {
+             (0, 0),
+             (1, 0),
+             (2, 0),
+             (3, 0),
+         }
+         ),
         ('+',
 
-                {
-                    (1, 0),
-                    (0, 1),
-                    (1, 1),
-                    (2, 1),
-                    (1, 2),
-                }
-                ),
+         {
+             (1, 0),
+             (0, 1),
+             (1, 1),
+             (2, 1),
+             (1, 2),
+         }
+         ),
         ('L',
 
-                {
-                    (0, 0),
-                    (1, 0),
-                    (2, 0),
-                    (2, 1),
-                    (2, 2),
-                }
-                ),
+         {
+             (0, 0),
+             (1, 0),
+             (2, 0),
+             (2, 1),
+             (2, 2),
+         }
+         ),
         ('I',
 
-                {
-                    (0, 0),
-                    (0, 1),
-                    (0, 2),
-                    (0, 3),
-                }
-                ),
+         {
+             (0, 0),
+             (0, 1),
+             (0, 2),
+             (0, 3),
+         }
+         ),
         ('.',
 
-                {
-                    (0, 0),
-                    (1, 0),
-                    (0, 1),
-                    (1, 1),
-                }
-                ),
+         {
+             (0, 0),
+             (1, 0),
+             (0, 1),
+             (1, 1),
+         }
+         ),
     ]
     rock_type_gen = itertools.cycle(rock_type_ls)
     new_rock = (FallingRock(rock_type[0], rock_type[1]) for rock_type in rock_type_gen)
@@ -117,6 +117,112 @@ class UnknownPatternError(Exception):
     pass
 
 
+def tuple_abs_diff(tuple1, tuple2):
+    """
+    calculates the differences between a pair of tuples
+    :param tuple1:
+    :param tuple2:
+    :return: the absolute difference
+
+    >>> tuple_abs_diff((1,1),(1,1))
+    (0, 0)
+
+    >>> tuple_abs_diff((2,2),(1,1))
+    (1, 1)
+
+    >>> tuple_abs_diff((1,1),(2,2))
+    (1, 1)
+
+    >>> tuple_abs_diff((3,4),(2,1))
+    (1, 3)
+    """
+
+    return (abs(tuple1[0] - tuple2[0]), abs(tuple1[1] - tuple2[1]))
+
+
+def find_next_node(curr_node, rock_nodes, roof_ls, path_ls):
+    """
+    finds the next node in top layer
+    :param path_ls: path so far
+    :param curr_node: node to move from
+    :param rock_nodes: list of coordinates defined as rocks
+    :param roof_ls: list of coordinates that are the highest nodes in each column
+
+    >>> find_next_node((0,3),{(0, -1), (0, 3), (1, -1), (1, 3), (2, -1), (2, 0), (2, 2), (2, 3), (2, 4), (2, 5), (3, -1), (3, 1), (3, 3), (4, -1), (4, 0), (4, 2), (5, -1), (5, 0), (6, -1)}, [3, 3, 5, 3, 2, 0, -1], [(0,3)])
+    (1, 3)
+
+    >>> find_next_node((1,3),{(0, -1), (0, 3), (1, -1), (1, 3), (2, -1), (2, 0), (2, 2), (2, 3), (2, 4), (2, 5), (3, -1), (3, 1), (3, 3), (4, -1), (4, 0), (4, 2), (5, -1), (5, 0), (6, -1)}, [3, 3, 5, 3, 2, 0, -1], [(0,3), (1, 3)])
+    (2, 4)
+
+    >>> find_next_node((2,4),{(0, -1), (0, 3), (1, -1), (1, 3), (2, -1), (2, 0), (2, 2), (2, 3), (2, 4), (2, 5), (3, -1), (3, 1), (3, 3), (4, -1), (4, 0), (4, 2), (5, -1), (5, 0), (6, -1)}, [3, 3, 5, 3, 2, 0, -1], [(0, 3), (1, 3), (2, 4), (2, 5), (2, 4)])
+    (3, 3)
+
+    >>> find_next_node((3,1),{(0, -1), (0, 3), (1, -1), (1, 3), (2, -1), (2, 0), (2, 2), (2, 3), (2, 4), (2, 5), (3, -1), (3, 1), (3, 3), (4, -1), (4, 0), (4, 2), (5, -1), (5, 0), (6, -1)}, [3, 3, 5, 3, 2, 0, -1], [(0, 3), (1, 3), (2, 4), (2, 5), (2, 4), (3, 3), (4, 2), (3, 1)])
+    (4, 0)
+    """
+    curr_x, curr_y = curr_node
+    next_roof_node = (curr_x + 1, roof_ls[curr_x + 1])
+    if (roof_ls[curr_x] == curr_y) and (tuple_abs_diff(curr_node, next_roof_node) in {
+        (1, 0),
+        (1, 1),
+    }):  # node is roof node and touches next roof node
+        return next_roof_node
+
+    else:
+        # can you move to a roof node?
+        next_node_gen = ((x[0], x[1]) for x in [
+            (curr_x - 1, roof_ls[curr_x - 1]),
+            (curr_x, roof_ls[curr_x]),
+            (curr_x + 1, roof_ls[curr_x + 1]),
+
+        ]
+                         )
+        for next_node in next_node_gen:
+            if (next_node not in path_ls) and (next_node in rock_nodes) and (tuple_abs_diff(curr_node, next_roof_node) in {(1, 0), (1, 1)}):
+                return next_node
+
+        # try different coordinates to find next connected node
+        next_node_gen = ((x[0], x[1]) for x in [
+            (curr_x - 1, curr_y),
+            (curr_x - 1, curr_y + 1),
+            (curr_x, curr_y + 1),
+            (curr_x + 1, curr_y + 1),
+            (curr_x + 1, curr_y),
+            (curr_x + 1, curr_y - 1),
+            (curr_x, curr_y - 1),
+        ]
+                         )
+        next_node = next(next_node_gen)
+        while ((next_node not in rock_nodes) or (
+                next_node == path_ls[-2] if len(path_ls) > 1 else False))or(# prevent flip flopping
+                roof_ls[next_node[0]]==next_node[1]):  # not a roof node
+            try:
+                next_node = next(next_node_gen)
+            except StopIteration:  # run out of nodes
+                return path_ls[-2]  # backtrack
+        return next_node
+
+
+def find_top_layer(rock_nodes, roof_ls, start_node):
+    """
+    defines the highest path from the left to right wall
+    :param rock_nodes: list of coordinates defined as rocks
+    :param path_ls: path so far
+    :return: path_ls
+    >>> find_top_layer({(0, -1), (0, 3), (1, -1), (1, 3), (2, -1), (2, 0), (2, 2), (2, 3), (2, 4), (2, 5), (3, -1), (3, 1), (3, 3), (4, -1), (4, 0), (4, 2), (5, -1), (5, 0), (6, -1)}, [3, 3, 5, 3, 2, 0, -1], (0,3))
+    [(0, 3), (1, 3), (2, 4), (2, 5), (2, 4), (3, 3), (4, 2), (3, 1), (4, 0), (5, 0), (6, -1)]
+
+    >>> find_top_layer({(0, -1), (0, 3), (1, -1), (1, 3), (2, -1), (2, 0), (2, 2), (2, 3), (2, 4), (2, 5), (3, -1), (3, 1), (3, 3), (4, -1), (4, 0), (4, 2), (5, -1), (5, 0), (6, -1)}, [-1, -1, 2, 3, 2, 0, -1], (0,-1))
+    [(0, -1), (1, -1), (2, 0), (3, 1), (2, 2), (3, 3), (4, 2), (3, 1), (4, 0), (5, 0), (6, -1)]
+    """
+    curr_node = start_node
+    path_ls = [curr_node]
+    while curr_node != (6, roof_ls[-1]):
+        curr_node = find_next_node(curr_node,rock_nodes,roof_ls, path_ls)
+        path_ls.append(curr_node)
+    return path_ls
+
+
 def model_falling_rocks(raw_input, num_rocks):
     """
     models the falling of num_rocks given the pattern of jet streams in the puzzle input
@@ -129,7 +235,8 @@ def model_falling_rocks(raw_input, num_rocks):
 
     # define landmarks
     top_point = -1  # highest point (use to determine drop point)
-    top_layer = {(x, -1) for x in range(7)}  # points that form the "path" of blocking rock
+    rock_nodes = {(x, -1) for x in range(7)}  # points that form the "path" of blocking rock
+    air_nodes = set()
 
     for i in range(num_rocks):
         curr_rock = next(rock_gen)
@@ -160,23 +267,110 @@ def model_falling_rocks(raw_input, num_rocks):
                     raise UnknownPatternError("unknown jet pattern")
 
                 # does the proposed movement intersect with existing rock?
-                if not test_coord_set.intersection(top_layer):
+                if not test_coord_set.intersection(rock_nodes):
                     curr_rock.coord_set = test_coord_set  # update coordinates
             elif next_action == 'fall':
                 test_coord_set = {
                     (curr_coord[0], curr_coord[1] - 1) for curr_coord in curr_rock.coord_set
                 }
                 # can it fall further?
-                if not test_coord_set.intersection(top_layer):  # can fall further?
+                if not test_coord_set.intersection(rock_nodes):  # can fall further?
                     curr_rock.coord_set = test_coord_set  # update coordinates
                 else:  # blocked
                     # comes to rest
                     falling = False
-                    top_layer = top_layer.union(curr_rock.coord_set)
-                    top_point = max([x[1] for x in top_layer])
+                    rock_nodes = rock_nodes.union(curr_rock.coord_set)
+                    top_point = max([x[1] for x in rock_nodes])
 
-    return top_point+1
+                    for row in draw_chamber(curr_rock, rock_nodes):
+                        print(row)
+
+                    # can we get rid of some nodes?
+                    # rocks with rocks to left, right, and top can be removed
+                    # look only where the last rock landed
+                    y_min = min([x[1] for x in curr_rock.coord_set]) - 1
+                    y_max = max([x[1] for x in curr_rock.coord_set])
+
+                    rocks_to_investigate_set = {x for x in rock_nodes if (x[1] <= y_max) and (x[1] >= y_min)}
+                    rocks_to_remove = set()
+                    for investigate_rock in rocks_to_investigate_set:
+                        curr_x, curr_y = investigate_rock
+                        if not {(curr_x - 1, curr_y), (curr_x, curr_y + 1), (curr_x + 1, curr_y)}.difference(
+                                rock_nodes):  # all three adjacent nodes are rocks
+                            rocks_to_remove.add(investigate_rock)
+                    rock_nodes = rock_nodes.difference(rocks_to_remove)
+
+                    # define  "roof" (top layer of rock
+                    roof_ls = [max([x[1] for x in [y for y in rock_nodes if y[0] == x_coord]]) for x_coord in range(7)]
+                    top_layer = find_top_layer(rock_nodes, roof_ls, roof_ls[0])
+                    # what rows were affected by the new rock?
+                    y_min = min([x[1] for x in curr_rock.coord_set])
+                    y_max = max([x[1] for x in curr_rock.coord_set])
+                    air_nodes = air_nodes.union(
+                        {
+                            (x_coord, y_coord) for x_coord in range(7) for y_coord in range(y_min, y_max + 1)
+                        }.difference(
+                            rock_nodes
+                        )
+                    )
+                    if 0 in [x[0] for x in curr_rock.coord_set]:  # left side sealed
+                        # define right wall of open space
+                        # what's the bottom of the right side (both sides cannot be blocked at the same time
+                        edge_floor = min([x[1] for x in [y for y in rock_nodes if y[0] == 6]])
+                        airgap_set = {(6, y) for y in range(edge_floor + 1, top_point + 1)}
+                        has_air = True
+                        save_nodes = set()
+                        x_coord = 5
+                        while has_air:
+                            has_air = False
+                            # check for air gap in column
+                            prev_air_nodes_set = {x for x in airgap_set if x[0] == x_coord + 1}
+                            curr_air_nodes_set = set()
+                            for air_node in prev_air_nodes_set:
+                                if (x_coord, air_node[1]) in rock_nodes:  # defined as rock:
+                                    save_nodes.add(
+                                        (x_coord, air_node[1]))  # can't delete this node because it touches airgap
+                                else:  # it's air
+                                    curr_air_nodes_set.add(air_node)
+                            # check vertical connection of air nodes
+                            air_nodes_to_test = list(curr_air_nodes_set)
+                            while air_nodes_to_test:
+                                new_air_nodes_ls = []
+                                for air_node in air_nodes_to_test:
+                                    # look up
+                                    up_node = (air_node[0], air_node[1] - 1)
+                                    if up_node not in rock_nodes:
+                                        curr_air_nodes_set.add(up_node)
+                                        new_air_nodes_ls.append(up_node)
+                                    # look down
+                                    down_node = (air_node[0], air_node[1] + 1)
+                                    if down_node not in rock_nodes:
+                                        curr_air_nodes_set.add(down_node)
+                                        new_air_nodes_ls.append(down_node)
+                                    else:
+                                        save_nodes.add(down_node)  # is a floor
+
+                            x_coord -= 1
+
+                    elif 6 in [x[0] for x in curr_rock.coord_set]:
+                        # define left wall of open space
+                        # what's the bottom of the right side (both sides cannot be blocked at the same time
+                        edge_floor = min([x[1] for x in [y for y in rock_nodes if y[0] == 0]])
+                        airgap_set = {(0, y) for y in range(edge_floor + 1, top_point + 1)}
+                        has_air = True
+                        save_nodes = set()
+                        x_coord = 0
+                        while has_air:
+                            has_air = False
+                            for y_coord in range(top_point + 1, edge_floor + 1, -1):
+                                if not (x_coord, y_coord) in rock_nodes:  # not defined as stone
+                                    airgap_set.add((x_coord, y_coord))
+                                    has_air = True
+                                elif ((x_coord - 1, y_coord) in airgap_set) or ((x_coord, y_coord + 1) in airgap_set):
+                                    save_nodes.add((x_coord, y_coord))  # can't delete this node
+
+    return top_point + 1
 
 
 if __name__ == '__main__':
-    print(f"height of final tower is {model_falling_rocks(data,2022)}")
+    print(f"height of final tower is {model_falling_rocks(data, 2022)}")
