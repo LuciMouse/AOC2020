@@ -83,27 +83,37 @@ def make_rock_generator():
     return new_rock
 
 
-def draw_chamber(curr_rock, top_layer):
+def draw_chamber(curr_rock, rock_nodes):
     """
     visualization of the chamber state
     :param curr_rock: object of the current rock
-    :param top_layer: list of the top of the settled rocks
+    :param rock_nodes: list of the top of the settled rocks
     :return: list of lists to print
     """
 
     highest_y = max(
         [
-            max([x[1] for x in top_layer]),
+            max([x[1] for x in rock_nodes]),
             max([x[1] for x in curr_rock.coord_set])
         ]
     )
 
-    chamber_ls = ['-------']
+    lowest_y = min(
+        [
+            min([x[1] for x in rock_nodes]),
+            min([x[1] for x in curr_rock.coord_set])
+        ]
+    )
+    if lowest_y == -1:
+        chamber_ls = ['-------']
+        lowest_y = 0
+    else:
+        chamber_ls = []
 
-    for curr_y in range(highest_y + 1):
+    for curr_y in range(lowest_y, highest_y + 1):
         y_ls = []
         for curr_x in range(7):
-            if (curr_x, curr_y) in top_layer:
+            if (curr_x, curr_y) in rock_nodes:
                 y_ls.append('#')
             elif (curr_x, curr_y) in curr_rock.coord_set:
                 y_ls.append('@')
@@ -178,7 +188,8 @@ def find_next_node(curr_node, rock_nodes, roof_ls, path_ls):
         ]
                          )
         for next_node in next_node_gen:
-            if (next_node not in path_ls) and (next_node in rock_nodes) and (tuple_abs_diff(curr_node, next_roof_node) in {(1, 0), (1, 1)}):
+            if (next_node not in path_ls) and (next_node in rock_nodes) and (
+                    tuple_abs_diff(curr_node, next_roof_node) in {(1, 0), (1, 1)}):
                 return next_node
 
         # try different coordinates to find next connected node
@@ -194,8 +205,8 @@ def find_next_node(curr_node, rock_nodes, roof_ls, path_ls):
                          )
         next_node = next(next_node_gen)
         while ((next_node not in rock_nodes) or (
-                next_node == path_ls[-2] if len(path_ls) > 1 else False))or(# prevent flip flopping
-                roof_ls[next_node[0]]==next_node[1]):  # not a roof node
+                next_node == path_ls[-2] if len(path_ls) > 1 else False)) or (  # prevent flip flopping
+                roof_ls[next_node[0]] == next_node[1]):  # not a roof node
             try:
                 next_node = next(next_node_gen)
             except StopIteration:  # run out of nodes
@@ -218,7 +229,7 @@ def find_top_layer(rock_nodes, roof_ls, start_node):
     curr_node = start_node
     path_ls = [curr_node]
     while curr_node != (6, roof_ls[-1]):
-        curr_node = find_next_node(curr_node,rock_nodes,roof_ls, path_ls)
+        curr_node = find_next_node(curr_node, rock_nodes, roof_ls, path_ls)
         path_ls.append(curr_node)
     return path_ls
 
@@ -236,9 +247,11 @@ def model_falling_rocks(raw_input, num_rocks):
     # define landmarks
     top_point = -1  # highest point (use to determine drop point)
     rock_nodes = {(x, -1) for x in range(7)}  # points that form the "path" of blocking rock
-    air_nodes = set()
 
     for i in range(num_rocks):
+        if i % 1000000 == 0:
+            print(i)
+            print(len(rock_nodes))
         curr_rock = next(rock_gen)
         # postion drop point of the new rock
         x_offset = 2
@@ -286,10 +299,13 @@ def model_falling_rocks(raw_input, num_rocks):
 
                     # define  "roof" (top layer of rock
                     roof_ls = [max([x[1] for x in [y for y in rock_nodes if y[0] == x_coord]]) for x_coord in range(7)]
-                    #drop all nodes lower than the lowest roof
+                    # drop all nodes lower than the lowest roof
 
                     lowest_roof = min(roof_ls)
                     rock_nodes = {x for x in rock_nodes if x[1] >= lowest_roof}
+
+                    # find the cycle
+
 
     return top_point + 1
 
