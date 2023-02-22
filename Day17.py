@@ -246,12 +246,13 @@ def model_falling_rocks(raw_input, num_rocks):
 
     # define landmarks
     top_point = -1  # highest point (use to determine drop point)
-    rock_nodes = {(x, -1) for x in range(7)}  # points that form the "path" of blocking rock
+    rock_nodes = {(x, -1) for x in range(7)}  # points that are fallen rock
+    cycle_rock_nodes_ls = []  # "fingerprint" or rock nodes at each step.  used to find repeating cycles)
 
     for i in range(num_rocks):
-        if i % 1000000 == 0:
-            print(i)
-            print(len(rock_nodes))
+        if i % 10 == 0:
+            print(f"i = {i}")
+            print(f"num rock nodes = {len(rock_nodes)}")
         curr_rock = next(rock_gen)
         # postion drop point of the new rock
         x_offset = 2
@@ -306,7 +307,15 @@ def model_falling_rocks(raw_input, num_rocks):
 
                     # find the cycle
 
+                    # tare rock nodes against the lowest roof
 
+                    cycle_nodes = {(node[0], node[1] - lowest_roof) for node in rock_nodes}
+
+                    if cycle_nodes in cycle_rock_nodes_ls:
+                        print(f"\ncurr cycle:{i}\nnodes:{cycle_nodes}\nnext jet = {next_jet_pattern}")
+                        matching_index = cycle_rock_nodes_ls.index(cycle_nodes)
+                        print(f"matching cycle: {matching_index }\nnodes:{cycle_rock_nodes_ls[matching_index]}\n\n")
+                    cycle_rock_nodes_ls.append(cycle_nodes)
     return top_point + 1
 
 
