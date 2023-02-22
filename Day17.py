@@ -234,6 +234,61 @@ def find_top_layer(rock_nodes, roof_ls, start_node):
     return path_ls
 
 
+def analyze_cycle(curr_cycle, cycle_nodes, cycle_rock_nodes_ls, fingerprint_ls, fingerprint_zero_cycle_index,
+                  num_full_cycles, cycle_height_ls,top_point):
+    """
+    detects cyclic behaviour in the node pattern
+    :param cycle_height_ls: height of stones at each full_cycle
+    :param curr_cycle: current cycle
+    :param cycle_nodes: nodes in the current cycle
+    :param cycle_rock_nodes_ls: nodes in the cycles so far
+    :param fingerprint_ls: nodes defining the current potential cycle
+    :param fingerprint_zero_cycle_index: index of cycle_rock_nodes_ls that corresponds to index 0 of fingerprint_ls
+    :param num_full_cycles: number of full cycles detected so far.
+    :return: cycle_nodes, cycle_rock_nodes_ls, fingerprint_ls, fingerprint_zero_cycle_index, num_full_cycles
+    """
+    matching_index = cycle_rock_nodes_ls.index(cycle_nodes)
+    if num_full_cycles == 0: #full cycle not defined
+        if fingerprint_ls:  # if there's an active list
+            if matching_index == fingerprint_zero_cycle_index:
+                print(f"full cycle complete, cycle is {len(fingerprint_ls)} steps long")
+                num_full_cycles += 1
+                cycle_height_ls.append(top_point)
+            elif fingerprint_zero_cycle_index + len(fingerprint_ls) == matching_index:
+                fingerprint_ls.append(cycle_nodes)
+                print(f"\ncurr cycle:{curr_cycle}\nnodes:{cycle_nodes}\n")
+                print(
+                    f"matching cycle: {matching_index}\nnodes:{cycle_rock_nodes_ls[matching_index]}\n\n")
+            else:  # cycle broke
+                print(f"cycle broke at position {len(fingerprint_ls)}")
+                fingerprint_ls = []
+                fingerprint_zero_cycle_index = None
+        else: #new list
+            fingerprint_zero_cycle_index = matching_index
+            fingerprint_ls.append(cycle_nodes)
+            print(f"\ncurr cycle:{curr_cycle}\nnodes:{cycle_nodes}\n")
+            print(
+                f"matching cycle: {matching_index}\nnodes:{cycle_rock_nodes_ls[matching_index]}\n\n")
+            cycle_height_ls.append(top_point)
+    else:
+        if num_full_cycles == 5: #five full cycles seems good.
+
+        elif matching_index == fingerprint_zero_cycle_index:
+            num_full_cycles += 1
+            print(f"full cycle complete, cycle is {len(fingerprint_ls)} steps long, cycle number {num_full_cycles}")
+            cycle_height_ls.append(top_point)
+        elif fingerprint_zero_cycle_index + len(fingerprint_ls) == matching_index:
+            print(f"\ncurr cycle:{curr_cycle}\nnodes:{cycle_nodes}\n")
+            print(
+                f"matching cycle: {matching_index}\nnodes:{cycle_rock_nodes_ls[matching_index]}\n\n")
+        else:  # cycle broke
+            print(f"cycle broke at position {len(fingerprint_ls)}")
+            fingerprint_ls = []
+            fingerprint_zero_cycle_index = None
+
+    return fingerprint_ls, fingerprint_zero_cycle_index, num_full_cycles, cycle_height_ls
+
+
 def model_falling_rocks(raw_input, num_rocks):
     """
     models the falling of num_rocks given the pattern of jet streams in the puzzle input
@@ -248,6 +303,10 @@ def model_falling_rocks(raw_input, num_rocks):
     top_point = -1  # highest point (use to determine drop point)
     rock_nodes = {(x, -1) for x in range(7)}  # points that are fallen rock
     cycle_rock_nodes_ls = []  # "fingerprint" or rock nodes at each step.  used to find repeating cycles)
+    fingerprint_ls = []
+    fingerprint_zero_cycle_index = None
+    num_cycles = 0
+    cycle_height_ls = [] #height of pile at the end of each cycle
 
     for i in range(num_rocks):
         if i % 10 == 0:
@@ -312,9 +371,16 @@ def model_falling_rocks(raw_input, num_rocks):
                     cycle_nodes = {(node[0], node[1] - lowest_roof) for node in rock_nodes}
 
                     if cycle_nodes in cycle_rock_nodes_ls:
-                        print(f"\ncurr cycle:{i}\nnodes:{cycle_nodes}\nnext jet = {next_jet_pattern}")
-                        matching_index = cycle_rock_nodes_ls.index(cycle_nodes)
-                        print(f"matching cycle: {matching_index }\nnodes:{cycle_rock_nodes_ls[matching_index]}\n\n")
+                        fingerprint_ls, fingerprint_zero_cycle_index, num_full_cycles, cycle_height_ls = analyze_cycle(
+                            i,
+                            cycle_nodes,
+                            cycle_rock_nodes_ls,
+                            fingerprint_ls,
+                            fingerprint_zero_cycle_index,
+                            num_cycles,
+                            cycle_height_ls,
+                            top_point,
+                        )
                     cycle_rock_nodes_ls.append(cycle_nodes)
     return top_point + 1
 

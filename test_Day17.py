@@ -60,6 +60,20 @@ class TestDrawChamber(unittest.TestCase):
             ],
             chamber_ls
         )
+class TestAnalyzeCycle(unittest.TestCase):
+    def test_new_list(self):
+        cycle_rock_nodes_ls = [
+            {(2, 1), (2, 5), (3, 3)},
+            {(2, 2), (1, 1), (3, 2)},
+            {(4, 2), (1, 0), (3, 5), (2, 7)},
+        ]
+        cycle_nodes = {(2, 2), (1, 1), (3, 2)}
+
+        fingerprint_ls = [],
+
+        fingerprint_zero_cycle_index = None
+
+        num_full_cycles = 0
 
 class TestModelFallingRocks(unittest.TestCase):
     def test_model_falling_rocks_part1(self):
