@@ -234,46 +234,54 @@ def find_top_layer(rock_nodes, roof_ls, start_node):
     return path_ls
 
 
-def analyze_cycle(curr_step, cycle_nodes, cycle_rock_nodes_ls, fingerprint_ls, fingerprint_zero_cycle_index,
-                  num_full_cycles, cycle_height_ls, top_point, step_height_ls, cycle_length, num_rocks, total_height):
+def analyze_cycle(curr_step, cycle_nodes, step_rock_nodes_ls, fingerprint_ls, fingerprint_zero_step_index,
+                  curr_fingerprint_index, num_full_cycles, cycle_height_ls, top_point, step_height_ls, cycle_length,
+                  num_rocks, total_height):
     """
     detects cyclic behaviour in the node pattern
+    :param curr_fingerprint_index: index within the fingerprint
     :param total_height: total height of fully modeled stack
     :param num_rocks: total number of rocks to drop (steps)
     :param cycle_length: length of the cycle
     :param step_height_ls: height of the stones at each step of the cycle
     :param top_point: height of the stack.
     :param cycle_height_ls: height of stones at each full_cycle
-    :param curr_step: current cycle
+    :param curr_step: total number of rocks dropped so far
     :param cycle_nodes: nodes in the current cycle
-    :param cycle_rock_nodes_ls: nodes in the cycles so far
+    :param step_rock_nodes_ls: nodes in the steps so far
     :param fingerprint_ls: nodes defining the current potential cycle
-    :param fingerprint_zero_cycle_index: index of cycle_rock_nodes_ls that corresponds to index 0 of fingerprint_ls
+    :param fingerprint_zero_step_index: index of step_rock_nodes_ls that corresponds to index 0 of fingerprint_ls
     :param num_full_cycles: number of full cycles detected so far.
     :return: fingerprint_ls, fingerprint_zero_cycle_index, num_full_cycles, step_height_ls, cycle_length
     """
 
-    matching_index = cycle_rock_nodes_ls.index(cycle_nodes)
+    matching_index = step_rock_nodes_ls.index(cycle_nodes)
     if num_full_cycles == 0:  # full cycle not defined
         if fingerprint_ls:  # if there's an active list
-            if matching_index == fingerprint_zero_cycle_index:
+            if matching_index == fingerprint_zero_step_index:  # completed a cycle
                 cycle_length = len(fingerprint_ls)
                 # print(f"full cycle complete, cycle is {cycle_length} steps long")
                 num_full_cycles += 1
                 cycle_height_ls.append(top_point)
-            elif fingerprint_zero_cycle_index + len(fingerprint_ls) == matching_index:  # cycle continues
+                curr_fingerprint_index = 0
+            elif cycle_nodes == step_rock_nodes_ls[
+                fingerprint_zero_step_index + curr_fingerprint_index + 1]:  # cycle continues
                 fingerprint_ls.append(cycle_nodes)
                 step_height_ls.append(top_point)
+                curr_fingerprint_index += 1
                 # print(f"\ncurr cycle:{curr_step}\nnodes:{cycle_nodes}\n")
                 # print(
                 #   f"matching cycle: {matching_index}\nnodes:{cycle_rock_nodes_ls[matching_index]}\n\n")
             else:  # cycle broke
-                # print(f"cycle broke at position {len(fingerprint_ls)}")
+                print(f"cycle broke at position {len(fingerprint_ls)}")
                 fingerprint_ls = []
                 step_height_ls = []
-                fingerprint_zero_cycle_index = None
+                cycle_height_ls = []
+                curr_fingerprint_index = None
+                fingerprint_zero_step_index = None
         else:  # new list
-            fingerprint_zero_cycle_index = matching_index
+            fingerprint_zero_step_index = matching_index
+            curr_fingerprint_index = 0
             fingerprint_ls.append(cycle_nodes)
             step_height_ls.append(top_point)
             # print(f"\ncurr cycle:{curr_step}\nnodes:{cycle_nodes}\n")
@@ -281,28 +289,35 @@ def analyze_cycle(curr_step, cycle_nodes, cycle_rock_nodes_ls, fingerprint_ls, f
             #   f"matching cycle: {matching_index}\nnodes:{cycle_rock_nodes_ls[matching_index]}\n\n")
             cycle_height_ls.append(top_point)
     else:
-        if num_full_cycles == 2:  # two full cycles seems good.
-            # does the stack gain the same height each full cycle?
-            height_diff_ls = [cycle_height_ls[i + 1] - cycle_height_ls[i] for i in range(len(cycle_height_ls) - 1)]
-            if len(set(height_diff_ls)) <= 1:  # all are same value:
-                # how many rocks left to drop
-                num_remaining_rocks = num_rocks - curr_step
-                # how many full cycles is that and how many remaining steps?
-                quotient, remainder = divmod(num_remaining_rocks, cycle_length)
-                full_cycle_height = quotient * height_diff_ls[0]
-                partial_cycle_height = step_height_ls[remainder] - step_height_ls[0]
-                total_height = top_point + full_cycle_height + partial_cycle_height - 1
-        elif matching_index == fingerprint_zero_cycle_index:
+        if (curr_fingerprint_index == len(fingerprint_ls)-1) and (cycle_nodes == fingerprint_ls[0]) :  # completed a cycle
             num_full_cycles += 1
             # print(f"full cycle complete, cycle is {len(fingerprint_ls)} steps long, cycle number {num_full_cycles}")
             cycle_height_ls.append(top_point)
-        elif fingerprint_ls.index(cycle_nodes) + fingerprint_zero_cycle_index != matching_index: # cycle broke
-            # print(f"cycle broke at position {len(fingerprint_ls)}")
+            curr_fingerprint_index = 0
+            if num_full_cycles == 3:  # three full cycles seems good.
+                # does the stack gain the same height each full cycle?
+                height_diff_ls = [cycle_height_ls[i + 1] - cycle_height_ls[i] for i in range(len(cycle_height_ls) - 1)]
+                if len(set(height_diff_ls)) <= 1:  # all are same value:
+                    # how many rocks left to drop
+                    num_remaining_rocks = num_rocks - curr_step
+                    # how many full cycles is that and how many remaining steps?
+                    quotient, remainder = divmod(num_remaining_rocks, cycle_length)
+                    full_cycle_height = quotient * height_diff_ls[0]
+                    partial_cycle_height = step_height_ls[remainder] - step_height_ls[0]
+                    total_height = top_point + full_cycle_height + partial_cycle_height
+        elif cycle_nodes == fingerprint_ls[curr_fingerprint_index+1]:  # cycle continues
+            curr_fingerprint_index += 1
+        else:  # cycle broke
+            print(f"cycle broke at position {len(fingerprint_ls)}")
             fingerprint_ls = []
             step_height_ls = []
-            fingerprint_zero_cycle_index = None
+            cycle_height_ls = []
+            cycle_length = None
+            fingerprint_zero_step_index = None
+            curr_fingerprint_index = None
+            num_full_cycles = 0
 
-    return fingerprint_ls, fingerprint_zero_cycle_index, num_full_cycles, cycle_height_ls, step_height_ls, cycle_length, total_height
+    return fingerprint_ls, fingerprint_zero_step_index, curr_fingerprint_index, num_full_cycles, cycle_height_ls, step_height_ls, cycle_length, total_height
 
 
 def model_falling_rocks(raw_input, num_rocks):
@@ -324,9 +339,10 @@ def model_falling_rocks(raw_input, num_rocks):
 
     cycle_rock_nodes_ls = []  # "fingerprint" or rock nodes at each step.  used to find repeating cycles)
     fingerprint_ls = []
+    fingerprint_zero_cycle_index = None
+    curr_fingerprint_index = None
 
     step_height_ls = []
-    fingerprint_zero_cycle_index = None
     num_full_cycles = 0
     cycle_length = None
     cycle_height_ls = []  # height of pile at the end of each cycle
@@ -394,12 +410,13 @@ def model_falling_rocks(raw_input, num_rocks):
                     cycle_nodes = {(node[0], node[1] - lowest_roof) for node in rock_nodes}
 
                     if cycle_nodes in cycle_rock_nodes_ls:
-                        fingerprint_ls, fingerprint_zero_cycle_index, num_full_cycles, cycle_height_ls, step_height_ls, cycle_length, total_height = analyze_cycle(
+                        fingerprint_ls, fingerprint_zero_cycle_index, curr_fingerprint_index, num_full_cycles, cycle_height_ls, step_height_ls, cycle_length, total_height = analyze_cycle(
                             curr_step,
                             cycle_nodes,
                             cycle_rock_nodes_ls,
                             fingerprint_ls,
                             fingerprint_zero_cycle_index,
+                            curr_fingerprint_index,
                             num_full_cycles,
                             cycle_height_ls,
                             top_point,
