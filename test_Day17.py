@@ -66,6 +66,7 @@ class TestAnalyzeCycle(unittest.TestCase):
             {(2, 1), (2, 5), (3, 3)},
             {(2, 2), (1, 1), (3, 2)},
             {(4, 2), (1, 0), (3, 5), (2, 7)},
+            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)}
         ]
         cycle_nodes = {(2, 2), (1, 1), (3, 2)}
 
@@ -74,6 +75,21 @@ class TestAnalyzeCycle(unittest.TestCase):
         fingerprint_zero_cycle_index = None
 
         num_full_cycles = 0
+
+        Day17.analyze_cycle(
+            curr_step,
+            cycle_nodes,
+            cycle_rock_nodes_ls,
+            fingerprint_ls,
+            fingerprint_zero_cycle_index,
+            num_full_cycles,
+            cycle_height_ls,
+            top_point,
+            step_height_ls,
+            cycle_length,
+            num_rocks,
+            total_height,
+        )
 
 class TestModelFallingRocks(unittest.TestCase):
     def test_model_falling_rocks_part1(self):

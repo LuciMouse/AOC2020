@@ -258,17 +258,17 @@ def analyze_cycle(curr_step, cycle_nodes, cycle_rock_nodes_ls, fingerprint_ls, f
         if fingerprint_ls:  # if there's an active list
             if matching_index == fingerprint_zero_cycle_index:
                 cycle_length = len(fingerprint_ls)
-                print(f"full cycle complete, cycle is {cycle_length} steps long")
+                # print(f"full cycle complete, cycle is {cycle_length} steps long")
                 num_full_cycles += 1
                 cycle_height_ls.append(top_point)
             elif fingerprint_zero_cycle_index + len(fingerprint_ls) == matching_index:  # cycle continues
                 fingerprint_ls.append(cycle_nodes)
                 step_height_ls.append(top_point)
-                print(f"\ncurr cycle:{curr_step}\nnodes:{cycle_nodes}\n")
-                print(
-                    f"matching cycle: {matching_index}\nnodes:{cycle_rock_nodes_ls[matching_index]}\n\n")
+                # print(f"\ncurr cycle:{curr_step}\nnodes:{cycle_nodes}\n")
+                # print(
+                #   f"matching cycle: {matching_index}\nnodes:{cycle_rock_nodes_ls[matching_index]}\n\n")
             else:  # cycle broke
-                print(f"cycle broke at position {len(fingerprint_ls)}")
+                # print(f"cycle broke at position {len(fingerprint_ls)}")
                 fingerprint_ls = []
                 step_height_ls = []
                 fingerprint_zero_cycle_index = None
@@ -276,9 +276,9 @@ def analyze_cycle(curr_step, cycle_nodes, cycle_rock_nodes_ls, fingerprint_ls, f
             fingerprint_zero_cycle_index = matching_index
             fingerprint_ls.append(cycle_nodes)
             step_height_ls.append(top_point)
-            print(f"\ncurr cycle:{curr_step}\nnodes:{cycle_nodes}\n")
-            print(
-                f"matching cycle: {matching_index}\nnodes:{cycle_rock_nodes_ls[matching_index]}\n\n")
+            # print(f"\ncurr cycle:{curr_step}\nnodes:{cycle_nodes}\n")
+            # print(
+            #   f"matching cycle: {matching_index}\nnodes:{cycle_rock_nodes_ls[matching_index]}\n\n")
             cycle_height_ls.append(top_point)
     else:
         if num_full_cycles == 2:  # two full cycles seems good.
@@ -291,15 +291,13 @@ def analyze_cycle(curr_step, cycle_nodes, cycle_rock_nodes_ls, fingerprint_ls, f
                 quotient, remainder = divmod(num_remaining_rocks, cycle_length)
                 full_cycle_height = quotient * height_diff_ls[0]
                 partial_cycle_height = step_height_ls[remainder] - step_height_ls[0]
-                total_height = top_point + full_cycle_height + partial_cycle_height-1
+                total_height = top_point + full_cycle_height + partial_cycle_height - 1
         elif matching_index == fingerprint_zero_cycle_index:
             num_full_cycles += 1
-            print(f"full cycle complete, cycle is {len(fingerprint_ls)} steps long, cycle number {num_full_cycles}")
+            # print(f"full cycle complete, cycle is {len(fingerprint_ls)} steps long, cycle number {num_full_cycles}")
             cycle_height_ls.append(top_point)
-        elif fingerprint_ls.index(cycle_nodes) + fingerprint_zero_cycle_index == matching_index:
-            print(f"curr cycle:{curr_step} matches fingerprint")
-        else:  # cycle broke
-            print(f"cycle broke at position {len(fingerprint_ls)}")
+        elif fingerprint_ls.index(cycle_nodes) + fingerprint_zero_cycle_index != matching_index: # cycle broke
+            # print(f"cycle broke at position {len(fingerprint_ls)}")
             fingerprint_ls = []
             step_height_ls = []
             fingerprint_zero_cycle_index = None
