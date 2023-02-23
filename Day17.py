@@ -272,15 +272,14 @@ def analyze_cycle(curr_cycle, cycle_nodes, cycle_rock_nodes_ls, fingerprint_ls, 
             cycle_height_ls.append(top_point)
     else:
         if num_full_cycles == 5: #five full cycles seems good.
-
+            #does the stack gain the same height each full cycle?
+            height_diff_ls = [cycle_height_ls[i+1] - cycle_height_ls[i] for i in range(len(cycle_height_ls)-1)]
         elif matching_index == fingerprint_zero_cycle_index:
             num_full_cycles += 1
             print(f"full cycle complete, cycle is {len(fingerprint_ls)} steps long, cycle number {num_full_cycles}")
             cycle_height_ls.append(top_point)
-        elif fingerprint_zero_cycle_index + len(fingerprint_ls) == matching_index:
-            print(f"\ncurr cycle:{curr_cycle}\nnodes:{cycle_nodes}\n")
-            print(
-                f"matching cycle: {matching_index}\nnodes:{cycle_rock_nodes_ls[matching_index]}\n\n")
+        elif fingerprint_ls.index(cycle_nodes) + fingerprint_zero_cycle_index == matching_index:
+            print(f"curr cycle:{curr_cycle} matches fingerprint")
         else:  # cycle broke
             print(f"cycle broke at position {len(fingerprint_ls)}")
             fingerprint_ls = []
@@ -305,11 +304,11 @@ def model_falling_rocks(raw_input, num_rocks):
     cycle_rock_nodes_ls = []  # "fingerprint" or rock nodes at each step.  used to find repeating cycles)
     fingerprint_ls = []
     fingerprint_zero_cycle_index = None
-    num_cycles = 0
+    num_full_cycles = 0
     cycle_height_ls = [] #height of pile at the end of each cycle
 
     for i in range(num_rocks):
-        if i % 10 == 0:
+        if i % 1000 == 0:
             print(f"i = {i}")
             print(f"num rock nodes = {len(rock_nodes)}")
         curr_rock = next(rock_gen)
@@ -377,7 +376,7 @@ def model_falling_rocks(raw_input, num_rocks):
                             cycle_rock_nodes_ls,
                             fingerprint_ls,
                             fingerprint_zero_cycle_index,
-                            num_cycles,
+                            num_full_cycles,
                             cycle_height_ls,
                             top_point,
                         )
