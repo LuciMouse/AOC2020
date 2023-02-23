@@ -69,7 +69,7 @@ class TestAnalyzeCycle(unittest.TestCase):
         ]
         cycle_nodes = {(2, 2), (1, 1), (3, 2)}
 
-        fingerprint_ls = [],
+        fingerprint_ls = []
 
         fingerprint_zero_cycle_index = None
 
