@@ -1,4 +1,5 @@
 import unittest
+from aocd import data
 import Day17
 
 
@@ -68,7 +69,7 @@ class TestAnalyzeCycle(unittest.TestCase):
         :return:
         """
         curr_step = 4
-        cycle_nodes = {(2, 2), (1, 1), (3, 2)}
+        step_nodes = {(2, 2), (1, 1), (3, 2)}
         step_rock_nodes_ls = [
             {(2, 1), (2, 5), (3, 3)},
             {(2, 2), (1, 1), (3, 2)},
@@ -99,7 +100,7 @@ class TestAnalyzeCycle(unittest.TestCase):
             ),
             Day17.analyze_cycle(
                 curr_step,
-                cycle_nodes,
+                step_nodes,
                 step_rock_nodes_ls,
                 fingerprint_ls,
                 fingerprint_zero_cycle_index,
@@ -120,7 +121,7 @@ class TestAnalyzeCycle(unittest.TestCase):
         :return:
         """
         curr_step = 5
-        cycle_nodes = {(4, 2), (1, 0), (3, 5), (2, 7)}
+        step_nodes = {(4, 2), (1, 0), (3, 5), (2, 7)}
         step_rock_nodes_ls = [
             {(2, 1), (2, 5), (3, 3)},
             {(2, 2), (1, 1), (3, 2)},
@@ -155,7 +156,7 @@ class TestAnalyzeCycle(unittest.TestCase):
             ),
             Day17.analyze_cycle(
                 curr_step,
-                cycle_nodes,
+                step_nodes,
                 step_rock_nodes_ls,
                 fingerprint_ls,
                 fingerprint_zero_cycle_index,
@@ -177,7 +178,7 @@ class TestAnalyzeCycle(unittest.TestCase):
         :return:
         """
         curr_step = 7
-        cycle_nodes = {(2, 2), (1, 1), (3, 2)}
+        step_nodes = {(2, 2), (1, 1), (3, 2)}
         step_rock_nodes_ls = [
             {(2, 1), (2, 5), (3, 3)},
             {(2, 2), (1, 1), (3, 2)},
@@ -219,7 +220,7 @@ class TestAnalyzeCycle(unittest.TestCase):
             ),
             Day17.analyze_cycle(
                 curr_step,
-                cycle_nodes,
+                step_nodes,
                 step_rock_nodes_ls,
                 fingerprint_ls,
                 fingerprint_zero_cycle_index,
@@ -241,7 +242,7 @@ class TestAnalyzeCycle(unittest.TestCase):
         :return:
         """
         curr_step = 7
-        cycle_nodes = {(4, 2), (1, 0), (3, 5), (2, 7)}
+        step_nodes = {(4, 2), (1, 0), (3, 5), (2, 7)}
         step_rock_nodes_ls = [
             {(2, 1), (2, 5), (3, 3)},
             {(2, 2), (1, 1), (3, 2)},
@@ -279,7 +280,7 @@ class TestAnalyzeCycle(unittest.TestCase):
             ),
             Day17.analyze_cycle(
                 curr_step,
-                cycle_nodes,
+                step_nodes,
                 step_rock_nodes_ls,
                 fingerprint_ls,
                 fingerprint_zero_cycle_index,
@@ -300,7 +301,7 @@ class TestAnalyzeCycle(unittest.TestCase):
         :return:
         """
         curr_step = 8
-        cycle_nodes = {(4, 2), (1, 0), (3, 5), (2, 7)}
+        step_nodes = {(4, 2), (1, 0), (3, 5), (2, 7)}
         step_rock_nodes_ls = [
             {(2, 1), (2, 5), (3, 3)},
             {(2, 2), (1, 1), (3, 2)},
@@ -343,7 +344,7 @@ class TestAnalyzeCycle(unittest.TestCase):
             ),
             Day17.analyze_cycle(
                 curr_step,
-                cycle_nodes,
+                step_nodes,
                 step_rock_nodes_ls,
                 fingerprint_ls,
                 fingerprint_zero_cycle_index,
@@ -364,7 +365,7 @@ class TestAnalyzeCycle(unittest.TestCase):
         :return:
         """
         curr_step = 8
-        cycle_nodes = {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)}
+        step_nodes = {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)}
         step_rock_nodes_ls= [
             {(2, 1), (2, 5), (3, 3)},
             {(2, 2), (1, 1), (3, 2)},
@@ -403,7 +404,7 @@ class TestAnalyzeCycle(unittest.TestCase):
             ),
             Day17.analyze_cycle(
                 curr_step,
-                cycle_nodes,
+                step_nodes,
                 step_rock_nodes_ls,
                 fingerprint_ls,
                 fingerprint_zero_cycle_index,
@@ -424,7 +425,7 @@ class TestAnalyzeCycle(unittest.TestCase):
         :return:
         """
         curr_step = 10
-        cycle_nodes = {(2, 2), (1, 1), (3, 2)}
+        step_nodes = {(2, 2), (1, 1), (3, 2)}
         step_rock_nodes_ls = [
             {(2, 1), (2, 5), (3, 3)},
             {(2, 2), (1, 1), (3, 2)},
@@ -469,7 +470,7 @@ class TestAnalyzeCycle(unittest.TestCase):
             ),
             Day17.analyze_cycle(
                 curr_step,
-                cycle_nodes,
+                step_nodes,
                 step_rock_nodes_ls,
                 fingerprint_ls,
                 fingerprint_zero_cycle_index,
@@ -490,7 +491,7 @@ class TestAnalyzeCycle(unittest.TestCase):
         :return:
         """
         curr_step = 13
-        cycle_nodes = {(2, 2), (1, 1), (3, 2)}
+        step_nodes = {(2, 2), (1, 1), (3, 2)}
         step_rock_nodes_ls = [
             {(2, 1), (2, 5), (3, 3)},
             {(2, 2), (1, 1), (3, 2)},
@@ -538,7 +539,7 @@ class TestAnalyzeCycle(unittest.TestCase):
             ),
             Day17.analyze_cycle(
                 curr_step,
-                cycle_nodes,
+                step_nodes,
                 step_rock_nodes_ls,
                 fingerprint_ls,
                 fingerprint_zero_cycle_index,
@@ -561,6 +562,11 @@ class TestModelFallingRocks(unittest.TestCase):
         self.assertEqual(
             3068,
             Day17.model_falling_rocks(raw_input, 2022)
+        )
+    def test_model_falling_rocks_full_data_part1(self):
+        self.assertEqual(
+            3153,
+            Day17.model_falling_rocks(data, 2022)
         )
     def test_model_falling_rocks_part2(self):
         with open("Day17_test_input.txt") as input_file:
