@@ -234,8 +234,73 @@ def find_top_layer(rock_nodes, roof_ls, start_node):
     return path_ls
 
 
+def try_single_cycle(curr_step, step_nodes, curr_cycle, step_rock_nodes_ls, top_point, step_height_all_ls):
+    """
+    sees if the current potential cycle aligns with the current data
+    :param curr_step: total number of rocks dropped so far
+    :param step_nodes: nodes in the current cycle
+    :param curr_cycle: potential cycle to analyze
+        a potential cycle is defined as tuple of (start_index, curr_index, end_index, num_full_cycles, cycle_height_ls, step_height_ls)
+            start_index: index of step_rock_nodes that corresponds to the start of the cycle
+            curr_index: index of step_rock_nodes that corresponds to the current position in the cycle
+            end_index: index of step_rock_nodes that corresponds to the end of the cycle (if known)
+            num_full_cycles: number of times a full cycle of this has been completed
+            cycle_height_ls: height of stones at each full_cycle
+            step_height_ls: height of the stones at each step of the cycle
+    :param step_rock_nodes_ls: nodes in the steps so far
+    :param top_point: height of the stack.
+    :param step_height_all_ls: heights of the pile at every point.  corresponds to step_rock_nodes_ls
+    :return:
+    """
+    start_index, curr_index, end_index, num_full_cycles, cycle_height_ls, step_height_ls = curr_cycle
+    if curr_index == end_index:  # finished the full defined cycle
+        if step_nodes == step_rock_nodes_ls[start_index]:  # start next full cycle
+            return [
+                (
+                    start_index,
+                    start_index,
+                    curr_index,
+                    num_full_cycles + 1,
+                    cycle_height_ls + [top_point],
+                    step_height_ls,
+                )
+            ]
+    elif step_nodes == step_rock_nodes_ls[curr_index + 1]:  # cycle continues
+        return [
+            (
+                start_index,
+                curr_index + 1,
+                end_index,
+                num_full_cycles,
+                cycle_height_ls,
+                step_height_ls,
+            )
+        ]
+    else:  # cycle breaks
+        # cycle may be more complex
+        cycle_1 = [
+            (start_index,
+             curr_index + 1,
+             curr_step,
+             num_full_cycles,
+             cycle_height_ls,
+             step_height_all_ls[start_index:] + [top_point])
+        ]
+
+        # or a new cycle from this point
+        second_start_index = step_rock_nodes_ls.index(step_nodes, start_index + 1)
+        cycle_2 = [
+            (second_start_index,
+             second_start_index,
+             curr_step - 1,
+             1,
+             [step_height_all_ls[second_start_index]],
+             step_height_all_ls[second_start_index:curr_step])
+        ]
+        return cycle_1 + cycle_2
+
 def analyze_cycle(curr_step, step_nodes, step_rock_nodes_ls, potential_cycles_ls, top_point,
-                  num_rocks, total_height):
+                  num_rocks, total_height, step_height_all_ls, num_cycles):
     """
     detects cyclic behaviour in the node pattern
 
@@ -262,10 +327,56 @@ def analyze_cycle(curr_step, step_nodes, step_rock_nodes_ls, potential_cycles_ls
     :param top_point: height of the stack.
     :param num_rocks: total number of rocks to drop (steps)
     :param total_height: total height of fully modeled stack
+    :param step_height_all_ls: heights of the pile at every point.  corresponds to step_rock_nodes_ls
+    :param num_cycles: number of times a potential cycle needs to appear for it to be considered reliable
     :return: fingerprint_ls, fingerprint_zero_cycle_index, num_full_cycles, step_height_ls, cycle_length
     """
 
-    matching_index = step_rock_nodes_ls.index(step_nodes)
+    if potential_cycles_ls:  # at least one potential cycle defined
+        processed_potential_cycle_ls = []
+        for curr_cycle in potential_cycles_ls:
+            new_potential_cycles_ls = try_single_cycle(
+                curr_step,
+                step_nodes,
+                curr_cycle,
+                step_rock_nodes_ls,
+                top_point,
+                step_height_all_ls,
+            )
+            for new_cycle in new_potential_cycles_ls:
+                start_index, curr_index, end_index, num_full_cycles, cycle_height_ls, step_height_ls = new_cycle
+                if num_full_cycles == num_cycles:  # we feel confident that this cycle pattern repeats until the end of the rock stack
+                    # does the stack gain the same height each full cycle?
+                    height_diff_ls = [cycle_height_ls[i + 1] - cycle_height_ls[i] for i in
+                                      range(len(cycle_height_ls) - 1)]
+                    if len(set(height_diff_ls)) <= 1:  # all are same value:
+                        # how many rocks left to drop
+                        num_remaining_rocks = num_rocks - curr_step
+                        # how many full cycles is that and how many remaining steps?
+                        cycle_length = end_index - start_index
+                        quotient, remainder = divmod(num_remaining_rocks, cycle_length)
+                        full_cycle_height = quotient * height_diff_ls[0]
+                        partial_cycle_height = step_height_ls[remainder] - step_height_ls[0]
+                        total_height = top_point + full_cycle_height + partial_cycle_height
+
+                        return potential_cycles_ls + [new_cycle], total_height
+                else:  # no cycles have repeated the required number of full cycles, need to process another step
+                    processed_potential_cycle_ls.append(new_cycle)
+        potential_cycles_ls = processed_potential_cycle_ls
+    else:  # define first potential cycle
+        matching_index = step_rock_nodes_ls.index(step_nodes)
+        potential_cycles_ls.append(
+            (
+                matching_index,
+                matching_index,
+                curr_step - 1,
+                1,
+                [step_height_all_ls[matching_index]],
+                step_height_all_ls[matching_index:curr_step]
+            )
+        )
+
+    """matching_index = step_rock_nodes_ls.index(step_nodes)
     if num_full_cycles == 0:  # full cycle not defined
         if fingerprint_ls:  # if there's an active list
             if matching_index == fingerprint_zero_step_index:  # completed a cycle
@@ -299,7 +410,8 @@ def analyze_cycle(curr_step, step_nodes, step_rock_nodes_ls, potential_cycles_ls
             #   f"matching cycle: {matching_index}\nnodes:{cycle_rock_nodes_ls[matching_index]}\n\n")
             cycle_height_ls.append(top_point)
     else:
-        if (curr_fingerprint_index == len(fingerprint_ls)-1) and (step_nodes == fingerprint_ls[0]) :  # completed a cycle
+        if (curr_fingerprint_index == len(fingerprint_ls) - 1) and (
+                step_nodes == fingerprint_ls[0]):  # completed a cycle
             num_full_cycles += 1
             # print(f"full cycle complete, cycle is {len(fingerprint_ls)} steps long, cycle number {num_full_cycles}")
             cycle_height_ls.append(top_point)
@@ -325,17 +437,19 @@ def analyze_cycle(curr_step, step_nodes, step_rock_nodes_ls, potential_cycles_ls
             cycle_length = None
             fingerprint_zero_step_index = None
             curr_fingerprint_index = None
-            num_full_cycles = 0
+            num_full_cycles = 0"""
 
-    return fingerprint_ls, fingerprint_zero_step_index, curr_fingerprint_index, num_full_cycles, cycle_height_ls, step_height_ls, cycle_length, total_height
+    return potential_cycles_ls, total_height
 
 
-def model_falling_rocks(raw_input, num_rocks):
+def model_falling_rocks(raw_input, num_rocks, num_cycles):
     """
     models the falling of num_rocks given the pattern of jet streams in the puzzle input
+
     :param raw_input: puzzle input
     :param num_rocks: number of rocks to model
-    :return:
+    :param num_cycles: number of times a potential cycle needs to appear for it to be considered reliable
+    :return: total height of the rock pile after num_rocks rocks have fallen
     """
     jet_pattern_gen = make_jet_pattern_generator(raw_input)
     rock_gen = make_rock_generator()
@@ -347,12 +461,12 @@ def model_falling_rocks(raw_input, num_rocks):
     total_height = None  # height of the whole modeled stack
     curr_step = 0
 
-    cycle_rock_nodes_ls = []  # "fingerprint" or rock nodes at each step.  used to find repeating cycles)
+    step_rock_nodes_ls = []  # "fingerprint" or rock nodes at each step.  used to find repeating cycles)
     fingerprint_ls = []
     fingerprint_zero_cycle_index = None
     curr_fingerprint_index = None
 
-    step_height_ls = []
+    step_height_all_ls = []
     num_full_cycles = 0
     cycle_length = None
     cycle_height_ls = []  # height of pile at the end of each cycle
@@ -417,26 +531,23 @@ def model_falling_rocks(raw_input, num_rocks):
 
                     # tare rock nodes against the lowest roof
 
-                    cycle_nodes = {(node[0], node[1] - lowest_roof) for node in rock_nodes}
+                    step_nodes = {(node[0], node[1] - lowest_roof) for node in rock_nodes}
 
-                    if cycle_nodes in cycle_rock_nodes_ls:
-                        fingerprint_ls, fingerprint_zero_cycle_index, curr_fingerprint_index, num_full_cycles, cycle_height_ls, step_height_ls, cycle_length, total_height = analyze_cycle(
+                    if step_nodes in step_rock_nodes_ls:
+                        potential_cycles_ls, total_height = analyze_cycle(
                             curr_step,
-                            cycle_nodes,
-                            cycle_rock_nodes_ls,
-                            fingerprint_ls,
-                            fingerprint_zero_cycle_index,
-                            curr_fingerprint_index,
-                            num_full_cycles,
-                            cycle_height_ls,
+                            step_nodes,
+                            step_rock_nodes_ls,
+                            potential_cycles_ls,
                             top_point,
-                            step_height_ls,
-                            cycle_length,
                             num_rocks,
                             total_height,
+                            step_height_all_ls,
+                            num_cycles,
                         )
 
-                    cycle_rock_nodes_ls.append(cycle_nodes)
+                    step_rock_nodes_ls.append(step_nodes)
+                    step_height_all_ls.append(top_point)
         curr_step += 1
     return total_height
 
