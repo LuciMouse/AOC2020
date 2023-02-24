@@ -554,4 +554,4 @@ def model_falling_rocks(raw_input, num_rocks, num_cycles, input_len):
 
 
 if __name__ == '__main__':
-    print(f"height of final tower is {model_falling_rocks(data, 2022)}")
+    print(f"height of final tower is {model_falling_rocks(data, 1000000000000, 3, len(data))}")
