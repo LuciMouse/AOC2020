@@ -31,7 +31,7 @@ class TestMakeRockGenerator(unittest.TestCase):
             i += 1
         self.assertEqual(
             "-+LI.-+LI.-+",
-
+            output_str
         )
 
 
@@ -162,6 +162,8 @@ class TestSingleCycle(unittest.TestCase):
             )
         )
     def test_try_single_cycle_break(self):
+        # break pattern in the middle of the cycle
+        # cycle was assumed to be ABC but is not.  Try ABCAC and CA as potential cycles
         curr_step = 5
         step_nodes = {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)}
         curr_cycle = (
@@ -191,8 +193,135 @@ class TestSingleCycle(unittest.TestCase):
             [
                 (
                     1,
-                    2,
                     5,
+                    5,
+                    1,
+                    [20],
+                    [20, 23, 25, 30, 35]
+                ),
+                (
+                    3,
+                    3,
+                    4,
+                    1,
+                    [25],
+                    [25, 30]
+                )
+            ]
+            ,
+            Day17.try_single_cycle(
+                curr_step,
+                step_nodes,
+                curr_cycle,
+                step_rock_nodes_ls,
+                top_point,
+                step_height_all_ls
+            )
+        )
+    def test_try_single_cycle_break_cycle_new(self):
+        # break the pattern at the end of the second cycle
+        # The cycle is naively assumed to be ABC but is actually ABCABCD
+        # This is the first appearance of 'D' so it will only enter analyze_cycle() on the step after that
+        curr_step = 8
+        step_nodes = {(2, 2), (1, 1), (3, 2)},
+        curr_cycle = (
+                        1,
+                        3,
+                        3,
+                        1,
+                        [20],
+                        [20, 23, 25]
+                    )
+        step_rock_nodes_ls = [
+            {(2, 1), (2, 5), (3, 3)},
+            {(2, 2), (1, 1), (3, 2)},
+            {(4, 2), (1, 0), (3, 5), (2, 7)},
+            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
+            {(2, 2), (1, 1), (3, 2)},
+            {(4, 2), (1, 0), (3, 5), (2, 7)},
+            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
+            {(3, 1), (2, 7), (3, 5)},
+        ]
+        top_point = 40
+        step_height_all_ls = [
+            17,
+            20,
+            23,
+            25,
+            30,
+            33,
+            35,
+            38,
+        ]
+        self.assertEqual(
+            [
+                (
+                    1,
+                    7,
+                    7,
+                    1,
+                    [20],
+                    [20, 23, 25, 30, 33, 35, 38]
+                ),
+                (
+                    3,
+                    3,
+                    4,
+                    1,
+                    [25],
+                    [25, 30]
+                )
+            ]
+            ,
+            Day17.try_single_cycle(
+                curr_step,
+                step_nodes,
+                curr_cycle,
+                step_rock_nodes_ls,
+                top_point,
+                step_height_all_ls
+            )
+        )
+
+    def test_try_single_cycle_break_cycle_existing(self):
+        # break the pattern at the end of the second cycle
+        # The cycle is naively assumed to be BCD but is actually ABCDBCD
+        # The "real" cycle includes the originally omitted node "A" as opposed to the last test that introdduced a new node so this test triggers a cycle earlier
+        curr_step = 7
+        step_nodes = {(2, 1), (2, 5), (3, 3)},
+        curr_cycle = (
+                        1,
+                        3,
+                        3,
+                        1,
+                        [20],
+                        [20, 23, 25]
+                    )
+        step_rock_nodes_ls = [
+            {(2, 1), (2, 5), (3, 3)},
+            {(2, 2), (1, 1), (3, 2)},
+            {(4, 2), (1, 0), (3, 5), (2, 7)},
+            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
+            {(2, 2), (1, 1), (3, 2)},
+            {(4, 2), (1, 0), (3, 5), (2, 7)},
+            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
+        ]
+        top_point = 37
+        step_height_all_ls = [
+            17,
+            20,
+            23,
+            25,
+            30,
+            33,
+            35,
+        ]
+        self.assertEqual(
+            [
+                (
+                    1,
+                    6,
+                    7,
                     1,
                     [20],
                     [20, 23, 25, 30, 35]
