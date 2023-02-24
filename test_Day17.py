@@ -700,12 +700,12 @@ class TestModelFallingRocks(unittest.TestCase):
 
         self.assertEqual(
             3068,
-            Day17.model_falling_rocks(raw_input, 2022, 3)
+            Day17.model_falling_rocks(raw_input, 2022, 3, len(raw_input))
         )
     def test_model_falling_rocks_full_data_part1(self):
         self.assertEqual(
             3153,
-            Day17.model_falling_rocks(data, 2022, 3)
+            Day17.model_falling_rocks(data, 2022, 3, len(data))
         )
     def test_model_falling_rocks_part2(self):
         with open("Day17_test_input.txt") as input_file:
@@ -713,7 +713,7 @@ class TestModelFallingRocks(unittest.TestCase):
 
         self.assertEqual(
             1514285714288,
-            Day17.model_falling_rocks(raw_input, 1000000000000, 3)
+            Day17.model_falling_rocks(raw_input, 1000000000000, 3, len(raw_input))
         )
 
 

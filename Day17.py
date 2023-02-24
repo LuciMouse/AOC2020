@@ -440,7 +440,7 @@ def analyze_cycle(curr_step, step_nodes, step_rock_nodes_ls, potential_cycles_ls
     return potential_cycles_ls, total_height
 
 
-def model_falling_rocks(raw_input, num_rocks, num_cycles):
+def model_falling_rocks(raw_input, num_rocks, num_cycles, input_len):
     """
     models the falling of num_rocks given the pattern of jet streams in the puzzle input
 
@@ -520,38 +520,37 @@ def model_falling_rocks(raw_input, num_rocks, num_cycles):
                     lowest_roof = min(roof_ls)
                     rock_nodes = {x for x in rock_nodes if x[1] >= lowest_roof}
 
-                    # find the cycle
-
+                    # find the cycle if we're over the length of the input string
                     # tare rock nodes against the lowest roof
                     step_nodes = {(node[0], node[1] - lowest_roof) for node in rock_nodes}
-
-                    # Do we already have potential cycles to test?
-                    if potential_cycles_ls:
-                        potential_cycles_ls, total_height = analyze_cycle(
-                            curr_step,
-                            step_nodes,
-                            step_rock_nodes_ls,
-                            potential_cycles_ls,
-                            top_point,
-                            num_rocks,
-                            total_height,
-                            step_height_all_ls,
-                            num_cycles,
-                        )
-                    else:  # cycle not yet defined.  Does this step identify a cycle?
-                        if step_nodes in step_rock_nodes_ls:
-                            start_index = step_rock_nodes_ls.index(step_nodes)
-                            potential_cycles_ls = new_cycle(
-                                start_index,
+                    if curr_step >= input_len:
+                        # Do we already have potential cycles to test?
+                        if potential_cycles_ls:
+                            potential_cycles_ls, total_height = analyze_cycle(
                                 curr_step,
+                                step_nodes,
+                                step_rock_nodes_ls,
+                                potential_cycles_ls,
                                 top_point,
+                                num_rocks,
+                                total_height,
                                 step_height_all_ls,
+                                num_cycles,
                             )
+                        else:  # cycle not yet defined.  Does this step identify a cycle?
+                            if step_nodes in step_rock_nodes_ls:
+                                start_index = step_rock_nodes_ls.index(step_nodes)
+                                potential_cycles_ls = new_cycle(
+                                    start_index,
+                                    curr_step,
+                                    top_point,
+                                    step_height_all_ls,
+                                )
 
                     step_rock_nodes_ls.append(step_nodes)
                     step_height_all_ls.append(top_point)
         curr_step += 1
-    return total_height
+    return total_height if total_height else top_point+1
 
 
 if __name__ == '__main__':
