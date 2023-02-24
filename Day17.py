@@ -376,12 +376,12 @@ def analyze_cycle(curr_step, step_nodes, step_rock_nodes_ls, potential_cycles_ls
     detects cyclic behaviour in the node pattern
 
     a potential cycle is defined as tuple of (start_index, curr_index, end_index, num_full_cycles, cycle_height_ls, step_height_ls)
-    start_index: index of step_rock_nodes that corresponds to the start of the cycle
-    curr_index: index of step_rock_nodes that corresponds to the current position in the cycle
-    end_index: index of step_rock_nodes that corresponds to the end of the cycle (if known)
-    num_full_cycles: number of times a full cycle of this has been completed
-    cycle_height_ls: height of stones at each full_cycle
-    step_height_ls: height of the stones at each step of the cycle
+        start_index: index of step_rock_nodes that corresponds to the start of the cycle
+        curr_index: index of step_rock_nodes that corresponds to the current position in the cycle
+        end_index: index of step_rock_nodes that corresponds to the end of the cycle (if known)
+        num_full_cycles: number of times a full cycle of this has been completed
+        cycle_height_ls: height of stones at each full_cycle
+        step_height_ls: height of the stones at each step of the cycle
 
 
     :param curr_step: total number of rocks dropped so far
@@ -426,8 +426,11 @@ def analyze_cycle(curr_step, step_nodes, step_rock_nodes_ls, potential_cycles_ls
                     cycle_length = end_index - start_index + 1
                     quotient, remainder = divmod(num_remaining_rocks, cycle_length)
                     full_cycle_height = quotient * height_diff_ls[0]
-                    partial_cycle_height = step_height_ls[start_index + remainder] - step_height_ls[start_index]
-                    total_height = top_point + full_cycle_height + partial_cycle_height - 1
+                    if remainder > 0:
+                        partial_cycle_height = step_height_ls[remainder] - step_height_ls[0]
+                        total_height = top_point + full_cycle_height + partial_cycle_height
+                    else:
+                        total_height = top_point + full_cycle_height -1
 
                     return potential_cycles_ls + [new_cycle], total_height
             else:  # no cycles have repeated the required number of full cycles, need to process another step
@@ -462,9 +465,9 @@ def model_falling_rocks(raw_input, num_rocks, num_cycles):
     step_height_all_ls = []
 
     while (not total_height) and (curr_step < num_rocks):
-        """if curr_step % 1000 == 0:
+        if curr_step % 100 == 0:
             print(f"i = {curr_step}")
-            print(f"num rock nodes = {len(rock_nodes)}")"""
+            print(f"num rock nodes = {len(rock_nodes)}")
         curr_rock = next(rock_gen)
         # postion drop point of the new rock
         x_offset = 2
