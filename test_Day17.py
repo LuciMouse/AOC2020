@@ -61,6 +61,158 @@ class TestDrawChamber(unittest.TestCase):
             ],
             chamber_ls
         )
+
+class TestNewCycle(unittest.TestCase):
+    def test_new_cycle(self):
+        """
+        creates a new cycle
+        :return:
+        """
+        curr_step = 4
+        step_nodes = {(2, 2), (1, 1), (3, 2)}
+        step_rock_nodes_ls = [
+            {(2, 1), (2, 5), (3, 3)},
+            {(2, 2), (1, 1), (3, 2)},
+            {(4, 2), (1, 0), (3, 5), (2, 7)},
+            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
+        ]
+        start_index = step_rock_nodes_ls.index(step_nodes)
+        top_point = 30
+        step_height_all_ls = [
+            17,
+            20,
+            23,
+            25,
+        ]
+        self.assertEqual(
+            [
+                (
+                    1,
+                    1,
+                    3,
+                    1,
+                    [20, 30],
+                    [20, 23, 25]
+                )
+            ],
+            Day17.new_cycle(
+                start_index,
+                curr_step,
+                top_point,
+                step_height_all_ls
+            )
+        )
+class TestBrokenCycle(unittest.TestCase):
+    def test_broken_cycle_existing(self):
+        """with existing step_nodes"""
+        curr_step = 5
+        step_nodes = {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)}
+        curr_cycle = (
+            1,
+            1,
+            3,
+            1,
+            [20, 30],
+            [20, 23, 25]
+        )
+        step_rock_nodes_ls = [
+            {(2, 1), (2, 5), (3, 3)},
+            {(2, 2), (1, 1), (3, 2)},
+            {(4, 2), (1, 0), (3, 5), (2, 7)},
+            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
+            {(2, 2), (1, 1), (3, 2)},
+        ]
+        top_point = 35
+        step_height_all_ls = [
+            17,
+            20,
+            23,
+            25,
+            30,
+        ]
+        self.assertEqual(
+            [
+                (
+                    1,
+                    5,
+                    5,
+                    1,
+                    [20, 30],
+                    [20, 23, 25, 30, 35]
+                ),
+                (
+                    3,
+                    3,
+                    4,
+                    1,
+                    [25, 35],
+                    [25, 30]
+                )
+            ]
+            ,
+            Day17.broken_cycle(
+                curr_step,
+                step_nodes,
+                curr_cycle,
+                step_rock_nodes_ls,
+                top_point,
+                step_height_all_ls
+            )
+        )
+    def test_broken_cycle_new(self):
+        """where step_nodes does not exist in step_rock_nodes"""
+        curr_step = 7
+        step_nodes = {(3, 1), (2, 7), (3, 5)},
+        curr_cycle = (
+            1,
+            3,
+            3,
+            1,
+            [20, 30],
+            [20, 23, 25]
+        )
+        step_rock_nodes_ls = [
+            {(2, 1), (2, 5), (3, 3)},
+            {(2, 2), (1, 1), (3, 2)},
+            {(4, 2), (1, 0), (3, 5), (2, 7)},
+            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
+            {(2, 2), (1, 1), (3, 2)},
+            {(4, 2), (1, 0), (3, 5), (2, 7)},
+            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
+
+        ]
+        top_point = 38
+        step_height_all_ls = [
+            17,
+            20,
+            23,
+            25,
+            30,
+            33,
+            35,
+        ]
+        self.assertEqual(
+            [
+                (
+                    1,
+                    7,
+                    7,
+                    1,
+                    [20, 30],
+                    [20, 23, 25, 30, 33, 35, 38]
+                )
+            ]
+            ,
+            Day17.broken_cycle(
+                curr_step,
+                step_nodes,
+                curr_cycle,
+                step_rock_nodes_ls,
+                top_point,
+                step_height_all_ls
+            )
+        )
+
 class TestSingleCycle(unittest.TestCase):
     def test_try_single_cycle_complete_cycle(self):
         # define end of cycle
@@ -71,7 +223,7 @@ class TestSingleCycle(unittest.TestCase):
             3,
             3,
             1,
-            [20],
+            [20, 30],
             [20, 23, 25]
         )
         step_rock_nodes_ls = [
@@ -84,7 +236,7 @@ class TestSingleCycle(unittest.TestCase):
             {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
             ]
 
-        top_point = 30
+        top_point = 40
         step_height_all_ls = [
             17,
             20,
@@ -101,7 +253,7 @@ class TestSingleCycle(unittest.TestCase):
                     1,
                     3,
                     2,
-                    [20, 30],
+                    [20, 30, 40],
                     [20, 23, 25]
                 )
             ],
@@ -122,7 +274,7 @@ class TestSingleCycle(unittest.TestCase):
                         1,
                         3,
                         1,
-                        [20],
+                        [20, 30],
                         [20, 23, 25],
                     )
         step_rock_nodes_ls = [
@@ -147,7 +299,7 @@ class TestSingleCycle(unittest.TestCase):
                     2,
                     3,
                     1,
-                    [20],
+                    [20, 30],
                     [20, 23, 25]
                 )
             ]
@@ -171,7 +323,7 @@ class TestSingleCycle(unittest.TestCase):
                         1,
                         3,
                         1,
-                        [20],
+                        [20, 30],
                         [20, 23, 25]
                     )
         step_rock_nodes_ls = [
@@ -196,7 +348,7 @@ class TestSingleCycle(unittest.TestCase):
                     5,
                     5,
                     1,
-                    [20],
+                    [20, 30],
                     [20, 23, 25, 30, 35]
                 ),
                 (
@@ -204,7 +356,7 @@ class TestSingleCycle(unittest.TestCase):
                     3,
                     4,
                     1,
-                    [25],
+                    [25, 35],
                     [25, 30]
                 )
             ]
@@ -221,15 +373,15 @@ class TestSingleCycle(unittest.TestCase):
     def test_try_single_cycle_break_cycle_new(self):
         # break the pattern at the end of the second cycle
         # The cycle is naively assumed to be ABC but is actually ABCABCD
-        # This is the first appearance of 'D' so it will only enter analyze_cycle() on the step after that
-        curr_step = 8
-        step_nodes = {(2, 2), (1, 1), (3, 2)},
+        # This is the first appearance of 'D'
+        curr_step = 7
+        step_nodes = {(3, 1), (2, 7), (3, 5)},
         curr_cycle = (
                         1,
                         3,
                         3,
                         1,
-                        [20],
+                        [20, 30],
                         [20, 23, 25]
                     )
         step_rock_nodes_ls = [
@@ -240,9 +392,9 @@ class TestSingleCycle(unittest.TestCase):
             {(2, 2), (1, 1), (3, 2)},
             {(4, 2), (1, 0), (3, 5), (2, 7)},
             {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
-            {(3, 1), (2, 7), (3, 5)},
+
         ]
-        top_point = 40
+        top_point = 38
         step_height_all_ls = [
             17,
             20,
@@ -251,7 +403,6 @@ class TestSingleCycle(unittest.TestCase):
             30,
             33,
             35,
-            38,
         ]
         self.assertEqual(
             [
@@ -260,16 +411,8 @@ class TestSingleCycle(unittest.TestCase):
                     7,
                     7,
                     1,
-                    [20],
+                    [20, 30],
                     [20, 23, 25, 30, 33, 35, 38]
-                ),
-                (
-                    3,
-                    3,
-                    4,
-                    1,
-                    [25],
-                    [25, 30]
                 )
             ]
             ,
@@ -285,16 +428,16 @@ class TestSingleCycle(unittest.TestCase):
 
     def test_try_single_cycle_break_cycle_existing(self):
         # break the pattern at the end of the second cycle
-        # The cycle is naively assumed to be BCD but is actually ABCDBCD
+        # The cycle is naively assumed to be BCD breaks could be ABCDBCD or BCDBCDA
         # The "real" cycle includes the originally omitted node "A" as opposed to the last test that introdduced a new node so this test triggers a cycle earlier
         curr_step = 7
-        step_nodes = {(2, 1), (2, 5), (3, 3)},
+        step_nodes = {(2, 1), (2, 5), (3, 3)}
         curr_cycle = (
                         1,
                         3,
                         3,
                         1,
-                        [20],
+                        [20, 30],
                         [20, 23, 25]
                     )
         step_rock_nodes_ls = [
@@ -320,19 +463,19 @@ class TestSingleCycle(unittest.TestCase):
             [
                 (
                     1,
-                    6,
+                    7,
                     7,
                     1,
-                    [20],
-                    [20, 23, 25, 30, 35]
+                    [20, 30],
+                    [20, 23, 25, 30, 33, 35, 37]
                 ),
                 (
-                    3,
-                    3,
-                    4,
+                    0,
+                    0,
+                    6,
                     1,
-                    [25],
-                    [25, 30]
+                    [17, 37],
+                    [17, 20, 23, 25, 30, 33, 35]
                 )
             ]
             ,
@@ -346,58 +489,6 @@ class TestSingleCycle(unittest.TestCase):
             )
         )
 class TestAnalyzeCycle(unittest.TestCase):
-    def test_new_list(self):
-        """
-        define a three step cycle
-        enter a new cycle
-        :return:
-        """
-        curr_step = 4
-        step_nodes = {(2, 2), (1, 1), (3, 2)}
-        step_rock_nodes_ls = [
-            {(2, 1), (2, 5), (3, 3)},
-            {(2, 2), (1, 1), (3, 2)},
-            {(4, 2), (1, 0), (3, 5), (2, 7)},
-            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)}
-        ]
-        potential_cycles_ls = []
-        top_point = 30
-        num_rocks = 100
-        total_height = None
-        step_height_all_ls = [
-            17,
-            20,
-            23,
-            25,
-        ]
-        num_cycles = 3
-
-        self.assertEqual(
-            (
-                [
-                    (
-                        1,
-                        1,
-                        3,
-                        1,
-                        [20],
-                        [20, 23, 25]
-                    )
-                ],
-                None
-            ),
-            Day17.analyze_cycle(
-                curr_step,
-                step_nodes,
-                step_rock_nodes_ls,
-                potential_cycles_ls,
-                top_point,
-                num_rocks,
-                total_height,
-                step_height_all_ls,
-                num_cycles,
-            )
-        )
 
     def test_extend_cycle(self):
         """
@@ -420,7 +511,7 @@ class TestAnalyzeCycle(unittest.TestCase):
                 1,
                 None,
                 0,
-                [20],
+                [20, 30],
                 [20, 23, 25],
             )
         ]
@@ -445,7 +536,7 @@ class TestAnalyzeCycle(unittest.TestCase):
                         2,
                         None,
                         0,
-                        [20],
+                        [20, 30],
                         [20, 23, 25]
                     )
                 ],
@@ -487,11 +578,11 @@ class TestAnalyzeCycle(unittest.TestCase):
                 3,
                 3,
                 1,
-                [20],
+                [20, 30],
                 [20, 23, 25]
             )
         ]
-        top_point = 30
+        top_point = 40
         num_rocks = 100
         total_height = None
         step_height_all_ls = [
@@ -513,7 +604,7 @@ class TestAnalyzeCycle(unittest.TestCase):
                         1,
                         3,
                         2,
-                        [20, 30],
+                        [20, 30, 40],
                         [20, 23, 25]
                     )
                 ],
@@ -534,8 +625,8 @@ class TestAnalyzeCycle(unittest.TestCase):
 
     def test_break_cycle(self):
         """
-        define a three step cycle
-        break the cycle
+        define a three step cycle ABC
+        break the cycle in middle of cycle. ABCAC or CA as potential new cycles
         :return:
         """
         curr_step = 5
@@ -545,7 +636,7 @@ class TestAnalyzeCycle(unittest.TestCase):
             1,
             3,
             1,
-            [20],
+            [20, 30],
             [20, 23, 25]
         )]
         step_rock_nodes_ls = [
@@ -572,10 +663,10 @@ class TestAnalyzeCycle(unittest.TestCase):
                 [
                     (
                         1,
-                        2,
+                        5,
                         5,
                         1,
-                        [20],
+                        [20, 30],
                         [20, 23, 25, 30, 35]
                     ),
                     (
@@ -583,7 +674,7 @@ class TestAnalyzeCycle(unittest.TestCase):
                         3,
                         4,
                         1,
-                        [25],
+                        [25, 35],
                         [25, 30]
                     )
                 ],
