@@ -465,6 +465,7 @@ def model_falling_rocks(raw_input, num_rocks, num_cycles):
     fingerprint_ls = []
     fingerprint_zero_cycle_index = None
     curr_fingerprint_index = None
+    potential_cycles_ls
 
     step_height_all_ls = []
     num_full_cycles = 0

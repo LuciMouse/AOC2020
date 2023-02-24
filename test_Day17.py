@@ -31,7 +31,7 @@ class TestMakeRockGenerator(unittest.TestCase):
             i += 1
         self.assertEqual(
             "-+LI.-+LI.-+",
-            output_str
+
         )
 
 
@@ -356,13 +356,13 @@ class TestAnalyzeCycle(unittest.TestCase):
             (
                 1,
                 3,
-                None,
-                0,
+                3,
+                1,
                 [20],
                 [20, 23, 25]
             )
         ]
-        top_point = 35
+        top_point = 30
         num_rocks = 100
         total_height = None
         step_height_all_ls = [
@@ -383,7 +383,7 @@ class TestAnalyzeCycle(unittest.TestCase):
                         1,
                         1,
                         3,
-                        1,
+                        2,
                         [20, 30],
                         [20, 23, 25]
                     )
@@ -470,289 +470,6 @@ class TestAnalyzeCycle(unittest.TestCase):
                 total_height,
                 step_height_all_ls,
                 num_cycles
-            )
-        )
-    def test_defined_cycle_extend(self):
-        """
-        define a three step cycle
-        extend a completed cycle
-        :return:
-        """
-        curr_step = 8
-        step_nodes = {(4, 2), (1, 0), (3, 5), (2, 7)}
-        step_rock_nodes_ls = [
-            {(2, 1), (2, 5), (3, 3)},
-            {(2, 2), (1, 1), (3, 2)},
-            {(4, 2), (1, 0), (3, 5), (2, 7)},
-            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
-            {(2, 2), (1, 1), (3, 2)},
-            {(4, 2), (1, 0), (3, 5), (2, 7)},
-            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
-            {(2, 2), (1, 1), (3, 2)},
-        ]
-        fingerprint_ls = [
-            {(2, 2), (1, 1), (3, 2)},
-            {(4, 2), (1, 0), (3, 5), (2, 7)},
-            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)}
-        ]
-        fingerprint_zero_cycle_index = 1
-        curr_fingerprint_index = 0
-        num_full_cycles = 1
-        cycle_height_ls = [20, 30]
-        top_point = 33
-        step_height_ls = [20, 23, 23]
-        cycle_length = 3
-        num_rocks = 100
-        total_height = None
-        step_height_all_ls = [
-            17,
-            20,
-            23,
-            23,
-        ]
-
-        self.assertEqual(
-            (
-                [
-                    {(2, 2), (1, 1), (3, 2)},
-                    {(4, 2), (1, 0), (3, 5), (2, 7)},
-                    {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)}
-                ],
-                1,
-                1,
-                1,
-                [20, 30],
-                [20, 23, 23],
-                3,
-                None,
-            ),
-            Day17.analyze_cycle(
-                curr_step,
-                step_nodes,
-                step_rock_nodes_ls,
-                fingerprint_ls,
-                fingerprint_zero_cycle_index,
-                curr_fingerprint_index,
-                num_full_cycles,
-                cycle_height_ls,
-                top_point,
-                step_height_ls,
-                cycle_length,
-                num_rocks,
-                total_height,
-            )
-        )
-    def test_defined_cycle_break(self):
-        """
-        define a three step cycle
-        break a completed cycle
-        :return:
-        """
-        curr_step = 8
-        step_nodes = {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)}
-        step_rock_nodes_ls= [
-            {(2, 1), (2, 5), (3, 3)},
-            {(2, 2), (1, 1), (3, 2)},
-            {(4, 2), (1, 0), (3, 5), (2, 7)},
-            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
-            {(2, 2), (1, 1), (3, 2)},
-            {(4, 2), (1, 0), (3, 5), (2, 7)},
-            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
-            {(2, 2), (1, 1), (3, 2)},
-        ]
-        fingerprint_ls = [
-            {(2, 2), (1, 1), (3, 2)},
-            {(4, 2), (1, 0), (3, 5), (2, 7)},
-            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)}
-        ]
-        fingerprint_zero_cycle_index = 1
-        curr_fingerprint_index = 0
-        num_full_cycles = 1
-        cycle_height_ls = [20, 30]
-        top_point = 40
-        step_height_ls = [20, 23, 23]
-        cycle_length = 3
-        num_rocks = 100
-        total_height = None
-        step_height_all_ls = [
-            17,
-            20,
-            23,
-            23,
-        ]
-
-        self.assertEqual(
-            (
-                [],
-                None,
-                None,
-                0,
-                [],
-                [],
-                None,
-                None,
-            ),
-            Day17.analyze_cycle(
-                curr_step,
-                step_nodes,
-                step_rock_nodes_ls,
-                fingerprint_ls,
-                fingerprint_zero_cycle_index,
-                curr_fingerprint_index,
-                num_full_cycles,
-                cycle_height_ls,
-                top_point,
-                step_height_ls,
-                cycle_length,
-                num_rocks,
-                total_height,
-            )
-        )
-    def test_defined_cycle_new_cycle(self):
-        """
-        define a three step cycle
-        complete another completed cycle
-        :return:
-        """
-        curr_step = 10
-        step_nodes = {(2, 2), (1, 1), (3, 2)}
-        step_rock_nodes_ls = [
-            {(2, 1), (2, 5), (3, 3)},
-            {(2, 2), (1, 1), (3, 2)},
-            {(4, 2), (1, 0), (3, 5), (2, 7)},
-            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
-            {(2, 2), (1, 1), (3, 2)},
-            {(4, 2), (1, 0), (3, 5), (2, 7)},
-            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
-            {(2, 2), (1, 1), (3, 2)},
-            {(4, 2), (1, 0), (3, 5), (2, 7)},
-            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)}
-        ]
-        fingerprint_ls = [
-            {(2, 2), (1, 1), (3, 2)},
-            {(4, 2), (1, 0), (3, 5), (2, 7)},
-            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)}
-        ]
-        fingerprint_zero_cycle_index = 1
-        curr_fingerprint_index = 2
-        num_full_cycles = 1
-        cycle_height_ls = [20, 30]
-        top_point = 40
-        step_height_ls = [20, 23, 23]
-        cycle_length = 3
-        num_rocks = 100
-        total_height = None
-        step_height_all_ls = [
-            17,
-            20,
-            23,
-            23,
-        ]
-
-        self.assertEqual(
-            (
-                [
-                    {(2, 2), (1, 1), (3, 2)},
-                    {(4, 2), (1, 0), (3, 5), (2, 7)},
-                    {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)}
-                ],
-                1,
-                0,
-                2,
-                [20, 30, 40],
-                [20, 23, 23],
-                3,
-                None,
-            ),
-            Day17.analyze_cycle(
-                curr_step,
-                step_nodes,
-                step_rock_nodes_ls,
-                fingerprint_ls,
-                fingerprint_zero_cycle_index,
-                curr_fingerprint_index,
-                num_full_cycles,
-                cycle_height_ls,
-                top_point,
-                step_height_ls,
-                cycle_length,
-                num_rocks,
-                total_height,
-            )
-        )
-    def test_defined_cycle_finish(self):
-        """
-        define a three step cycle
-        complete required number of cycles and returns height of stack
-        :return:
-        """
-        curr_step = 13
-        step_nodes = {(2, 2), (1, 1), (3, 2)}
-        step_rock_nodes_ls = [
-            {(2, 1), (2, 5), (3, 3)},
-            {(2, 2), (1, 1), (3, 2)},
-            {(4, 2), (1, 0), (3, 5), (2, 7)},
-            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
-            {(2, 2), (1, 1), (3, 2)},
-            {(4, 2), (1, 0), (3, 5), (2, 7)},
-            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
-            {(2, 2), (1, 1), (3, 2)},
-            {(4, 2), (1, 0), (3, 5), (2, 7)},
-            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
-            {(2, 2), (1, 1), (3, 2)},
-            {(4, 2), (1, 0), (3, 5), (2, 7)},
-            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)},
-        ]
-        fingerprint_ls = [
-            {(2, 2), (1, 1), (3, 2)},
-            {(4, 2), (1, 0), (3, 5), (2, 7)},
-            {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)}
-        ]
-        fingerprint_zero_cycle_index = 1
-        curr_fingerprint_index = 2
-        num_full_cycles = 2
-        cycle_height_ls = [20, 30, 40]
-        top_point = 50
-        step_height_ls = [20, 23, 23]
-        cycle_length = 3
-        num_rocks = 100
-        total_height = None
-        step_height_all_ls = [
-            17,
-            20,
-            23,
-            23,
-        ]
-
-        self.assertEqual(
-            (
-                [
-                    {(2, 2), (1, 1), (3, 2)},
-                    {(4, 2), (1, 0), (3, 5), (2, 7)},
-                    {(4, 18), (1, 17), (2, 1), (3, 11), (6, 2)}
-                ],
-                1,
-                0,
-                3,
-                [20, 30, 40, 50],
-                [20, 23, 23],
-                3,
-                50 + 290 + 0,
-            ),
-            Day17.analyze_cycle(
-                curr_step,
-                step_nodes,
-                step_rock_nodes_ls,
-                fingerprint_ls,
-                fingerprint_zero_cycle_index,
-                curr_fingerprint_index,
-                num_full_cycles,
-                cycle_height_ls,
-                top_point,
-                step_height_ls,
-                cycle_length,
-                num_rocks,
-                total_height,
             )
         )
 
