@@ -166,7 +166,6 @@ def create_path_generator(high_flow_valves_set, low_flow_valves_set):
     :param low_flow_valves_set: set of valves that need to be at the end of the list
     :return: generator that yields paths
 
-    >>>
     """
     product_gen = product(permutations(high_flow_valves_set), permutations(low_flow_valves_set))
     for curr_product in product_gen:
