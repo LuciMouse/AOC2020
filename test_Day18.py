@@ -448,6 +448,9 @@ class AddAdjacentCubeSides(unittest.TestCase):
         # new side (changed side type)
         sides_dict_copy[(1, 2, (1, 2))].side_type = 'covered'
         adjacent_cube_copy.sides_dict[(1, 2, (1, 2))] = sides_dict_copy[(1, 2, (1, 2))]
+        # this is needed in the test because the deepcopy means that the Side object in sides_dict_copy is no
+        # longer the same object that is in flanking_cube_copy (In contrast, it is the same object in sides_dict and flanking_cube)
+        flanking_cube_copy.sides_dict[(1, 2, (1, 2))] = sides_dict_copy[(1, 2, (1, 2))]
         # check sides_dict
         self.assertEqual(
             [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in

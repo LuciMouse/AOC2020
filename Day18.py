@@ -150,7 +150,8 @@ def add_adjacent_cube_side(adjacent_cube, adjacent_side_cube_coord, shared_side_
             adjacent_side = sides_dict[adjacent_side_coord]
             adjacent_cube.sides_dict[adjacent_side_coord] = adjacent_side
             # can we define the side type?
-            flanking_cubes_ls = [value for index, value in cubes_dict.items() if index in adjacent_side.flanking_cube_coordinates]
+            flanking_cubes_ls = [value for index, value in cubes_dict.items() if
+                                 index in adjacent_side.flanking_cube_coordinates]
             if len(flanking_cubes_ls) > 1:  # both cubes defined
                 cube_1_type = flanking_cubes_ls[0].cube_type
                 cube_2_type = flanking_cubes_ls[1].cube_type
@@ -161,29 +162,16 @@ def add_adjacent_cube_side(adjacent_cube, adjacent_side_cube_coord, shared_side_
                 cube_2_sides = flanking_cubes_ls[1].sides_dict.values()
                 cube_2_side_types_set = set([side.side_type for side in cube_2_sides])
 
-                if cube_1_type == 'lava':
-                    if cube_2_type == 'lava':
+                # make sure cube_types are ok
+                if not cube_1_type in {'air', 'lava'}:
+                    raise Exception("cube1 type not defined")
+                if not cube_2_type in {'air', 'lava'}:
+                    raise Exception("cube2 type not defined")
+
+                if cube_1_type == cube_2_type:
+                    if cube_1_type == 'lava':
                         adjacent_side.side_type = 'covered'
-                    elif cube_2_type == 'air':  # exposed
-                        # look at sides of cube_2, are any exterior?
-                        if len({'air-exterior', 'exposed-exterior'}.intersection(cube_2_side_types_set)) > 0:
-                            adjacent_side.side_type = 'exposed-exterior'
-                        elif len({'air-interior', 'exposed-interior'}.intersection(cube_2_side_types_set)) > 0:
-                            adjacent_side.side_type = 'exposed-interior'
-                        else:
-                            adjacent_side.side_type = 'exposed-unknown'
-                    else:
-                        raise Exception("cube2 type not defined")
-                elif cube_1_type == 'air':
-                    if cube_2_type == 'lava':  # exposed
-                        # look at sides of cube_1, are any exterior?
-                        if len({'air-exterior', 'exposed-exterior'}.intersection(cube_1_side_types_set)) > 0:
-                            adjacent_side.side_type = 'exposed-exterior'
-                        elif len({'air-interior', 'exposed-interior'}.intersection(cube_1_side_types_set)) > 0:
-                            adjacent_side.side_type = 'exposed-interior'
-                        else:
-                            adjacent_side.side_type = 'exposed-unknown'
-                    elif cube_2_type == 'air':
+                    elif cube_1_type == 'air':
                         # need to look at both air cubes
                         if len(
                                 {'air-exterior', 'exposed-exterior'}.intersection(
@@ -199,17 +187,31 @@ def add_adjacent_cube_side(adjacent_cube, adjacent_side_cube_coord, shared_side_
                             adjacent_side.side_type = 'air-interior'
                         else:
                             adjacent_side.side_type = 'air-unknown'
+                else:  # one of each exposed
+                    if cube_1_type == 'air':
+                        air_cube_side_types_set = cube_1_side_types_set
+                    else:  # cube_2 is the air cube
+                        air_cube_side_types_set = cube_2_side_types_set
+
+                    if len({'air-exterior', 'exposed-exterior'}.intersection(air_cube_side_types_set)) > 0:
+                        adjacent_side.side_type = 'exposed-exterior'
+                    elif len({'air-interior', 'exposed-interior'}.intersection(air_cube_side_types_set)) > 0:
+                        adjacent_side.side_type = 'exposed-interior'
                     else:
-                        raise Exception("cube2 type not defined")
-                else:
-                    raise Exception("cube1 type not defined")
+                        adjacent_side.side_type = 'exposed-unknown'
+
+                    # should't be able to have both, but catch it
+                    if (
+                            len({'air-exterior', 'exposed-exterior'}.intersection(air_cube_side_types_set)) > 0) and (
+                            len({'air-interior', 'exposed-interior'}.intersection(air_cube_side_types_set)) > 0):
+                        raise Exception("both types should not exist on the same cube")
 
         else:
             # does this side touch the edge (i.e. the adjacent_side_cube_coord is out of bounds?
             is_edge_cube = sum(
                 [adjacent_side_cube_coord[index] <= max_bounds_tuple[index] for index in range(3)]) > 0  # out of bounds
             # define the side type
-            if is_edge_cube: #assumes adjacent_side_cube to be cube_type 'air'
+            if is_edge_cube:  # assumes adjacent_side_cube to be cube_type 'air'
                 if adjacent_cube.cube_type == 'lava':
                     side_type = 'exposed-exterior'
                 else:
@@ -253,8 +255,8 @@ def add_adjacent_cube(adjacent_cube_coord, new_lava_cube, lava_cubes_ls, max_bou
         add_adjacent_cube_side(adjacent_cube, adjacent_side_cube_coord, shared_side_coord, max_bounds_tuple,
                                cubes_dict, sides_dict)
 
-def add_lava_cube(lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict, sides_dict):
 
+def add_lava_cube(lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict, sides_dict):
     new_lava_cube = Cube(
         coordinates=lava_cube_coord,
         cube_type='lava'
@@ -266,6 +268,7 @@ def add_lava_cube(lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict, 
                 range(3)]) == 0:  # not out of bound
             add_adjacent_cube(adjacent_cube_coord, lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict,
                               sides_dict)
+
 
 def calculate_external_surface_area(lava_cubes_ls):
     """
