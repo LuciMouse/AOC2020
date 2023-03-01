@@ -460,6 +460,18 @@ class AddAdjacentCubeSides(unittest.TestCase):
              adjacent_cube.sides_dict.items()]
         )
 
+class TestAddAdjacentCube(unittest.TestCase):
+    def test_add_adjacent_cube(self):
+        self.assertEqual(
+            True,
+            False
+        )
+class TestAddLavaCube(unittest.TestCase):
+    def test_add_lava_cube(self):
+        self.assertEqual(
+            True,
+            False
+        )
 
 class TestFindSurfaceArea(unittest.TestCase):
     def test_find_surface_area(self):

@@ -253,6 +253,19 @@ def add_adjacent_cube(adjacent_cube_coord, new_lava_cube, lava_cubes_ls, max_bou
         add_adjacent_cube_sides(adjacent_cube, adjacent_side_cube_coord, shared_side_coord, max_bounds_tuple,
                                 cubes_dict, sides_dict)
 
+def add_lava_cube(lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict, sides_dict):
+
+    new_lava_cube = Cube(
+        coordinates=lava_cube_coord,
+        cube_type='lava'
+    )
+    cubes_dict[lava_cube_coord] = new_lava_cube
+
+    for adjacent_cube_coord in adjacent_cube_generator(lava_cube_coord):
+        if sum([adjacent_cube_coord[index] <= max_bounds_tuple[index] for index in
+                range(3)]) == 0:  # not out of bound
+            add_adjacent_cube(adjacent_cube_coord, lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict,
+                              sides_dict)
 
 def calculate_external_surface_area(lava_cubes_ls):
     """
@@ -273,17 +286,9 @@ def calculate_external_surface_area(lava_cubes_ls):
     max_bounds_tuple = (max_x, max_y, max_z)
     # for each stone cube, create 6 cubes around it
     for lava_cube_coord in lava_cubes_ls:
-        new_lava_cube = Cube(
-            coordinates=lava_cube_coord,
-            cube_type='lava'
+        add_lava_cube(
+            lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict, sides_dict
         )
-        cubes_dict[lava_cube_coord] = new_lava_cube
-
-        for adjacent_cube_coord in adjacent_cube_generator(lava_cube_coord):
-            if sum([adjacent_cube_coord[index] <= max_bounds_tuple[index] for index in
-                    range(3)]) == 0:  # not out of bound
-                add_adjacent_cube(adjacent_cube_coord, lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict,
-                                  sides_dict)
 
     return external_surface_area
 
