@@ -150,7 +150,7 @@ def add_adjacent_cube_sides(adjacent_cube, adjacent_side_cube_coord, shared_side
             adjacent_side = sides_dict[adjacent_side_coord]
             adjacent_cube.sides_dict[adjacent_side_coord] = adjacent_side
             # can we define the side type?
-            flanking_cubes_ls = [value for index, value in cubes_dict if index in adjacent_side.flanking_cubes]
+            flanking_cubes_ls = [value for index, value in cubes_dict.items() if index in adjacent_side.flanking_cube_coordinates]
             if len(flanking_cubes_ls) > 1:  # both cubes defined
                 cube_1_type = flanking_cubes_ls[0].cube_type
                 cube_2_type = flanking_cubes_ls[1].cube_type
@@ -166,9 +166,9 @@ def add_adjacent_cube_sides(adjacent_cube, adjacent_side_cube_coord, shared_side
                         adjacent_side.side_type = 'covered'
                     elif cube_2_type == 'air':  # exposed
                         # look at sides of cube_2, are any exterior?
-                        if 'air-exterior' in cube_2_side_types_set:
+                        if len({'air-exterior', 'exposed-exterior'}.intersection(cube_2_side_types_set)) > 0:
                             adjacent_side.side_type = 'exposed-exterior'
-                        elif 'air-interior' in cube_2_side_types_set:
+                        elif len({'air-interior', 'exposed-interior'}.intersection(cube_2_side_types_set)) > 0:
                             adjacent_side.side_type = 'exposed-interior'
                         else:
                             adjacent_side.side_type = 'exposed-unknown'
@@ -177,17 +177,25 @@ def add_adjacent_cube_sides(adjacent_cube, adjacent_side_cube_coord, shared_side
                 elif cube_1_type == 'air':
                     if cube_2_type == 'lava':  # exposed
                         # look at sides of cube_1, are any exterior?
-                        if 'air-exterior' in cube_1_side_types_set:
+                        if len({'air-exterior', 'exposed-exterior'}.intersection(cube_1_side_types_set)) > 0:
                             adjacent_side.side_type = 'exposed-exterior'
-                        elif 'air-interior' in cube_1_side_types_set:
+                        elif len({'air-interior', 'exposed-interior'}.intersection(cube_1_side_types_set)) > 0:
                             adjacent_side.side_type = 'exposed-interior'
                         else:
                             adjacent_side.side_type = 'exposed-unknown'
                     elif cube_2_type == 'air':
                         # need to look at both air cubes
-                        if 'air-exterior' in cube_1_side_types_set.union(cube_2_side_types_set):
+                        if len(
+                                {'air-exterior', 'exposed-exterior'}.intersection(
+                                    cube_1_side_types_set.union(cube_2_side_types_set)
+                                )
+                        ):
                             adjacent_side.side_type = 'air-exterior'
-                        elif 'air-interior' in cube_1_side_types_set.union(cube_2_side_types_set):
+                        elif len(
+                                {'air-interior', 'exposed-interior'}.intersection(
+                                    cube_1_side_types_set.union(cube_2_side_types_set)
+                                )
+                        ):
                             adjacent_side.side_type = 'air-interior'
                         else:
                             adjacent_side.side_type = 'air-unknown'
