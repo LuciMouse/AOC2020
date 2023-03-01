@@ -130,8 +130,8 @@ def adjacent_cube_generator(center_cube_coordinates):
         yield cube
 
 
-def add_adjacent_cube_sides(adjacent_cube, adjacent_side_cube_coord, shared_side_coord, max_bounds_tuple, cubes_dict,
-                            sides_dict):
+def add_adjacent_cube_side(adjacent_cube, adjacent_side_cube_coord, shared_side_coord, max_bounds_tuple, cubes_dict,
+                           sides_dict):
     """
     defines a side of the adjacent cube.  We only define the Side object and not the Cube object (adjacent_side_cube_coord)
     so that we don't end up recursing endlessly.
@@ -250,8 +250,8 @@ def add_adjacent_cube(adjacent_cube_coord, new_lava_cube, lava_cubes_ls, max_bou
 
     # define other sides of adjacent_cube, but only define the sides, not the cubes
     for adjacent_side_cube_coord in adjacent_cube_generator(adjacent_cube_coord):
-        add_adjacent_cube_sides(adjacent_cube, adjacent_side_cube_coord, shared_side_coord, max_bounds_tuple,
-                                cubes_dict, sides_dict)
+        add_adjacent_cube_side(adjacent_cube, adjacent_side_cube_coord, shared_side_coord, max_bounds_tuple,
+                               cubes_dict, sides_dict)
 
 def add_lava_cube(lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict, sides_dict):
 

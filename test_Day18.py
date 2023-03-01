@@ -45,7 +45,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
             ((1, 2), 2, 2): shared_side
         }
 
-        Day18.add_adjacent_cube_sides(
+        Day18.add_adjacent_cube_side(
             adjacent_cube,
             adjacent_side_cube_coord,
             shared_side_coord,
@@ -160,7 +160,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
 
         adjacent_side_cube_coord = (0, 2, 2)
 
-        Day18.add_adjacent_cube_sides(
+        Day18.add_adjacent_cube_side(
             adjacent_cube,
             adjacent_side_cube_coord,
             shared_side_coord,
@@ -328,7 +328,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
         sides_dict_copy = deepcopy(sides_dict)
 
         adjacent_side_cube_coord = (1, 2, 2)
-        Day18.add_adjacent_cube_sides(
+        Day18.add_adjacent_cube_side(
             adjacent_cube,
             adjacent_side_cube_coord,
             shared_side_coord,
@@ -437,7 +437,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
         flanking_cube_copy = deepcopy(flanking_cube)
         sides_dict_copy = deepcopy(sides_dict)
 
-        Day18.add_adjacent_cube_sides(
+        Day18.add_adjacent_cube_side(
             adjacent_cube,
             adjacent_side_cube_coord,
             shared_side_coord,
@@ -561,7 +561,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
         flanking_cube_copy = deepcopy(flanking_cube)
         sides_dict_copy = deepcopy(sides_dict)
 
-        Day18.add_adjacent_cube_sides(
+        Day18.add_adjacent_cube_side(
             adjacent_cube,
             adjacent_side_cube_coord,
             shared_side_coord,
@@ -685,7 +685,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
         flanking_cube_copy = deepcopy(flanking_cube)
         sides_dict_copy = deepcopy(sides_dict)
 
-        Day18.add_adjacent_cube_sides(
+        Day18.add_adjacent_cube_side(
             adjacent_cube,
             adjacent_side_cube_coord,
             shared_side_coord,
@@ -809,7 +809,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
         flanking_cube_copy = deepcopy(flanking_cube)
         sides_dict_copy = deepcopy(sides_dict)
 
-        Day18.add_adjacent_cube_sides(
+        Day18.add_adjacent_cube_side(
             adjacent_cube,
             adjacent_side_cube_coord,
             shared_side_coord,
@@ -932,7 +932,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
         flanking_cube_copy = deepcopy(flanking_cube)
         sides_dict_copy = deepcopy(sides_dict)
 
-        Day18.add_adjacent_cube_sides(
+        Day18.add_adjacent_cube_side(
             adjacent_cube,
             adjacent_side_cube_coord,
             shared_side_coord,
