@@ -290,7 +290,7 @@ def calculate_external_surface_area(lava_cubes_ls):
             lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict, sides_dict
         )
 
-    return external_surface_area
+    return 0
 
 
 def find_surface_area(raw_input, external_only):
