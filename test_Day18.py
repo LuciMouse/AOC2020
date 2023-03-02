@@ -851,7 +851,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
             [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
              flanking_cube.sides_dict.items()]
         )
-    def test_add_side_both_defined_air_air(self):
+    def test_add_side_both_defined_air_air_exterior(self):
         """
             test all permutations where both cubes flanking the target Side (flanking_cube and adjacent_cube) are defined
             both cubes are air
@@ -946,6 +946,129 @@ class AddAdjacentCubeSides(unittest.TestCase):
         # new side (changed side type)
         target_side = sides_dict_copy[(1, 2, (1, 2))]
         target_side.side_type = 'air-exterior'
+        adjacent_cube_copy.sides_dict[(1, 2, (1, 2))] = sides_dict_copy[(1, 2, (1, 2))]
+
+        # this is needed in the test because the deepcopy means that the Side object in sides_dict_copy is no
+        # longer the same object that is in flanking_cube_copy (In contrast, it is the same object in sides_dict and flanking_cube)
+        flanking_cube_copy.sides_dict[(1, 2, (1, 2))] = sides_dict_copy[(1, 2, (1, 2))]
+        # check sides_dict
+        self.assertEqual(
+            [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
+             sides_dict_copy.items()],
+            [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
+             sides_dict.items()]
+        )
+
+        # check the adjacent_cube object
+        self.assertEqual(
+            [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
+             adjacent_cube_copy.sides_dict.items()],
+            [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
+             adjacent_cube.sides_dict.items()]
+        )
+
+        # check the cube on the other side of the target side (flanking cube)
+        self.assertEqual(
+            [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
+             flanking_cube_copy.sides_dict.items()],
+            [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
+             flanking_cube.sides_dict.items()]
+        )
+    def test_add_side_both_defined_air_air_interior(self):
+        """
+            test all permutations where both cubes flanking the target Side (flanking_cube and adjacent_cube) are defined
+            both cubes are air
+        """
+        shared_side_coord = ((1, 2), 2, 1)
+        max_bounds_tuple = (3, 3, 6)
+
+        # side objects
+        shared_side = Day18.Side(
+            coordinates=shared_side_coord,
+            side_type='exposed-unknown',
+            flanking_cube_coordinates={
+                (2, 2, 1),
+                (1, 2, 1)
+            }
+        )
+        existing_sides_ls = [
+            Day18.Side(
+                coordinates=((1, 2), 2, 2),
+                side_type='covered',
+                flanking_cube_coordinates={
+                    (2, 2, 2),
+                    (1, 2, 2)
+                }
+            ),
+
+            Day18.Side(
+                coordinates=(1, 2, (1, 2)),
+                side_type='exposed-interior',
+                flanking_cube_coordinates={
+                    (1, 2, 1),
+                    (1, 2, 2)
+                }
+            )
+        ]
+        # cube objects
+
+        existing_cubes_ls = [
+            Day18.Cube(
+                coordinates=(2, 2, 2),
+                cube_type='lava',
+                sides_dict={
+                    ((1, 2), 2, 2): existing_sides_ls[0],
+                }
+            ),
+
+
+        ]
+        lava_cube = Day18.Cube(
+            coordinates=(2, 2, 1),
+            cube_type='lava',
+            sides_dict={
+                ((1, 2), 2, 1): shared_side,
+            }
+        )
+
+        adjacent_cube = Day18.Cube(
+            coordinates=(1, 2, 1),
+            cube_type='air',
+            sides_dict={
+                ((1, 2), 2, 2): existing_sides_ls[0],
+            }
+        )
+
+        flanking_cube = Day18.Cube(
+                coordinates=(1, 2, 2),
+                cube_type='air',
+                sides_dict={
+                    ((1, 2), 2, 2): existing_sides_ls[0],
+                    (1, 2, (1, 2)): existing_sides_ls[1]
+                }
+            )
+
+        cubes_dict = {cube.coordinates: cube for cube in existing_cubes_ls + [lava_cube] + [adjacent_cube] + [flanking_cube]}
+        sides_dict = {side.coordinates: side for side in existing_sides_ls + [shared_side]}
+
+        adjacent_side_cube_coord = (1, 2, 2)
+
+        # Objects expected to be changed. Make a deep copy since the originals are going to be mutated
+        adjacent_cube_copy = deepcopy(adjacent_cube)
+        flanking_cube_copy = deepcopy(flanking_cube)
+        sides_dict_copy = deepcopy(sides_dict)
+
+        Day18.add_adjacent_cube_side(
+            adjacent_cube,
+            adjacent_side_cube_coord,
+            shared_side_coord,
+            max_bounds_tuple,
+            cubes_dict,
+            sides_dict
+        )
+        # new side (changed side type)
+        target_side = sides_dict_copy[(1, 2, (1, 2))]
+        target_side.side_type = 'air-interior'
         adjacent_cube_copy.sides_dict[(1, 2, (1, 2))] = sides_dict_copy[(1, 2, (1, 2))]
 
         # this is needed in the test because the deepcopy means that the Side object in sides_dict_copy is no
@@ -1084,7 +1207,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
         existing_sides_ls = [
             Day18.Side(
                 coordinates=((1, 2), 2, 2),
-                side_type='covered',
+                side_type='exposed-interior',
                 flanking_cube_coordinates={
                     (2, 2, 2),
                     (1, 2, 2)
@@ -1152,7 +1275,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
                 cubes_dict,
                 sides_dict
             )
-        self.assertTrue("cube2 type not defined" in str(context.exception))
+        self.assertTrue("both types should not exist on the same cube" in str(context.exception))
 
 
 class TestAddAdjacentCube(unittest.TestCase):
