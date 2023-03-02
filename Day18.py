@@ -163,10 +163,10 @@ def add_adjacent_cube_side(adjacent_cube, adjacent_side_cube_coord, shared_side_
                 cube_2_side_types_set = set([side.side_type for side in cube_2_sides])
 
                 # make sure cube_types are ok
-                if not cube_1_type in {'air', 'lava'}:
-                    raise Exception("cube1 type not defined")
-                if not cube_2_type in {'air', 'lava'}:
-                    raise Exception("cube2 type not defined")
+                cube_type_check_ls = [cube_types not in {'air', 'lava'} for cube_types in [cube_1_type, cube_2_type]]
+                if sum(cube_type_check_ls) > 0:
+                    problem_cube_index = cube_type_check_ls.index(True)
+                    raise Exception(f"cube{problem_cube_index + 1} type not defined")
 
                 if cube_1_type == cube_2_type:
                     if cube_1_type == 'lava':
@@ -177,16 +177,29 @@ def add_adjacent_cube_side(adjacent_cube, adjacent_side_cube_coord, shared_side_
                                 {'air-exterior', 'exposed-exterior'}.intersection(
                                     cube_1_side_types_set.union(cube_2_side_types_set)
                                 )
-                        ):
+                        ) > 0:
                             adjacent_side.side_type = 'air-exterior'
                         elif len(
                                 {'air-interior', 'exposed-interior'}.intersection(
                                     cube_1_side_types_set.union(cube_2_side_types_set)
                                 )
-                        ):
+                        ) > 0:
                             adjacent_side.side_type = 'air-interior'
                         else:
                             adjacent_side.side_type = 'air-unknown'
+                        # should't be able to have both, but catch it
+                        if (
+                                len(
+                                    {'air-exterior', 'exposed-exterior'}.intersection(
+                                        cube_1_side_types_set.union(cube_2_side_types_set)
+                                    )
+                                ) > 0) and (
+                                len(
+                                    {'air-interior', 'exposed-interior'}.intersection(
+                                        cube_1_side_types_set.union(cube_2_side_types_set)
+                                    )
+                                ) > 0):
+                            raise Exception("both types should not exist on the same cube")
                 else:  # one of each exposed
                     if cube_1_type == 'air':
                         air_cube_side_types_set = cube_1_side_types_set

@@ -317,7 +317,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
             coordinates=(1, 2, 1),
             cube_type='air',
             sides_dict={
-                ((1, 2), 2, 2): shared_side,
+                ((1, 2), 2, 2): existing_sides_ls[0],
             }
         )
         cubes_dict = {cube.coordinates: cube for cube in existing_cubes_ls + [lava_cube] + [adjacent_cube]}
@@ -422,7 +422,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
             coordinates=(1, 2, 1),
             cube_type='lava',
             sides_dict={
-                ((1, 2), 2, 2): shared_side,
+                ((1, 2), 2, 2): existing_sides_ls[0],
             }
         )
         cubes_dict = {cube.coordinates: cube for cube in existing_cubes_ls + [lava_cube] + [adjacent_cube]}
@@ -541,7 +541,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
             coordinates=(1, 2, 1),
             cube_type='lava',
             sides_dict={
-                ((1, 2), 2, 2): shared_side,
+                ((1, 2), 2, 2): existing_sides_ls[0],
             }
         )
 
@@ -665,7 +665,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
             coordinates=(1, 2, 1),
             cube_type='lava',
             sides_dict={
-                ((1, 2), 2, 2): shared_side,
+                ((1, 2), 2, 2): existing_sides_ls[0],
             }
         )
 
@@ -789,7 +789,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
             coordinates=(1, 2, 1),
             cube_type='air',
             sides_dict={
-                ((1, 2), 2, 2): shared_side,
+                ((1, 2), 2, 2):existing_sides_ls[0],
             }
         )
 
@@ -912,7 +912,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
             coordinates=(1, 2, 1),
             cube_type='air',
             sides_dict={
-                ((1, 2), 2, 2): shared_side,
+                ((1, 2), 2, 2): existing_sides_ls[0],
             }
         )
 
@@ -975,6 +975,184 @@ class AddAdjacentCubeSides(unittest.TestCase):
              flanking_cube.sides_dict.items()]
         )
 
+    def test_add_side_cube_type_error(self):
+        """
+            cube type out of permitted values should throw error
+        """
+        shared_side_coord = ((1, 2), 2, 1)
+        max_bounds_tuple = (3, 3, 6)
+
+        # side objects
+        shared_side = Day18.Side(
+            coordinates=shared_side_coord,
+            side_type='exposed-unknown',
+            flanking_cube_coordinates={
+                (2, 2, 1),
+                (1, 2, 1)
+            }
+        )
+        existing_sides_ls = [
+            Day18.Side(
+                coordinates=((1, 2), 2, 2),
+                side_type='covered',
+                flanking_cube_coordinates={
+                    (2, 2, 2),
+                    (1, 2, 2)
+                }
+            ),
+
+            Day18.Side(
+                coordinates=(1, 2, (1, 2)),
+                side_type='exposed-exterior',
+                flanking_cube_coordinates={
+                    (1, 2, 1),
+                    (1, 2, 2)
+                }
+            )
+        ]
+        # cube objects
+
+        existing_cubes_ls = [
+            Day18.Cube(
+                coordinates=(2, 2, 2),
+                cube_type='lava',
+                sides_dict={
+                    ((1, 2), 2, 2): existing_sides_ls[0],
+                }
+            ),
+
+
+        ]
+        lava_cube = Day18.Cube(
+            coordinates=(2, 2, 1),
+            cube_type='lava',
+            sides_dict={
+                ((1, 2), 2, 1): shared_side,
+            }
+        )
+
+        adjacent_cube = Day18.Cube(
+            coordinates=(1, 2, 1),
+            cube_type='lava',
+            sides_dict={
+                ((1, 2), 2, 2): existing_sides_ls[0],
+            }
+        )
+
+        flanking_cube = Day18.Cube(
+                coordinates=(1, 2, 2),
+                cube_type='foo',
+                sides_dict={
+                    ((1, 2), 2, 2): existing_sides_ls[0],
+                    (1, 2, (1, 2)): existing_sides_ls[1]
+                }
+            )
+
+        cubes_dict = {cube.coordinates: cube for cube in existing_cubes_ls + [lava_cube] + [adjacent_cube] + [flanking_cube]}
+        sides_dict = {side.coordinates: side for side in existing_sides_ls + [shared_side]}
+
+        adjacent_side_cube_coord = (1, 2, 2)
+
+        with self.assertRaises(Exception) as context:
+            Day18.add_adjacent_cube_side(
+                adjacent_cube,
+                adjacent_side_cube_coord,
+                shared_side_coord,
+                max_bounds_tuple,
+                cubes_dict,
+                sides_dict
+            )
+        self.assertTrue("cube2 type not defined" in str(context.exception))
+
+    def test_add_side_both_defined_both_type_error(self):
+        """
+            test all permutations where both cubes flanking the target Side (flanking_cube and adjacent_cube) are defined
+            having both types on a cube should throw error
+        """
+        shared_side_coord = ((1, 2), 2, 1)
+        max_bounds_tuple = (3, 3, 6)
+
+        # side objects
+        shared_side = Day18.Side(
+            coordinates=shared_side_coord,
+            side_type='exposed-unknown',
+            flanking_cube_coordinates={
+                (2, 2, 1),
+                (1, 2, 1)
+            }
+        )
+        existing_sides_ls = [
+            Day18.Side(
+                coordinates=((1, 2), 2, 2),
+                side_type='covered',
+                flanking_cube_coordinates={
+                    (2, 2, 2),
+                    (1, 2, 2)
+                }
+            ),
+
+            Day18.Side(
+                coordinates=(1, 2, (1, 2)),
+                side_type='exposed-exterior',
+                flanking_cube_coordinates={
+                    (1, 2, 1),
+                    (1, 2, 2)
+                }
+            )
+        ]
+        # cube objects
+
+        existing_cubes_ls = [
+            Day18.Cube(
+                coordinates=(2, 2, 2),
+                cube_type='lava',
+                sides_dict={
+                    ((1, 2), 2, 2): existing_sides_ls[0],
+                }
+            ),
+
+
+        ]
+        lava_cube = Day18.Cube(
+            coordinates=(2, 2, 1),
+            cube_type='lava',
+            sides_dict={
+                ((1, 2), 2, 1): shared_side,
+            }
+        )
+
+        adjacent_cube = Day18.Cube(
+            coordinates=(1, 2, 1),
+            cube_type='air',
+            sides_dict={
+                ((1, 2), 2, 2): existing_sides_ls[0],
+            }
+        )
+
+        flanking_cube = Day18.Cube(
+                coordinates=(1, 2, 2),
+                cube_type='air',
+                sides_dict={
+                    ((1, 2), 2, 1): existing_sides_ls[0],
+                    (1, 2, (1, 2)): existing_sides_ls[1]
+                }
+            )
+
+        cubes_dict = {cube.coordinates: cube for cube in existing_cubes_ls + [lava_cube] + [adjacent_cube] + [flanking_cube]}
+        sides_dict = {side.coordinates: side for side in existing_sides_ls + [shared_side]}
+
+        adjacent_side_cube_coord = (1, 2, 2)
+
+        with self.assertRaises(Exception) as context:
+            Day18.add_adjacent_cube_side(
+                adjacent_cube,
+                adjacent_side_cube_coord,
+                shared_side_coord,
+                max_bounds_tuple,
+                cubes_dict,
+                sides_dict
+            )
+        self.assertTrue("cube2 type not defined" in str(context.exception))
 
 
 class TestAddAdjacentCube(unittest.TestCase):
