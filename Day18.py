@@ -316,12 +316,12 @@ def find_surface_area(raw_input, external_only):
     :param raw_input: raw puzzle input
     :return: surface area
     """
-    lava_cubes_ls = list(map(lambda x: [int(y) for y in x], [row.split(',') for row in raw_input.split('\n')]))
+    lava_cubes_ls = list(map(lambda x: tuple([int(y) for y in x]), [row.split(',') for row in raw_input.split('\n')]))
     if external_only:
-        surace_area = calculate_external_surface_area(lava_cubes_ls)
+        surface_area = calculate_external_surface_area(lava_cubes_ls)
     else:
-        surace_area = calculate_exposed_surfaces(lava_cubes_ls)
-    return surace_area
+        surface_area = calculate_exposed_surfaces(lava_cubes_ls)
+    return surface_area
 
 
 if __name__ == '__main__':
