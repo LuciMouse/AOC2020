@@ -2,14 +2,16 @@ from aocd import data
 
 
 class Cube:
-    def __init__(self, cube_type, coordinates, sides_dict={}):
+    def __init__(self, cube_type, coordinates, sides_dict=None):
+        if sides_dict is None:
+            sides_dict = {}
         self.cube_type = cube_type  # 'lava' 'air'
         self.coordinates = coordinates
         self.sides_dict = sides_dict
 
 
 class Side:
-    def __init__(self, coordinates, side_type, flanking_cube_coordinates=set()):
+    def __init__(self, coordinates, side_type, flanking_cube_coordinates=None):
         """
         :param coordinates: 
         :param side_type: type of interface of the side
@@ -23,6 +25,8 @@ class Side:
             unknown: at least one side of interface is unknown
         :param flanking_cube_coordinates: set of coordinates of the two cubes flanking this side
         """
+        if flanking_cube_coordinates is None:
+            flanking_cube_coordinates = set()
         self.coordinates = coordinates
         self.side_type = side_type
         self.flanking_cube_coordinates = flanking_cube_coordinates
@@ -222,7 +226,7 @@ def add_adjacent_cube_side(adjacent_cube, adjacent_side_cube_coord, shared_side_
         else:
             # does this side touch the edge (i.e. the adjacent_side_cube_coord is out of bounds?
             is_edge_cube = sum(
-                [adjacent_side_cube_coord[index] <= max_bounds_tuple[index] for index in range(3)]) > 0  # out of bounds
+                [(adjacent_side_cube_coord[index] > max_bounds_tuple[index]) or (adjacent_side_cube_coord[index]<=0) for index in range(3)]) > 0  # out of bounds
             # define the side type
             if is_edge_cube:  # assumes adjacent_side_cube to be cube_type 'air'
                 if adjacent_cube.cube_type == 'lava':
@@ -277,10 +281,22 @@ def add_lava_cube(lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict, 
     cubes_dict[lava_cube_coord] = new_lava_cube
 
     for adjacent_cube_coord in adjacent_cube_generator(lava_cube_coord):
-        if sum([adjacent_cube_coord[index] <= max_bounds_tuple[index] for index in
+        if sum([((adjacent_cube_coord[index] > max_bounds_tuple[index]) or (adjacent_cube_coord[index]==0)) for index in
                 range(3)]) == 0:  # not out of bound
-            add_adjacent_cube(adjacent_cube_coord, lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict,
+            add_adjacent_cube(adjacent_cube_coord, new_lava_cube, lava_cubes_ls, max_bounds_tuple, cubes_dict,
                               sides_dict)
+        else: #still need to create the side of lava_cube
+            shared_side_coord = find_shared_side(new_lava_cube.coordinates, adjacent_cube_coord)
+            if shared_side_coord in sides_dict:
+                shared_side = sides_dict[shared_side_coord]
+            else:
+                shared_side = Side(
+                    coordinates=shared_side_coord,
+                    side_type='exposed-exterior',
+                    flanking_cube_coordinates={new_lava_cube.coordinates, adjacent_cube_coord}
+                )
+            sides_dict[shared_side_coord] = shared_side
+            new_lava_cube.sides_dict[shared_side_coord] = shared_side
 
 
 def calculate_external_surface_area(lava_cubes_ls):
