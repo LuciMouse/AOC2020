@@ -69,7 +69,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
                 (
                     (1, 2, (1, 2)),
                     (1, 2, (1, 2)),
-                    'exposed-exterior',
+                    'unknown',
                     frozenset({
                         (1, 2, 1),
                         (1, 2, 2)
@@ -96,7 +96,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
                 (
                     (1, 2, (1, 2)),
                     (1, 2, (1, 2)),
-                    'exposed-exterior',
+                    'unknown',
                     frozenset({
                         (1, 2, 1),
                         (1, 2, 2)
@@ -2134,7 +2134,7 @@ class TestAddLavaCube(unittest.TestCase):
         ]
         new_cubes_dict = {cube.coordinates: cube for cube in cubes_ls}
 
-        print("sides_dict")
+
         # check sides_dict
 
         self.assertEqual.__self__.maxDiff = None
@@ -2144,7 +2144,6 @@ class TestAddLavaCube(unittest.TestCase):
             [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
              sides_dict.items()])
 
-        print("cubes dict")
         # check cubes_dict
 
         self.assertEqual(
@@ -2177,6 +2176,766 @@ class TestAddLavaCube(unittest.TestCase):
         )
 
 
+class TestUpdateUnknownSides(unittest.TestCase):
+    def test_update_unknown_sides_single_defined_cube(self):
+        """
+        only one of the flanking cubes are in cubes_dict
+        """
+        side_ls = [
+            Day18.Side(
+                coordinates=(1, 2, (0, 1)),
+                side_type='air-exterior',
+                flanking_cube_coordinates={
+                    (1, 2, 0),
+                    (1, 2, 1)
+                }
+            ),
+            Day18.Side(
+                coordinates=(1, 2, (1, 2)),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (1, 2, 1),
+                    (1, 2, 2)
+                }
+            ),
+            Day18.Side(
+                coordinates=((0, 1), 2, 1),
+                side_type='air-exterior',
+                flanking_cube_coordinates={
+                    (0, 2, 1),
+                    (1, 2, 1)
+                }
+            ),
+            Day18.Side(
+                coordinates=((1, 2), 2, 1),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (1, 2, 1),
+                    (2, 2, 1)
+                }
+            ),
+            Day18.Side(
+                coordinates=(1, (1, 2), 1),
+                side_type='unknown',
+                flanking_cube_coordinates={
+                    (1, 1, 1),
+                    (1, 2, 1)
+                }
+            ),
+            Day18.Side(
+                coordinates=(1, (2, 3), 1),
+                side_type='unknown',
+                flanking_cube_coordinates={
+                    (1, 2, 1),
+                    (1, 3, 1)
+                }
+            ),
+        ]
+        sides_dict = sides_dict = {side.coordinates: side for side in side_ls}
+        cube_ls = [
+            Day18.Cube(
+                coordinates=(1, 2, 1),
+                cube_type='air',
+                sides_dict={
+                    side_coord: sides_dict[side_coord] for side_coord in [
+                        ((0, 1), 2, 1),
+                        ((1, 2), 2, 1),
+                        (1, (1, 2), 1),
+                        (1, (2, 3), 1),
+                        (1, 2, (0, 1)),
+                        (1, 2, (1, 2)),
+                    ]
+                }
+            ),
+
+        ]
+        cubes_dict = {cube.coordinates: cube for cube in cube_ls}
+
+        # Objects expected to be changed. Make a deep copy since the originals are going to be mutated
+        cubes_dict_copy = deepcopy(cubes_dict)
+        sides_dict_copy = deepcopy(sides_dict)
+
+        unknown_side_coord_ls = [
+            (1, (1, 2), 1),
+            (1, (2, 3), 1),
+        ]
+
+        Day18.update_unknown_sides(
+            sides_dict,
+            cubes_dict,
+            [value for key, value in sides_dict.items() if key in unknown_side_coord_ls]
+        )
+        for unknown_air_side_coord in unknown_side_coord_ls:
+            sides_dict_copy[unknown_air_side_coord].side_type = 'air-exterior'
+        for key, cube in cubes_dict_copy.items():
+            for unknown_air_side_coord in unknown_side_coord_ls:
+                if unknown_air_side_coord in cube.sides_dict:
+                    cube.sides_dict[unknown_air_side_coord].side_type = 'air-exterior'
+
+
+        # check sides_dict
+
+        self.assertEqual.__self__.maxDiff = None
+        self.assertEqual(
+            [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
+             sides_dict_copy.items()],
+            [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
+             sides_dict.items()])
+
+
+        # check cubes_dict
+
+        self.assertEqual(
+            [
+                (
+                    cube_key,
+                    cube_value.coordinates,
+                    cube_value.cube_type,
+                    [
+                        (side_key,
+                         side_value.coordinates,
+                         side_value.side_type,
+                         frozenset(side_value.flanking_cube_coordinates)) for side_key, side_value in
+                        cube_value.sides_dict.items()]
+                ) for cube_key, cube_value in cubes_dict_copy.items()
+            ],
+            [
+                (
+                    cube_key,
+                    cube_value.coordinates,
+                    cube_value.cube_type,
+                    [
+                        (side_key,
+                         side_value.coordinates,
+                         side_value.side_type,
+                         frozenset(side_value.flanking_cube_coordinates)) for side_key, side_value in
+                        cube_value.sides_dict.items()]
+                ) for cube_key, cube_value in cubes_dict.items()
+            ]
+        )
+
+
+class TestUpdateAirSides(unittest.TestCase):
+    def test_update_air_sides_internal(self):
+        """
+        case where both air cubes flanking the 'air-unknown' face are internal
+        """
+        side_ls = [
+            Day18.Side(
+                coordinates=(2, 2, (4, 5)),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (2, 2, 4),
+                    (2, 2, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=(2, 2, (5, 6)),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (2, 2, 5),
+                    (2, 2, 6)
+                }
+            ),
+            Day18.Side(
+                coordinates=((1, 2), 2, 5),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (1, 2, 5),
+                    (2, 2, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=((2, 3), 2, 5),
+                side_type='air-unknown',
+                flanking_cube_coordinates={
+                    (2, 2, 5),
+                    (3, 2, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=(2, (1, 2), 5),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (2, 1, 5),
+                    (2, 2, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=(2, (2, 3), 5),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (2, 2, 5),
+                    (2, 3, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=(3, 2, (4, 5)),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (3, 2, 4),
+                    (3, 2, 5),
+                }
+            ),
+            Day18.Side(
+                coordinates=(3, 2, (5, 6)),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (3, 2, 5),
+                    (3, 2, 6)
+                }
+            ),
+            Day18.Side(
+                coordinates=((3, 4), 2, 5),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (3, 2, 5),
+                    (4, 2, 5)
+                }
+
+            ),
+            Day18.Side(
+                coordinates=(3, (1, 2), 5),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (3, 1, 5),
+                    (3, 2, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=(3, (2, 3), 5),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (3, 2, 5),
+                    (3, 3, 5)
+                }
+            )
+        ]
+        sides_dict = {side.coordinates: side for side in side_ls}
+        cube_ls = [
+            Day18.Cube(
+                coordinates=(2, 2, 5),
+                cube_type='air',
+                sides_dict={
+                    side_coord: sides_dict[side_coord] for side_coord in [
+                        (2, 2, (4, 5)),
+                        (2, 2, (5, 6)),
+                        ((1, 2), 2, 5),
+                        ((2, 3), 2, 5),
+                        (2, (1, 2), 5),
+                        (2, (2, 3), 5)
+                    ]
+                }
+            ),
+            Day18.Cube(
+                coordinates=(3, 2, 5),
+                cube_type='air',
+                sides_dict={
+                    side_coord: sides_dict[side_coord] for side_coord in [
+                        (3, 2, (4, 5)),
+                        (3, 2, (5, 6)),
+                        ((2, 3), 2, 5),
+                        ((3, 4), 2, 5),
+                        (3, (1, 2), 5),
+                        (3, (2, 3), 5)
+                    ]
+                }
+            )
+        ]
+        cubes_dict = {cube.coordinates: cube for cube in cube_ls}
+
+        # Objects expected to be changed. Make a deep copy since the originals are going to be mutated
+        cubes_dict_copy = deepcopy(cubes_dict)
+        sides_dict_copy = deepcopy(sides_dict)
+
+        unknown_air_side_coord = ((2, 3), 2, 5)
+
+        Day18.update_air_sides(
+            sides_dict,
+            cubes_dict,
+            [sides_dict[unknown_air_side_coord]],
+            (5,3,6)
+        )
+        sides_dict_copy[unknown_air_side_coord].side_type = 'air-interior'
+        for key, cube in cubes_dict_copy.items():
+            cube.sides_dict[unknown_air_side_coord].side_type = 'air-interior'
+
+        # check sides_dict
+
+        self.assertEqual.__self__.maxDiff = None
+        self.assertEqual(
+            [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
+             sides_dict_copy.items()],
+            [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
+             sides_dict.items()])
+
+
+        # check cubes_dict
+
+        self.assertEqual(
+            [
+                (
+                    cube_key,
+                    cube_value.coordinates,
+                    cube_value.cube_type,
+                    [
+                        (side_key,
+                         side_value.coordinates,
+                         side_value.side_type,
+                         frozenset(side_value.flanking_cube_coordinates)) for side_key, side_value in
+                        cube_value.sides_dict.items()]
+                ) for cube_key, cube_value in cubes_dict_copy.items()
+            ],
+            [
+                (
+                    cube_key,
+                    cube_value.coordinates,
+                    cube_value.cube_type,
+                    [
+                        (side_key,
+                         side_value.coordinates,
+                         side_value.side_type,
+                         frozenset(side_value.flanking_cube_coordinates)) for side_key, side_value in
+                        cube_value.sides_dict.items()]
+                ) for cube_key, cube_value in cubes_dict.items()
+            ]
+        )
+
+    def test_update_air_sides_propagate_external(self):
+        """
+        case where 'air-external' needs to propagate in from edge. 3 cube system
+        """
+        side_ls = [
+            Day18.Side(
+                coordinates=(2, 2, (4, 5)),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (2, 2, 4),
+                    (2, 2, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=(2, 2, (5, 6)),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (2, 2, 5),
+                    (2, 2, 6)
+                }
+            ),
+            Day18.Side(
+                coordinates=((1, 2), 2, 5),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (1, 2, 5),
+                    (2, 2, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=((2, 3), 2, 5),
+                side_type='air-unknown',
+                flanking_cube_coordinates={
+                    (2, 2, 5),
+                    (3, 2, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=(2, (1, 2), 5),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (2, 1, 5),
+                    (2, 2, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=(2, (2, 3), 5),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (2, 2, 5),
+                    (2, 3, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=(3, 2, (4, 5)),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (3, 2, 4),
+                    (3, 2, 5),
+                }
+            ),
+            Day18.Side(
+                coordinates=(3, 2, (5, 6)),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (3, 2, 5),
+                    (3, 2, 6)
+                }
+            ),
+            Day18.Side(
+                coordinates=((3, 4), 2, 5),
+                side_type='air-unknown',
+                flanking_cube_coordinates={
+                    (3, 2, 5),
+                    (4, 2, 5)
+                }
+
+            ),
+            Day18.Side(
+                coordinates=(3, (1, 2), 5),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (3, 1, 5),
+                    (3, 2, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=(3, (2, 3), 5),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (3, 2, 5),
+                    (3, 3, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=(4, 2, (4, 5)),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (4, 2, 4),
+                    (4, 2, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=(4, 2, (5, 6)),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (4, 2, 5),
+                    (4, 2, 6)
+                }
+            ),
+            Day18.Side(
+                coordinates=((4, 5), 2, 5),
+                side_type='air-exterior',
+                flanking_cube_coordinates={
+                    (4, 2, 5),
+                    (5, 2, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=(4, (1, 2), 5),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (4, 1, 5),
+                    (4, 2, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=(4, (2, 3), 5),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (4, 2, 5),
+                    (4, 3, 5)
+                }
+            )
+        ]
+        sides_dict = {side.coordinates: side for side in side_ls}
+        cube_ls = [
+            Day18.Cube(
+                coordinates=(2, 2, 5),
+                cube_type='air',
+                sides_dict={
+                    side_coord: sides_dict[side_coord] for side_coord in [
+                        (2, 2, (4, 5)),
+                        (2, 2, (5, 6)),
+                        ((1, 2), 2, 5),
+                        ((2, 3), 2, 5),
+                        (2, (1, 2), 5),
+                        (2, (2, 3), 5)
+                    ]
+                }
+            ),
+            Day18.Cube(
+                coordinates=(3, 2, 5),
+                cube_type='air',
+                sides_dict={
+                    side_coord: sides_dict[side_coord] for side_coord in [
+                        (3, 2, (4, 5)),
+                        (3, 2, (5, 6)),
+                        ((2, 3), 2, 5),
+                        ((3, 4), 2, 5),
+                        (3, (1, 2), 5),
+                        (3, (2, 3), 5)
+                    ]
+                }
+            ),
+            Day18.Cube(
+                coordinates=(4, 2, 5),
+                cube_type='air',
+                sides_dict={
+                    side_coord: sides_dict[side_coord] for side_coord in [
+                        (4, 2, (4, 5)),
+                        (4, 2, (5, 6)),
+                        ((4, 5), 2, 5),
+                        ((3, 4), 2, 5),
+                        (4, (1, 2), 5),
+                        (4, (2, 3), 5)
+                    ]
+                }
+            )
+        ]
+        cubes_dict = {cube.coordinates: cube for cube in cube_ls}
+
+        # Objects expected to be changed. Make a deep copy since the originals are going to be mutated
+        cubes_dict_copy = deepcopy(cubes_dict)
+        sides_dict_copy = deepcopy(sides_dict)
+
+        unknown_air_side_coord_ls = [
+            ((2, 3), 2, 5),
+            ((3, 4), 2, 5)
+        ]
+
+        Day18.update_air_sides(
+            sides_dict,
+            cubes_dict,
+            [value for key, value in sides_dict.items() if key in unknown_air_side_coord_ls],
+            (5, 3, 6)
+        )
+        for unknown_air_side_coord in unknown_air_side_coord_ls:
+            sides_dict_copy[unknown_air_side_coord].side_type = 'air-exterior'
+        for key, cube in cubes_dict_copy.items():
+            for unknown_air_side_coord in unknown_air_side_coord_ls:
+                if unknown_air_side_coord in cube.sides_dict:
+                    cube.sides_dict[unknown_air_side_coord].side_type = 'air-exterior'
+
+        # check sides_dict
+
+        self.assertEqual.__self__.maxDiff = None
+        self.assertEqual(
+            [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
+             sides_dict_copy.items()],
+            [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
+             sides_dict.items()])
+
+
+        # check cubes_dict
+
+        self.assertEqual(
+            [
+                (
+                    cube_key,
+                    cube_value.coordinates,
+                    cube_value.cube_type,
+                    [
+                        (side_key,
+                         side_value.coordinates,
+                         side_value.side_type,
+                         frozenset(side_value.flanking_cube_coordinates)) for side_key, side_value in
+                        cube_value.sides_dict.items()]
+                ) for cube_key, cube_value in cubes_dict_copy.items()
+            ],
+            [
+                (
+                    cube_key,
+                    cube_value.coordinates,
+                    cube_value.cube_type,
+                    [
+                        (side_key,
+                         side_value.coordinates,
+                         side_value.side_type,
+                         frozenset(side_value.flanking_cube_coordinates)) for side_key, side_value in
+                        cube_value.sides_dict.items()]
+                ) for cube_key, cube_value in cubes_dict.items()
+            ]
+        )
+
+
+class TestUpdateExposedSides(unittest.TestCase):
+    def test_update_exposed_sides_internal(self):
+        """
+               case where both air cubes flanking the 'air-unknown' face are internal
+               """
+        side_ls = [
+            Day18.Side(
+                coordinates=(2, 2, (4, 5)),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (2, 2, 4),
+                    (2, 2, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=(2, 2, (5, 6)),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (2, 2, 5),
+                    (2, 2, 6)
+                }
+            ),
+            Day18.Side(
+                coordinates=((1, 2), 2, 5),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (1, 2, 5),
+                    (2, 2, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=((2, 3), 2, 5),
+                side_type='air-interior',
+                flanking_cube_coordinates={
+                    (2, 2, 5),
+                    (3, 2, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=(2, (1, 2), 5),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (2, 1, 5),
+                    (2, 2, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=(2, (2, 3), 5),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (2, 2, 5),
+                    (2, 3, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=(3, 2, (4, 5)),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (3, 2, 4),
+                    (3, 2, 5),
+                }
+            ),
+            Day18.Side(
+                coordinates=(3, 2, (5, 6)),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (3, 2, 5),
+                    (3, 2, 6)
+                }
+            ),
+            Day18.Side(
+                coordinates=((3, 4), 2, 5),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (3, 2, 5),
+                    (4, 2, 5)
+                }
+
+            ),
+            Day18.Side(
+                coordinates=(3, (1, 2), 5),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (3, 1, 5),
+                    (3, 2, 5)
+                }
+            ),
+            Day18.Side(
+                coordinates=(3, (2, 3), 5),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (3, 2, 5),
+                    (3, 3, 5)
+                }
+            )
+        ]
+        sides_dict = {side.coordinates: side for side in side_ls}
+        cube_ls = [
+            Day18.Cube(
+                coordinates=(2, 2, 5),
+                cube_type='air',
+                sides_dict={
+                    side_coord: sides_dict[side_coord] for side_coord in [
+                        (2, 2, (4, 5)),
+                        (2, 2, (5, 6)),
+                        ((1, 2), 2, 5),
+                        ((2, 3), 2, 5),
+                        (2, (1, 2), 5),
+                        (2, (2, 3), 5)
+                    ]
+                }
+            ),
+            Day18.Cube(
+                coordinates=(3, 2, 5),
+                cube_type='air',
+                sides_dict={
+                    side_coord: sides_dict[side_coord] for side_coord in [
+                        (3, 2, (4, 5)),
+                        (3, 2, (5, 6)),
+                        ((2, 3), 2, 5),
+                        ((3, 4), 2, 5),
+                        (3, (1, 2), 5),
+                        (3, (2, 3), 5)
+                    ]
+                }
+            )
+        ]
+        cubes_dict = {cube.coordinates: cube for cube in cube_ls}
+
+        # Objects expected to be changed. Make a deep copy since the originals are going to be mutated
+        cubes_dict_copy = deepcopy(cubes_dict)
+        sides_dict_copy = deepcopy(sides_dict)
+
+        unknown_exposed_side_dict = {key: value for key, value in sides_dict.items() if
+                                     value.side_type == 'exposed-unknown'}
+        Day18.update_exposed_sides(
+            sides_dict,
+            cubes_dict,
+            unknown_exposed_side_dict.values()
+        )
+        for unknown_exposed_side_coord in unknown_exposed_side_dict.keys():
+            sides_dict_copy[unknown_exposed_side_coord].side_type = 'exposed-interior'
+        for key, cube in cubes_dict_copy.items():
+            for unknown_air_side_coord in unknown_exposed_side_dict.keys():
+                if unknown_air_side_coord in cube.sides_dict:
+                    cube.sides_dict[unknown_air_side_coord].side_type = 'exposed-interior'
+
+        # check sides_dict
+
+        self.assertEqual.__self__.maxDiff = None
+        self.assertEqual(
+            [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
+             sides_dict_copy.items()],
+            [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
+             sides_dict.items()])
+
+
+        # check cubes_dict
+
+        self.assertEqual(
+            [
+                (
+                    cube_key,
+                    cube_value.coordinates,
+                    cube_value.cube_type,
+                    [
+                        (side_key,
+                         side_value.coordinates,
+                         side_value.side_type,
+                         frozenset(side_value.flanking_cube_coordinates)) for side_key, side_value in
+                        cube_value.sides_dict.items()]
+                ) for cube_key, cube_value in cubes_dict_copy.items()
+            ],
+            [
+                (
+                    cube_key,
+                    cube_value.coordinates,
+                    cube_value.cube_type,
+                    [
+                        (side_key,
+                         side_value.coordinates,
+                         side_value.side_type,
+                         frozenset(side_value.flanking_cube_coordinates)) for side_key, side_value in
+                        cube_value.sides_dict.items()]
+                ) for cube_key, cube_value in cubes_dict.items()
+            ]
+        )
+
+
 class TestFindSurfaceArea(unittest.TestCase):
     def test_find_surface_area(self):
         with open("Day18_test_input.txt") as input_file:
@@ -2191,6 +2950,22 @@ class TestFindSurfaceArea(unittest.TestCase):
             raw_input = input_file.read()
         self.assertEqual(
             58,
+            Day18.find_surface_area(raw_input, True)
+        )
+
+    def test_find_surface_area_2(self):
+        with open("Day18_test_input_2.txt") as input_file:
+            raw_input = input_file.read()
+        self.assertEqual(
+            80,
+            Day18.find_surface_area(raw_input, False)
+        )
+
+    def test_find_external_surface_area_2(self):
+        with open("Day18_test_input_2.txt") as input_file:
+            raw_input = input_file.read()
+        self.assertEqual(
+            70,
             Day18.find_surface_area(raw_input, True)
         )
 
