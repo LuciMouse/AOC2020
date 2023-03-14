@@ -306,6 +306,33 @@ def add_lava_cube(lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict, 
             lava_cube.sides_dict[shared_side_coord] = shared_side
 
 
+def update_single_air_cubes(
+        cubes_dict
+):
+    """
+    defines single air cubes
+    :param cubes_dict: dictionary of cube objects
+    :return: none
+    """
+    # find all single air cubes
+
+    air_cubes_ls = [cube for cube_coord, cube in cubes_dict.items() if cube.cube_type == 'air']
+    single_air_cubes_ls = []
+
+    for curr_cube in air_cubes_ls:
+        curr_sides = curr_cube.sides_dict.values()
+        flanking_cubes_set = frozenset().union(
+            *[frozenset(side.flanking_cube_coordinates) for side in curr_sides]).difference({curr_cube.coordinates})
+        flanking_cube_type_ls = [
+            cubes_dict[cube].cube_type for cube in flanking_cubes_set
+        ]
+        if sum([cube_type == 'lava' for cube_type in flanking_cube_type_ls]) == 6:
+            single_air_cubes_ls.append(curr_cube)
+    for curr_cube in single_air_cubes_ls:
+        for side in curr_cube.sides_dict.values():
+            side.side_type = 'exposed-internal'
+
+
 def update_unknown_sides(sides_dict, cubes_dict, unknown_sides_ls):
     """
         defines all unknown sides.
@@ -346,7 +373,7 @@ def update_unknown_sides(sides_dict, cubes_dict, unknown_sides_ls):
                 ) > 0:
                     curr_side.side_type = 'air-interior'
                     updated_side = True
-                else: #can't define right now
+                else:  # can't define right now
                     curr_side.side_type = 'air-unknown'
 
                 # should't be able to have both, but catch it
@@ -386,7 +413,7 @@ def update_unknown_sides(sides_dict, cubes_dict, unknown_sides_ls):
                 ) > 0:
                     curr_side.side_type = 'exposed-interior'
                     updated_side = True
-                else: #can't define right now
+                else:  # can't define right now
                     curr_side.side_type = 'exposed-unknown'
                 # should't be able to have both, but catch it
                 if (
@@ -422,52 +449,53 @@ def update_air_sides(sides_dict, cubes_dict, unknown_air_sides_ls, max_bounds_tu
             flanking_cubes_coord_ls = list(curr_side.flanking_cube_coordinates)
             is_edge_cube = sum([
                 ((
-                    flanking_cubes_coord_ls[0][index] == max_bounds_tuple[index]
-                ) or (
-                    flanking_cubes_coord_ls[1][index] == max_bounds_tuple[index]
-                ) or (
-                    flanking_cubes_coord_ls[0][index] == 1
-                ) or (
-                    flanking_cubes_coord_ls[1][index] == 1
-                )) for index in range(3)
+                         flanking_cubes_coord_ls[0][index] == max_bounds_tuple[index]
+                 ) or (
+                         flanking_cubes_coord_ls[1][index] == max_bounds_tuple[index]
+                 ) or (
+                         flanking_cubes_coord_ls[0][index] == 1
+                 ) or (
+                         flanking_cubes_coord_ls[1][index] == 1
+                 )) for index in range(3)
             ]) > 0
             if is_edge_cube:
                 curr_side.side_type = 'air-exterior'
                 updated_side = True
+            else:
+                # look at side types in flanking cubes
+                flanking_cube_side_types_set = set().union(
+                    *[set([side.side_type for side in value.sides_dict.values()]) for key, value in cubes_dict.items()
+                      if
+                      key in curr_side.flanking_cube_coordinates])
 
-            # look at side types in flanking cubes
-            flanking_cube_side_types_set = set().union(
-                *[set([side.side_type for side in value.sides_dict.values()]) for key, value in cubes_dict.items() if
-                  key in curr_side.flanking_cube_coordinates])
-
-            if len(
-                    {'air-exterior'}.intersection(
-                        flanking_cube_side_types_set
-                    )
-            ) > 0:
-                curr_side.side_type = 'air-exterior'
-                updated_side = True
-            elif len(
-                    {'air-interior'}.intersection(
-                        flanking_cube_side_types_set
-                    )
-            ) > 0:
-                curr_side.side_type = 'air-interior'
-                updated_side = True
-
-            # should't be able to have both, but catch it
-            if (
-                    len(
-                        {'air-exterior', 'exposed-exterior'}.intersection(
+                if len(
+                        {'air-exterior'}.intersection(
                             flanking_cube_side_types_set
                         )
-                    ) > 0) and (
-                    len(
-                        {'air-interior', 'exposed-interior'}.intersection(
+                ) > 0:
+                    curr_side.side_type = 'air-exterior'
+                    updated_side = True
+                elif len(
+                        {'air-interior'}.intersection(
                             flanking_cube_side_types_set
                         )
-                    ) > 0):
-                raise Exception("both types should not exist on the same cube")
+                ) > 0:
+                    curr_side.side_type = 'air-interior'
+                    updated_side = True
+
+                # should't be able to have both, but catch it
+                if (
+                        len(
+                            {'air-exterior', 'exposed-exterior'}.intersection(
+                                flanking_cube_side_types_set
+                            )
+                        ) > 0) and (
+                        len(
+                            {'air-interior', 'exposed-interior'}.intersection(
+                                flanking_cube_side_types_set
+                            )
+                        ) > 0):
+                    raise Exception("both types should not exist on the same cube")
         unknown_air_sides_ls = [value for key, value in sides_dict.items() if value.side_type == 'air-unknown']
     # if we can't define them, they must be internal
     for curr_side in unknown_air_sides_ls:
@@ -522,9 +550,7 @@ def update_exposed_sides(sides_dict, cubes_dict, unknown_exposed_sides_ls):
                     ) > 0):
                 raise Exception("both types should not exist on the same cube")
         unknown_exposed_sides_ls = [value for key, value in sides_dict.items() if value.side_type == 'exposed-unknown']
-    # if we can't define them, they must be internal
-    for curr_side in unknown_exposed_sides_ls:
-        curr_side.side_type = 'exposed-interior'
+    return unknown_exposed_sides_ls
 
 
 def calculate_external_surface_area(lava_cubes_ls):
@@ -549,8 +575,14 @@ def calculate_external_surface_area(lava_cubes_ls):
         add_lava_cube(
             lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict, sides_dict
         )
-
     # go through sides and see if we can define more sides
+
+    # single air cubes that are completely surrounded by lava cubes are always 'exposed-internal'
+    update_single_air_cubes(
+        sides_dict,
+        cubes_dict
+    )
+
     unknown_sides_ls = [value for key, value in sides_dict.items() if value.side_type == 'unknown']
     if len(unknown_sides_ls):
         update_unknown_sides(
@@ -559,7 +591,6 @@ def calculate_external_surface_area(lava_cubes_ls):
             unknown_sides_ls
         )
     # look at the air:air sides that are undefined
-
     unknown_air_sides_ls = [value for key, value in sides_dict.items() if value.side_type == 'air-unknown']
     if len(unknown_air_sides_ls):
         update_air_sides(
@@ -577,8 +608,9 @@ def calculate_external_surface_area(lava_cubes_ls):
             unknown_exposed_sides_ls
         )
     all_sides_ls = [value for key, value in sides_dict.items() if value.side_type[:7] == 'exposed']
-    unknown_sides_ls = [value for key, value in sides_dict.items() if value.side_type == 'unknown']
+    covered_sides_ls = [value for key, value in sides_dict.items() if value.side_type == 'covered']
     external_sides_ls = [value for key, value in sides_dict.items() if value.side_type == 'exposed-exterior']
+    internal_sides_ls = [value for key, value in sides_dict.items() if value.side_type == 'exposed-interior']
 
     return len(external_sides_ls)
 
@@ -599,4 +631,5 @@ def find_surface_area(raw_input, external_only):
 
 
 if __name__ == '__main__':
-    print(f"part1 surface area is {find_surface_area(data, False)}")
+    # print(f"part1 surface area is {find_surface_area(data, False)}")
+    print(f"part2 surface area is {find_surface_area(data, True)}")  # 2130 too low

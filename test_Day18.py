@@ -2134,7 +2134,6 @@ class TestAddLavaCube(unittest.TestCase):
         ]
         new_cubes_dict = {cube.coordinates: cube for cube in cubes_ls}
 
-
         # check sides_dict
 
         self.assertEqual.__self__.maxDiff = None
@@ -2173,6 +2172,128 @@ class TestAddLavaCube(unittest.TestCase):
                         cube_value.sides_dict.items()]
                 ) for cube_key, cube_value in cubes_dict.items()
             ]
+        )
+
+
+class TestUpdateSingleAirCubes(unittest.TestCase):
+    def test_update_single_air_cube_single_cube(self):
+        """
+        one enclosed single air cube
+        :return:
+        """
+        sides_ls = [
+            Day18.Side(
+                coordinates=(2, 2, (1, 2)),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (2, 2, 1),
+                    (2, 2, 2)
+                }
+            ),
+            Day18.Side(
+                coordinates=(2, 2, (2, 3)),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (2, 2, 2),
+                    (2, 2, 3)
+                }
+            ),
+            Day18.Side(
+                coordinates=((1, 2), 2, 2),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (1, 2, 2),
+                    (2, 2, 2)
+                }
+            ),
+            Day18.Side(
+                coordinates=((2, 3), 2, 2),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (2, 2, 2),
+                    (3, 2, 2)
+                }
+            ),
+            Day18.Side(
+                coordinates=(2, (1, 2), 2),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (2, 1, 2),
+                    (2, 2, 2)
+                }
+            ),
+            Day18.Side(
+                coordinates=(2, (2, 3), 2),
+                side_type='exposed-unknown',
+                flanking_cube_coordinates={
+                    (2, 2, 2),
+                    (2, 3, 2)
+                }
+            )
+        ]
+        sides_dict = {
+            side.coordinates: side for side in sides_ls
+        }
+
+        cubes_ls = [
+            Day18.Cube(
+                coordinates=(2, 2, 2),
+                cube_type='air',
+                sides_dict=sides_dict
+            ),
+            Day18.Cube(
+                coordinates=(2, 2, 1),
+                cube_type='lava',
+                sides_dict={}
+            ),
+            Day18.Cube(
+                coordinates=(2,2,3),
+                cube_type='lava',
+                sides_dict={}
+            ),
+            Day18.Cube(
+                coordinates=(1, 2, 2),
+                cube_type='lava',
+                sides_dict={}
+            ),
+            Day18.Cube(
+                coordinates=(3, 2, 2),
+                cube_type='lava',
+                sides_dict={}
+            ),
+            Day18.Cube(
+                coordinates=(2, 1, 2),
+                cube_type='lava',
+                sides_dict={}
+            ),
+            Day18.Cube(
+                coordinates=(2, 3, 2),
+                cube_type='lava',
+                sides_dict={}
+            )
+        ]
+        cubes_dict = {
+            cube.coordinates: cube for cube in cubes_ls
+        }
+
+        sides_dict_copy = deepcopy(sides_dict)
+        cubes_dict_copy = deepcopy(cubes_dict)
+
+        Day18.update_single_air_cubes(cubes_dict)
+
+        for side in sides_dict_copy.values():
+            side.side_type = 'exposed-internal'
+
+        for cube in cubes_dict_copy.values():
+            for side in cube.sides_dict.values():
+                side.side_type = 'exposed-internal'
+        self.assertEqual(
+            [(side_coord, side.coordinates, side.side_type, side.flanking_cube_coordinates) for side_coord, side in sides_dict_copy.items()],
+            [(side_coord, side.coordinates, side.side_type, side.flanking_cube_coordinates) for side_coord, side in sides_dict.items()]
+        )
+        self.assertEqual(
+            [(cube_coord, cube.coordinates, cube.cube_type, [side_coord for side_coord,side in cube.sides_dict.items()]) for cube_coord, cube in cubes_dict_copy.items()],
+            [(cube_coord, cube.coordinates, cube.cube_type, [side_coord for side_coord,side in cube.sides_dict.items()]) for cube_coord, cube in cubes_dict.items()]
         )
 
 
@@ -2272,7 +2393,6 @@ class TestUpdateUnknownSides(unittest.TestCase):
                 if unknown_air_side_coord in cube.sides_dict:
                     cube.sides_dict[unknown_air_side_coord].side_type = 'air-exterior'
 
-
         # check sides_dict
 
         self.assertEqual.__self__.maxDiff = None
@@ -2281,7 +2401,6 @@ class TestUpdateUnknownSides(unittest.TestCase):
              sides_dict_copy.items()],
             [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
              sides_dict.items()])
-
 
         # check cubes_dict
 
@@ -2454,7 +2573,7 @@ class TestUpdateAirSides(unittest.TestCase):
             sides_dict,
             cubes_dict,
             [sides_dict[unknown_air_side_coord]],
-            (5,3,6)
+            (5, 3, 6)
         )
         sides_dict_copy[unknown_air_side_coord].side_type = 'air-interior'
         for key, cube in cubes_dict_copy.items():
@@ -2468,7 +2587,6 @@ class TestUpdateAirSides(unittest.TestCase):
              sides_dict_copy.items()],
             [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
              sides_dict.items()])
-
 
         # check cubes_dict
 
@@ -2714,7 +2832,6 @@ class TestUpdateAirSides(unittest.TestCase):
             [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
              sides_dict.items()])
 
-
         # check cubes_dict
 
         self.assertEqual(
@@ -2902,7 +3019,6 @@ class TestUpdateExposedSides(unittest.TestCase):
              sides_dict_copy.items()],
             [(key, value.coordinates, value.side_type, frozenset(value.flanking_cube_coordinates)) for key, value in
              sides_dict.items()])
-
 
         # check cubes_dict
 
