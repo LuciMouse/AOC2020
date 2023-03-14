@@ -579,8 +579,7 @@ def calculate_external_surface_area(lava_cubes_ls):
 
     # single air cubes that are completely surrounded by lava cubes are always 'exposed-internal'
     update_single_air_cubes(
-        sides_dict,
-        cubes_dict
+        sides_dict
     )
 
     unknown_sides_ls = [value for key, value in sides_dict.items() if value.side_type == 'unknown']
