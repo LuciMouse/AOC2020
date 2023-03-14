@@ -2247,7 +2247,7 @@ class TestUpdateSingleAirCubes(unittest.TestCase):
                 sides_dict={}
             ),
             Day18.Cube(
-                coordinates=(2,2,3),
+                coordinates=(2, 2, 3),
                 cube_type='lava',
                 sides_dict={}
             ),
@@ -2288,12 +2288,18 @@ class TestUpdateSingleAirCubes(unittest.TestCase):
             for side in cube.sides_dict.values():
                 side.side_type = 'exposed-internal'
         self.assertEqual(
-            [(side_coord, side.coordinates, side.side_type, side.flanking_cube_coordinates) for side_coord, side in sides_dict_copy.items()],
-            [(side_coord, side.coordinates, side.side_type, side.flanking_cube_coordinates) for side_coord, side in sides_dict.items()]
+            [(side_coord, side.coordinates, side.side_type, side.flanking_cube_coordinates) for side_coord, side in
+             sides_dict_copy.items()],
+            [(side_coord, side.coordinates, side.side_type, side.flanking_cube_coordinates) for side_coord, side in
+             sides_dict.items()]
         )
         self.assertEqual(
-            [(cube_coord, cube.coordinates, cube.cube_type, [side_coord for side_coord,side in cube.sides_dict.items()]) for cube_coord, cube in cubes_dict_copy.items()],
-            [(cube_coord, cube.coordinates, cube.cube_type, [side_coord for side_coord,side in cube.sides_dict.items()]) for cube_coord, cube in cubes_dict.items()]
+            [(
+             cube_coord, cube.coordinates, cube.cube_type, [side_coord for side_coord, side in cube.sides_dict.items()])
+             for cube_coord, cube in cubes_dict_copy.items()],
+            [(
+             cube_coord, cube.coordinates, cube.cube_type, [side_coord for side_coord, side in cube.sides_dict.items()])
+             for cube_coord, cube in cubes_dict.items()]
         )
 
 
@@ -3052,7 +3058,67 @@ class TestUpdateExposedSides(unittest.TestCase):
         )
 
 
+class TestVisualizeDropLava(unittest.TestCase):
+    def test_visualize_drop_lava_1(self):
+        with open("Day18_test_input.txt") as input_file:
+            raw_input = input_file.read()
+        lava_cubes_ls = list(
+            map(lambda x: tuple([int(y) for y in x]), [row.split(',') for row in raw_input.split('\n')]))
+        max_x = max([cube[0] for cube in lava_cubes_ls])
+        max_y = max([cube[1] for cube in lava_cubes_ls])
+        max_z = max([cube[2] for cube in lava_cubes_ls])
+
+        max_bounds_tuple = (max_x, max_y, max_z)
+
+        drop_diagram_ls = Day18.visualize_drop_lava(
+                lava_cubes_ls,
+                max_bounds_tuple
+            )
+
+        self.assertEqual(
+            [
+                [
+                    ['_', '_', '_'],
+                    ['_', 'L', '_'],
+                    ['_', '_', '_'],
+                ],
+                [
+                    ['_', 'L', '_'],
+                    ['L', 'L', 'L'],
+                    ['_', 'L', '_'],
+                ],
+                [
+                    ['_', '_', '_'],
+                    ['_', 'L', '_'],
+                    ['_', '_', '_'],
+                ],
+                [
+                    ['_', '_', '_'],
+                    ['_', 'L', '_'],
+                    ['_', '_', '_'],
+                ],
+                [
+                    ['_', 'L', '_'],
+                    ['L', '_', 'L'],
+                    ['_', 'L', '_'],
+                ],
+                [
+                    ['_', '_', '_'],
+                    ['_', 'L', '_'],
+                    ['_', '_', '_'],
+                ],
+            ],
+            drop_diagram_ls
+        )
+        for z in drop_diagram_ls:
+            z.reverse()
+            for y in z:
+                print("".join(y))
+            print("\n")
+
+
 class TestFindSurfaceArea(unittest.TestCase):
+
     def test_find_surface_area(self):
         with open("Day18_test_input.txt") as input_file:
             raw_input = input_file.read()
@@ -3079,6 +3145,22 @@ class TestFindSurfaceArea(unittest.TestCase):
 
     def test_find_external_surface_area_2(self):
         with open("Day18_test_input_2.txt") as input_file:
+            raw_input = input_file.read()
+        self.assertEqual(
+            70,
+            Day18.find_surface_area(raw_input, True)
+        )
+
+    def test_find_surface_area_3(self):
+        with open("Day18_test_input_3.txt") as input_file:
+            raw_input = input_file.read()
+        self.assertEqual(
+            70,
+            Day18.find_surface_area(raw_input, False)
+        )
+
+    def test_find_external_surface_area_3(self):
+        with open("Day18_test_input_3.txt") as input_file:
             raw_input = input_file.read()
         self.assertEqual(
             70,

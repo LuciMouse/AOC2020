@@ -305,6 +305,19 @@ def add_lava_cube(lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict, 
             sides_dict[shared_side_coord] = shared_side
             lava_cube.sides_dict[shared_side_coord] = shared_side
 
+def visualize_drop_lava(lava_cubes_ls, max_bounds_tuple):
+    #create empty arrays
+    droplet_ls = [
+        [
+            [
+                "_" for x in range(max_bounds_tuple[0])
+            ] for y in range(max_bounds_tuple[1])
+        ] for z in range(max_bounds_tuple[2])
+    ]
+    for lava_cube_coord in lava_cubes_ls:
+        x_coord,y_coord,z_coord = lava_cube_coord
+        droplet_ls[z_coord-1][y_coord-1][x_coord-1]='L'
+    return droplet_ls
 
 def update_single_air_cubes(
         cubes_dict
