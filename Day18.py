@@ -310,7 +310,7 @@ def visualize_drop_lava(lava_cubes_ls, max_bounds_tuple):
     droplet_ls = [
         [
             [
-                "_" for x in range(max_bounds_tuple[0])
+                "." for x in range(max_bounds_tuple[0])
             ] for y in range(max_bounds_tuple[1])
         ] for z in range(max_bounds_tuple[2])
     ]
