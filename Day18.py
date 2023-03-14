@@ -330,7 +330,7 @@ def update_single_air_cubes(
             single_air_cubes_ls.append(curr_cube)
     for curr_cube in single_air_cubes_ls:
         for side in curr_cube.sides_dict.values():
-            side.side_type = 'exposed-internal'
+            side.side_type = 'exposed-interior'
 
 
 def update_unknown_sides(sides_dict, cubes_dict, unknown_sides_ls):
