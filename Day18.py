@@ -323,10 +323,10 @@ def update_single_air_cubes(
         curr_sides = curr_cube.sides_dict.values()
         flanking_cubes_set = frozenset().union(
             *[frozenset(side.flanking_cube_coordinates) for side in curr_sides]).difference({curr_cube.coordinates})
-        flanking_cube_type_ls = [
-            cubes_dict[cube].cube_type for cube in flanking_cubes_set
+        flanking_cube_coord_type_ls = [
+            cubes_dict[cube_coord].cube_type if cube_coord in cubes_dict else None for cube_coord in flanking_cubes_set
         ]
-        if sum([cube_type == 'lava' for cube_type in flanking_cube_type_ls]) == 6:
+        if sum([cube_type == 'lava' for cube_type in flanking_cube_coord_type_ls]) == 6:
             single_air_cubes_ls.append(curr_cube)
     for curr_cube in single_air_cubes_ls:
         for side in curr_cube.sides_dict.values():
@@ -579,7 +579,7 @@ def calculate_external_surface_area(lava_cubes_ls):
 
     # single air cubes that are completely surrounded by lava cubes are always 'exposed-internal'
     update_single_air_cubes(
-        sides_dict
+        cubes_dict
     )
 
     unknown_sides_ls = [value for key, value in sides_dict.items() if value.side_type == 'unknown']
