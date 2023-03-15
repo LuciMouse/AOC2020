@@ -2282,11 +2282,11 @@ class TestUpdateSingleAirCubes(unittest.TestCase):
         Day18.update_single_air_cubes(cubes_dict)
 
         for side in sides_dict_copy.values():
-            side.side_type = 'exposed-internal'
+            side.side_type = 'exposed-interior'
 
         for cube in cubes_dict_copy.values():
             for side in cube.sides_dict.values():
-                side.side_type = 'exposed-internal'
+                side.side_type = 'exposed-inteior'
         self.assertEqual(
             [(side_coord, side.coordinates, side.side_type, side.flanking_cube_coordinates) for side_coord, side in
              sides_dict_copy.items()],
@@ -3155,7 +3155,7 @@ class TestFindSurfaceArea(unittest.TestCase):
         with open("Day18_test_input_3.txt") as input_file:
             raw_input = input_file.read()
         self.assertEqual(
-            70,
+            158,
             Day18.find_surface_area(raw_input, False)
         )
 
@@ -3163,7 +3163,7 @@ class TestFindSurfaceArea(unittest.TestCase):
         with open("Day18_test_input_3.txt") as input_file:
             raw_input = input_file.read()
         self.assertEqual(
-            70,
+            158,
             Day18.find_surface_area(raw_input, True)
         )
 
