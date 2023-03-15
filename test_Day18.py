@@ -2295,11 +2295,13 @@ class TestUpdateSingleAirCubes(unittest.TestCase):
         )
         self.assertEqual(
             [(
-             cube_coord, cube.coordinates, cube.cube_type, [side_coord for side_coord, side in cube.sides_dict.items()])
-             for cube_coord, cube in cubes_dict_copy.items()],
+                cube_coord, cube.coordinates, cube.cube_type,
+                [side_coord for side_coord, side in cube.sides_dict.items()])
+                for cube_coord, cube in cubes_dict_copy.items()],
             [(
-             cube_coord, cube.coordinates, cube.cube_type, [side_coord for side_coord, side in cube.sides_dict.items()])
-             for cube_coord, cube in cubes_dict.items()]
+                cube_coord, cube.coordinates, cube.cube_type,
+                [side_coord for side_coord, side in cube.sides_dict.items()])
+                for cube_coord, cube in cubes_dict.items()]
         )
 
 
@@ -2574,12 +2576,14 @@ class TestUpdateAirSides(unittest.TestCase):
         sides_dict_copy = deepcopy(sides_dict)
 
         unknown_air_side_coord = ((2, 3), 2, 5)
+        lava_cubes_ls = [(1, 2, 5), (4, 2, 5)] #to prevent the side from being called external
 
         Day18.update_air_sides(
             sides_dict,
             cubes_dict,
             [sides_dict[unknown_air_side_coord]],
-            (5, 3, 6)
+            (5, 3, 6),
+            lava_cubes_ls
         )
         sides_dict_copy[unknown_air_side_coord].side_type = 'air-interior'
         for key, cube in cubes_dict_copy.items():
@@ -2815,12 +2819,14 @@ class TestUpdateAirSides(unittest.TestCase):
             ((2, 3), 2, 5),
             ((3, 4), 2, 5)
         ]
+        lava_cubes_ls = [(1, 2, 5), (5, 2, 5)]  # to prevent the side from being called external
 
         Day18.update_air_sides(
             sides_dict,
             cubes_dict,
             [value for key, value in sides_dict.items() if key in unknown_air_side_coord_ls],
-            (5, 3, 6)
+            (5, 3, 6),
+            lava_cubes_ls
         )
         for unknown_air_side_coord in unknown_air_side_coord_ls:
             sides_dict_copy[unknown_air_side_coord].side_type = 'air-exterior'
@@ -3071,9 +3077,9 @@ class TestVisualizeDropLava(unittest.TestCase):
         max_bounds_tuple = (max_x, max_y, max_z)
 
         drop_diagram_ls = Day18.visualize_drop_lava(
-                lava_cubes_ls,
-                max_bounds_tuple
-            )
+            lava_cubes_ls,
+            max_bounds_tuple
+        )
 
         self.assertEqual(
             [
@@ -3164,6 +3170,22 @@ class TestFindSurfaceArea(unittest.TestCase):
             raw_input = input_file.read()
         self.assertEqual(
             158,
+            Day18.find_surface_area(raw_input, True)
+        )
+
+    def test_find_surface_area_4(self):
+        with open("Day18_test_input_4.txt") as input_file:
+            raw_input = input_file.read()
+        self.assertEqual(
+            658,
+            Day18.find_surface_area(raw_input, False)
+        )
+
+    def test_find_external_surface_area_4(self):
+        with open("Day18_test_input_4.txt") as input_file:
+            raw_input = input_file.read()
+        self.assertEqual(
+            640,
             Day18.find_surface_area(raw_input, True)
         )
 
