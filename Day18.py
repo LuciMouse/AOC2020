@@ -134,7 +134,7 @@ def adjacent_cube_generator(center_cube_coordinates):
         yield cube
 
 
-def add_adjacent_cube_side(adjacent_cube, adjacent_side_cube_coord, shared_side_coord, max_bounds_tuple, cubes_dict,
+def add_adjacent_cube_side(adjacent_cube, adjacent_side_cube_coord, shared_side_coord, max_bounds_tuple, min_bounds_tuple, cubes_dict,
                            sides_dict):
     """
     defines a side of the adjacent cube.  We only define the Side object and not the Cube object (adjacent_side_cube_coord)
@@ -226,7 +226,7 @@ def add_adjacent_cube_side(adjacent_cube, adjacent_side_cube_coord, shared_side_
         else:
             # does this side touch the edge (i.e. the adjacent_side_cube_coord is out of bounds?
             is_edge_cube = sum(
-                [(adjacent_side_cube_coord[index] > max_bounds_tuple[index]) or (adjacent_side_cube_coord[index] <= 0)
+                [(adjacent_side_cube_coord[index] > max_bounds_tuple[index]) or (adjacent_side_cube_coord[index] < min_bounds_tuple[index])
                  for index in range(3)]) > 0  # out of bounds
             # define the side type
             if is_edge_cube:  # assumes adjacent_side_cube to be cube_type 'air'
@@ -245,7 +245,7 @@ def add_adjacent_cube_side(adjacent_cube, adjacent_side_cube_coord, shared_side_
             adjacent_cube.sides_dict[adjacent_side_coord] = adjacent_side
 
 
-def add_adjacent_cube(adjacent_cube_coord, center_cube, lava_cubes_ls, max_bounds_tuple, cubes_dict, sides_dict):
+def add_adjacent_cube(adjacent_cube_coord, center_cube, lava_cubes_ls, max_bounds_tuple, min_bounds_tuple, cubes_dict, sides_dict):
     if adjacent_cube_coord in cubes_dict:
         adjacent_cube = cubes_dict[adjacent_cube_coord]
     else:
@@ -278,11 +278,11 @@ def add_adjacent_cube(adjacent_cube_coord, center_cube, lava_cubes_ls, max_bound
 
     # define other sides of adjacent_cube, but only define the sides, not the cubes
     for adjacent_side_cube_coord in adjacent_cube_generator(adjacent_cube_coord):
-        add_adjacent_cube_side(adjacent_cube, adjacent_side_cube_coord, shared_side_coord, max_bounds_tuple,
+        add_adjacent_cube_side(adjacent_cube, adjacent_side_cube_coord, shared_side_coord, max_bounds_tuple, min_bounds_tuple,
                                cubes_dict, sides_dict)
 
 
-def add_lava_cube(lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict, sides_dict):
+def add_lava_cube(lava_cube_coord, lava_cubes_ls, max_bounds_tuple, min_bounds_tuple, cubes_dict, sides_dict):
     if lava_cube_coord in cubes_dict:
         lava_cube = cubes_dict[lava_cube_coord]
     else:
@@ -293,10 +293,10 @@ def add_lava_cube(lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict, 
         cubes_dict[lava_cube_coord] = lava_cube
 
     for adjacent_cube_coord in adjacent_cube_generator(lava_cube_coord):
-        if sum([((adjacent_cube_coord[index] > max_bounds_tuple[index]) or (adjacent_cube_coord[index] == 0)) for index
+        if sum([((adjacent_cube_coord[index] > max_bounds_tuple[index]) or (adjacent_cube_coord[index] < min_bounds_tuple[index])) for index
                 in
                 range(3)]) == 0:  # not out of bound
-            add_adjacent_cube(adjacent_cube_coord, lava_cube, lava_cubes_ls, max_bounds_tuple, cubes_dict,
+            add_adjacent_cube(adjacent_cube_coord, lava_cube, lava_cubes_ls, max_bounds_tuple, min_bounds_tuple, cubes_dict,
                               sides_dict)
         else:  # still need to create the side of lava_cube
             shared_side_coord = find_shared_side(lava_cube.coordinates, adjacent_cube_coord)
@@ -312,43 +312,43 @@ def add_lava_cube(lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict, 
             lava_cube.sides_dict[shared_side_coord] = shared_side
 
 
-def visualize_drop_lava(lava_cubes_ls, max_bounds_tuple):
+def visualize_drop_lava(lava_cubes_ls, max_bounds_tuple, min_bounds_tuple,):
     # create empty arrays
     droplet_ls = [
         [
             [
-                "." for x in range(max_bounds_tuple[0])
-            ] for y in range(max_bounds_tuple[1])
-        ] for z in range(max_bounds_tuple[2])
+                "." for x in range(max_bounds_tuple[0]-min_bounds_tuple[0]+1)
+            ] for y in range(max_bounds_tuple[1]-min_bounds_tuple[1]+1)
+        ] for z in range(max_bounds_tuple[2]-min_bounds_tuple[2]+1)
     ]
     for lava_cube_coord in lava_cubes_ls:
         x_coord, y_coord, z_coord = lava_cube_coord
-        droplet_ls[z_coord - 1][y_coord - 1][x_coord - 1] = 'L'
+        droplet_ls[z_coord-min_bounds_tuple[2]][y_coord-min_bounds_tuple[1]][x_coord-min_bounds_tuple[0]] = 'L'
     return droplet_ls
 
-def visualize_drop_lava_air(cubes_dict, max_bounds_tuple):
+def visualize_drop_lava_air(cubes_dict, max_bounds_tuple, min_bounds_tuple):
     # create empty arrays
     droplet_ls = [
         [
             [
-                "." for x in range(max_bounds_tuple[0])
-            ] for y in range(max_bounds_tuple[1])
-        ] for z in range(max_bounds_tuple[2])
+                "." for x in range(max_bounds_tuple[0]-min_bounds_tuple[0]+1)
+            ] for y in range(max_bounds_tuple[1]-min_bounds_tuple[1]+1)
+        ] for z in range(max_bounds_tuple[2]-min_bounds_tuple[2]+1)
     ]
     for cube in cubes_dict.values():
         x_coord, y_coord, z_coord = cube.coordinates
         if cube.cube_type == 'lava':
-            droplet_ls[z_coord - 1][y_coord - 1][x_coord - 1] = 'L'
+            droplet_ls[z_coord-min_bounds_tuple[2]][y_coord-min_bounds_tuple[1]][x_coord-min_bounds_tuple[0]] = 'L'
         else:#air cube
             #is it internal or external?
             cube_sides = cube.sides_dict.values()
             cube_side_types_set = set([side.side_type for side in cube_sides])
             if len({'air-exterior', 'exposed-exterior'}.intersection(cube_side_types_set)) > 0:
-                droplet_ls[z_coord - 1][y_coord - 1][x_coord - 1] = '+'
+                droplet_ls[z_coord-min_bounds_tuple[2]][y_coord-min_bounds_tuple[1]][x_coord-min_bounds_tuple[0]] = '+'
             elif len({'air-interior', 'exposed-interior'}.intersection(cube_side_types_set)) > 0:
-                droplet_ls[z_coord - 1][y_coord - 1][x_coord - 1] = '*'
+                droplet_ls[z_coord-min_bounds_tuple[2]][y_coord-min_bounds_tuple[1]][x_coord-min_bounds_tuple[0]] = '*'
             else:
-                droplet_ls[z_coord - 1][y_coord - 1][x_coord - 1] = '?'
+                droplet_ls[z_coord-min_bounds_tuple[2]][y_coord-min_bounds_tuple[1]][x_coord-min_bounds_tuple[0]] = '?'
 
     return droplet_ls
 
@@ -478,7 +478,7 @@ def update_unknown_sides(sides_dict, cubes_dict, unknown_sides_ls):
         unknown_sides_ls = [value for key, value in sides_dict.items() if value.side_type[:7] == 'unknown']
 
 
-def update_air_sides(sides_dict, cubes_dict, unknown_air_sides_ls, max_bounds_tuple, lava_cubes_ls):
+def update_air_sides(sides_dict, cubes_dict, unknown_air_sides_ls, max_bounds_tuple, min_bounds_tuple, lava_cubes_ls):
     """
     defines all unknown air-air sides.
     first, looks at the flanking cubes and sees if any of them are definitely exterior
@@ -566,6 +566,7 @@ def update_air_sides(sides_dict, cubes_dict, unknown_air_sides_ls, max_bounds_tu
                                         cubes_dict[existing_cube_coord],
                                         lava_cubes_ls,
                                         max_bounds_tuple,
+                                        min_bounds_tuple,
                                         cubes_dict,
                                         sides_dict,
                                     )
@@ -654,6 +655,13 @@ def calculate_external_surface_area(lava_cubes_ls):
     # dictionary to hold sides
     sides_dict = {}
 
+    # what's the minimum value for x, y, z?
+    min_x = min([cube[0] for cube in lava_cubes_ls])
+    min_y = min([cube[1] for cube in lava_cubes_ls])
+    min_z = min([cube[2] for cube in lava_cubes_ls])
+
+    min_bounds_tuple = (min_x, min_y, min_z)
+
     # what's the maximum value for x, y, z?
     max_x = max([cube[0] for cube in lava_cubes_ls])
     max_y = max([cube[1] for cube in lava_cubes_ls])
@@ -663,7 +671,7 @@ def calculate_external_surface_area(lava_cubes_ls):
     # for each stone cube, create 6 cubes around it
     for lava_cube_coord in lava_cubes_ls:
         add_lava_cube(
-            lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict, sides_dict
+            lava_cube_coord, lava_cubes_ls, max_bounds_tuple, min_bounds_tuple, cubes_dict, sides_dict
         )
     # go through sides and see if we can define more sides
 
@@ -686,6 +694,7 @@ def calculate_external_surface_area(lava_cubes_ls):
             sides_dict,
             cubes_dict,
             unknown_air_sides_ls,
+            min_bounds_tuple,
             max_bounds_tuple,
             lava_cubes_ls
         )

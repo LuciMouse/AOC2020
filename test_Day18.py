@@ -37,6 +37,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
         adjacent_side_cube_coord = (1, 2, 1)
 
         max_bounds_tuple = (3, 3, 6)
+        min_bounds_tuple = (1, 1, 1)
 
         cubes_dict = {
             (2, 2, 2): lava_cube,
@@ -51,6 +52,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
             adjacent_side_cube_coord,
             shared_side_coord,
             max_bounds_tuple,
+            min_bounds_tuple,
             cubes_dict,
             sides_dict
         )
@@ -114,6 +116,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
         """
         shared_side_coord = ((1, 2), 2, 2)
         max_bounds_tuple = (3, 3, 6)
+        min_bounds_tuple = (1, 1, 1)
 
         # side objects
         shared_side = Day18.Side(
@@ -166,6 +169,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
             adjacent_side_cube_coord,
             shared_side_coord,
             max_bounds_tuple,
+            min_bounds_tuple,
             cubes_dict,
             sides_dict
         )
@@ -257,6 +261,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
         """
         shared_side_coord = ((1, 2), 2, 1)
         max_bounds_tuple = (3, 3, 6)
+        min_bounds_tuple = (1, 1, 1)
 
         # side objects
         shared_side = Day18.Side(
@@ -334,6 +339,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
             adjacent_side_cube_coord,
             shared_side_coord,
             max_bounds_tuple,
+            min_bounds_tuple,
             cubes_dict,
             sides_dict
         )
@@ -362,6 +368,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
         """
         shared_side_coord = ((1, 2), 2, 1)
         max_bounds_tuple = (3, 3, 6)
+        min_bounds_tuple = (1, 1, 1)
 
         # side objects
         shared_side = Day18.Side(
@@ -443,6 +450,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
             adjacent_side_cube_coord,
             shared_side_coord,
             max_bounds_tuple,
+            min_bounds_tuple,
             cubes_dict,
             sides_dict
         )
@@ -488,6 +496,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
         """
         shared_side_coord = ((1, 2), 2, 1)
         max_bounds_tuple = (3, 3, 6)
+        min_bounds_tuple = (1, 1, 1)
 
         # side objects
         shared_side = Day18.Side(
@@ -570,6 +579,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
             adjacent_side_cube_coord,
             shared_side_coord,
             max_bounds_tuple,
+            min_bounds_tuple,
             cubes_dict,
             sides_dict
         )
@@ -612,6 +622,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
         """
         shared_side_coord = ((1, 2), 2, 1)
         max_bounds_tuple = (3, 3, 6)
+        min_bounds_tuple = (1, 1, 1)
 
         # side objects
         shared_side = Day18.Side(
@@ -694,6 +705,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
             adjacent_side_cube_coord,
             shared_side_coord,
             max_bounds_tuple,
+            min_bounds_tuple,
             cubes_dict,
             sides_dict
         )
@@ -736,6 +748,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
         """
         shared_side_coord = ((1, 2), 2, 1)
         max_bounds_tuple = (3, 3, 6)
+        min_bounds_tuple = (1, 1, 1)
 
         # side objects
         shared_side = Day18.Side(
@@ -818,6 +831,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
             adjacent_side_cube_coord,
             shared_side_coord,
             max_bounds_tuple,
+            min_bounds_tuple,
             cubes_dict,
             sides_dict
         )
@@ -860,6 +874,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
         """
         shared_side_coord = ((1, 2), 2, 1)
         max_bounds_tuple = (3, 3, 6)
+        min_bounds_tuple = (1, 1, 1)
 
         # side objects
         shared_side = Day18.Side(
@@ -942,6 +957,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
             adjacent_side_cube_coord,
             shared_side_coord,
             max_bounds_tuple,
+            min_bounds_tuple,
             cubes_dict,
             sides_dict
         )
@@ -984,6 +1000,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
         """
         shared_side_coord = ((1, 2), 2, 1)
         max_bounds_tuple = (3, 3, 6)
+        min_bounds_tuple = (1, 1, 1)
 
         # side objects
         shared_side = Day18.Side(
@@ -1066,6 +1083,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
             adjacent_side_cube_coord,
             shared_side_coord,
             max_bounds_tuple,
+            min_bounds_tuple,
             cubes_dict,
             sides_dict
         )
@@ -1109,6 +1127,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
         """
         shared_side_coord = (2, 2, (2, 3))
         max_bounds_tuple = (3, 3, 6)
+        min_bounds_tuple = (1, 1, 1)
 
         # side objects
         shared_side = Day18.Side(
@@ -1180,6 +1199,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
             adjacent_side_cube_coord,
             shared_side_coord,
             max_bounds_tuple,
+            min_bounds_tuple,
             cubes_dict,
             sides_dict
         )
@@ -1219,6 +1239,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
         """
         shared_side_coord = ((1, 2), 2, 1)
         max_bounds_tuple = (3, 3, 6)
+        min_bounds_tuple = (1, 1, 1)
 
         # side objects
         shared_side = Day18.Side(
@@ -1297,6 +1318,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
                 adjacent_side_cube_coord,
                 shared_side_coord,
                 max_bounds_tuple,
+                min_bounds_tuple,
                 cubes_dict,
                 sides_dict
             )
@@ -1309,6 +1331,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
         """
         shared_side_coord = ((1, 2), 2, 1)
         max_bounds_tuple = (3, 3, 6)
+        min_bounds_tuple = (1, 1, 1)
 
         # side objects
         shared_side = Day18.Side(
@@ -1387,6 +1410,7 @@ class AddAdjacentCubeSides(unittest.TestCase):
                 adjacent_side_cube_coord,
                 shared_side_coord,
                 max_bounds_tuple,
+                min_bounds_tuple,
                 cubes_dict,
                 sides_dict
             )
@@ -1399,6 +1423,7 @@ class TestAddAdjacentCube(unittest.TestCase):
             add first adjacent cube
         """
         max_bounds_tuple = (3, 3, 6)
+        min_bounds_tuple = (1,1,1)
 
         # cube objects
         lava_cube = Day18.Cube(
@@ -1422,6 +1447,7 @@ class TestAddAdjacentCube(unittest.TestCase):
             lava_cube,
             lava_cubes_ls,
             max_bounds_tuple,
+            min_bounds_tuple,
             cubes_dict,
             sides_dict
         )
@@ -1561,6 +1587,7 @@ class TestAddAdjacentCube(unittest.TestCase):
             add second adjacent cube. non-edge
         """
         max_bounds_tuple = (3, 3, 6)
+        min_bounds_tuple = (1, 1, 1)
         # Side objects
         existing_sides_ls = [
             Day18.Side(
@@ -1647,6 +1674,7 @@ class TestAddAdjacentCube(unittest.TestCase):
             lava_cube,
             lava_cubes_ls,
             max_bounds_tuple,
+            min_bounds_tuple,
             cubes_dict,
             sides_dict
         )
@@ -1788,6 +1816,7 @@ class TestAddLavaCube(unittest.TestCase):
         lava_cubes_ls = [(2, 2, 2), (1, 2, 2), (3, 2, 2), (2, 1, 2), (2, 3, 2), (2, 2, 1), (2, 2, 3), (2, 2, 4),
                          (2, 2, 6), (1, 2, 5), (3, 2, 5), (2, 1, 5), (2, 3, 5)]
         max_bounds_tuple = (3, 3, 6)
+        min_bounds_tuple = (1, 1, 1)
         cubes_dict = {}
         sides_dict = {}
 
@@ -1795,6 +1824,7 @@ class TestAddLavaCube(unittest.TestCase):
             lava_cube_coord,
             lava_cubes_ls,
             max_bounds_tuple,
+            min_bounds_tuple,
             cubes_dict,
             sides_dict
         )
@@ -2584,6 +2614,7 @@ class TestUpdateAirSides(unittest.TestCase):
             cubes_dict,
             [sides_dict[unknown_air_side_coord]],
             (5, 3, 6),
+            (1, 1, 1),
             lava_cubes_ls
         )
         sides_dict_copy[unknown_air_side_coord].side_type = 'air-interior'
@@ -2827,6 +2858,7 @@ class TestUpdateAirSides(unittest.TestCase):
             cubes_dict,
             [value for key, value in sides_dict.items() if key in unknown_air_side_coord_ls],
             (5, 3, 6),
+            (1, 1, 1),
             lava_cubes_ls
         )
         for unknown_air_side_coord in unknown_air_side_coord_ls:
@@ -3071,6 +3103,13 @@ class TestVisualizeDropLava(unittest.TestCase):
             raw_input = input_file.read()
         lava_cubes_ls = list(
             map(lambda x: tuple([int(y) for y in x]), [row.split(',') for row in raw_input.split('\n')]))
+
+        min_x = min([cube[0] for cube in lava_cubes_ls])
+        min_y = min([cube[1] for cube in lava_cubes_ls])
+        min_z = min([cube[2] for cube in lava_cubes_ls])
+
+        min_bounds_tuple = (min_x, min_y, min_z)
+
         max_x = max([cube[0] for cube in lava_cubes_ls])
         max_y = max([cube[1] for cube in lava_cubes_ls])
         max_z = max([cube[2] for cube in lava_cubes_ls])
@@ -3079,7 +3118,8 @@ class TestVisualizeDropLava(unittest.TestCase):
 
         drop_diagram_ls = Day18.visualize_drop_lava(
             lava_cubes_ls,
-            max_bounds_tuple
+            max_bounds_tuple,
+            min_bounds_tuple,
         )
 
         self.assertEqual(
@@ -3134,6 +3174,13 @@ class TestVisualizeDropLavaAir(unittest.TestCase):
         # dictionary to hold sides
         sides_dict = {}
 
+        # what's the minimum value for x, y, z?
+        min_x = min([cube[0] for cube in lava_cubes_ls])
+        min_y = min([cube[1] for cube in lava_cubes_ls])
+        min_z = min([cube[2] for cube in lava_cubes_ls])
+
+        min_bounds_tuple = (min_x, min_y, min_z)
+
         # what's the maximum value for x, y, z?
         max_x = max([cube[0] for cube in lava_cubes_ls])
         max_y = max([cube[1] for cube in lava_cubes_ls])
@@ -3143,7 +3190,7 @@ class TestVisualizeDropLavaAir(unittest.TestCase):
         # for each stone cube, create 6 cubes around it
         for lava_cube_coord in lava_cubes_ls:
             Day18.add_lava_cube(
-                lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict, sides_dict
+                lava_cube_coord, lava_cubes_ls, max_bounds_tuple, min_bounds_tuple, cubes_dict, sides_dict
             )
 
         Day18.update_single_air_cubes(
@@ -3165,6 +3212,7 @@ class TestVisualizeDropLavaAir(unittest.TestCase):
                 cubes_dict,
                 unknown_air_sides_ls,
                 max_bounds_tuple,
+                min_bounds_tuple,
                 lava_cubes_ls
             )
         # look at the lava:air sides that are undefined
@@ -3179,7 +3227,8 @@ class TestVisualizeDropLavaAir(unittest.TestCase):
 
         drop_diagram_ls = Day18.visualize_drop_lava_air(
             cubes_dict,
-            max_bounds_tuple
+            max_bounds_tuple,
+            min_bounds_tuple,
         )
 
         self.assertEqual(
@@ -3299,13 +3348,28 @@ class TestFindSurfaceArea(unittest.TestCase):
 
         with open(f"Day18_test_input_{filter_value}.txt", "r+") as input_file:
             raw_input = input_file.read()[:-1] #strip newline
+        #calculate exposed surfaces the old way
+        lava_cubes_ls = list(
+            map(lambda x: tuple([int(y) for y in x]), [row.split(',') for row in raw_input.split('\n')]))
+        num_cubes = len(lava_cubes_ls)
+        max_exposed_surfaces = num_cubes * 6
+        surface_area = max_exposed_surfaces
 
+        covered_sides = set()
+
+        for cube in lava_cubes_ls:
+            adjacent_cubes_ls = [x for x in [y for y in lava_cubes_ls if y != cube] if Day18.is_adjacent(x, cube)]
+            for adjacent_cube in adjacent_cubes_ls:
+                covered_sides.add(Day18.find_shared_side(cube,adjacent_cube))
+            surface_area -= len(adjacent_cubes_ls)
+
+        covered_sides_ls = Day18.find_surface_area(raw_input, True)
         self.assertEqual(
             2332,
             Day18.find_surface_area(raw_input, False)
         )
         self.assertEqual(
-            2188,
+            2194,
             Day18.find_surface_area(raw_input, True)
         )
 
