@@ -320,6 +320,32 @@ def visualize_drop_lava(lava_cubes_ls, max_bounds_tuple):
         droplet_ls[z_coord - 1][y_coord - 1][x_coord - 1] = 'L'
     return droplet_ls
 
+def visualize_drop_lava_air(cubes_dict, max_bounds_tuple):
+    # create empty arrays
+    droplet_ls = [
+        [
+            [
+                "." for x in range(max_bounds_tuple[0])
+            ] for y in range(max_bounds_tuple[1])
+        ] for z in range(max_bounds_tuple[2])
+    ]
+    for cube in cubes_dict.values():
+        x_coord, y_coord, z_coord = cube.coordinates
+        if cube.cube_type == 'lava':
+            droplet_ls[z_coord - 1][y_coord - 1][x_coord - 1] = 'L'
+        else:#air cube
+            #is it internal or external?
+            cube_sides = cube.sides_dict.values()
+            cube_side_types_set = set([side.side_type for side in cube_sides])
+            if len({'air-exterior', 'exposed-exterior'}.intersection(cube_side_types_set)) > 0:
+                droplet_ls[z_coord - 1][y_coord - 1][x_coord - 1] = 'e'
+            elif len({'air-interior', 'exposed-interior'}.intersection(cube_side_types_set)) > 0:
+                droplet_ls[z_coord - 1][y_coord - 1][x_coord - 1] = 'i'
+            else:
+                raise Exception("air cube sides not defined")
+
+    return droplet_ls
+
 
 def update_single_air_cubes(
         cubes_dict
@@ -657,7 +683,7 @@ def calculate_external_surface_area(lava_cubes_ls):
 
 def find_surface_area(raw_input, external_only):
     """
-    determines the surface area of a doplet given an array of its component cubes
+    determines the surface area of a droplet given an array of its component cubes
     :param external_only: only calculate external (part 2) surfaces
     :param raw_input: raw puzzle input
     :return: surface area

@@ -1,6 +1,7 @@
 import unittest
 from copy import deepcopy
 import Day18
+from aocd import data
 
 
 class AddAdjacentCubeSides(unittest.TestCase):
@@ -2576,7 +2577,7 @@ class TestUpdateAirSides(unittest.TestCase):
         sides_dict_copy = deepcopy(sides_dict)
 
         unknown_air_side_coord = ((2, 3), 2, 5)
-        lava_cubes_ls = [(1, 2, 5), (4, 2, 5)] #to prevent the side from being called external
+        lava_cubes_ls = [(1, 2, 5), (4, 2, 5)]  # to prevent the side from being called external
 
         Day18.update_air_sides(
             sides_dict,
@@ -3122,6 +3123,105 @@ class TestVisualizeDropLava(unittest.TestCase):
                 print("".join(y))
             print("\n")
 
+class TestVisualizeDropLavaAir(unittest.TestCase):
+    def test_visualize_drop_lava_air_1(self):
+        with open("Day18_test_input.txt") as input_file:
+            raw_input = input_file.read()
+        lava_cubes_ls = list(
+            map(lambda x: tuple([int(y) for y in x]), [row.split(',') for row in raw_input.split('\n')]))
+        # dictionary to hold cubes
+        cubes_dict = {}
+        # dictionary to hold sides
+        sides_dict = {}
+
+        # what's the maximum value for x, y, z?
+        max_x = max([cube[0] for cube in lava_cubes_ls])
+        max_y = max([cube[1] for cube in lava_cubes_ls])
+        max_z = max([cube[2] for cube in lava_cubes_ls])
+
+        max_bounds_tuple = (max_x, max_y, max_z)
+        # for each stone cube, create 6 cubes around it
+        for lava_cube_coord in lava_cubes_ls:
+            Day18.add_lava_cube(
+                lava_cube_coord, lava_cubes_ls, max_bounds_tuple, cubes_dict, sides_dict
+            )
+
+        Day18.update_single_air_cubes(
+            cubes_dict
+        )
+
+        unknown_sides_ls = [value for key, value in sides_dict.items() if value.side_type == 'unknown']
+        if len(unknown_sides_ls):
+            Day18.update_unknown_sides(
+                sides_dict,
+                cubes_dict,
+                unknown_sides_ls
+            )
+        # look at the air:air sides that are undefined
+        unknown_air_sides_ls = [value for key, value in sides_dict.items() if value.side_type == 'air-unknown']
+        if len(unknown_air_sides_ls):
+            Day18.update_air_sides(
+                sides_dict,
+                cubes_dict,
+                unknown_air_sides_ls,
+                max_bounds_tuple,
+                lava_cubes_ls
+            )
+        # look at the lava:air sides that are undefined
+        unknown_exposed_sides_ls = [value for key, value in sides_dict.items() if value.side_type == 'exposed-unknown']
+        if len(unknown_exposed_sides_ls):
+            Day18.update_exposed_sides(
+                sides_dict,
+                cubes_dict,
+                unknown_exposed_sides_ls
+            )
+
+
+        drop_diagram_ls = Day18.visualize_drop_lava_air(
+            cubes_dict,
+            max_bounds_tuple
+        )
+
+        self.assertEqual(
+            [
+                [
+                    ['.', 'e', '.'],
+                    ['e', 'L', 'e'],
+                    ['.', 'e', '.'],
+                ],
+                [
+                    ['e', 'L', 'e'],
+                    ['L', 'L', 'L'],
+                    ['e', 'L', 'e'],
+                ],
+                [
+                    ['.', 'e', '.'],
+                    ['e', 'L', 'e'],
+                    ['.', 'e', '.'],
+                ],
+                [
+                    ['.', 'e', '.'],
+                    ['e', 'L', 'e'],
+                    ['.', 'e', '.'],
+                ],
+                [
+                    ['e', 'L', 'e'],
+                    ['L', 'i', 'L'],
+                    ['e', 'L', 'e'],
+                ],
+                [
+                    ['.', 'e', '.'],
+                    ['e', 'L', 'e'],
+                    ['.', 'e', '.'],
+                ],
+            ],
+            drop_diagram_ls
+        )
+        for z in drop_diagram_ls:
+            z.reverse()
+            for y in z:
+                print("".join(y))
+            print("\n")
 
 class TestFindSurfaceArea(unittest.TestCase):
 
@@ -3186,6 +3286,26 @@ class TestFindSurfaceArea(unittest.TestCase):
             raw_input = input_file.read()
         self.assertEqual(
             640,
+            Day18.find_surface_area(raw_input, True)
+        )
+
+    def test_find_external_surface_area_16(self):
+        filter_value = 16
+        lava_cubes_ls = list(map(lambda x: tuple([int(y) for y in x]), [row.split(',') for row in data.split('\n')]))
+        with open(f"Day18_test_input_{filter_value}.txt", "r+") as output_file:
+            for curr_cube in lava_cubes_ls:
+                if curr_cube[0] < filter_value and curr_cube[1] < filter_value and curr_cube[2] < filter_value:
+                    output_file.write(f"{curr_cube[0]},{curr_cube[1]},{curr_cube[2]}\n")
+
+        with open(f"Day18_test_input_{filter_value}.txt", "r+") as input_file:
+            raw_input = input_file.read()[:-1] #strip newline
+
+        self.assertEqual(
+            2332,
+            Day18.find_surface_area(raw_input, False)
+        )
+        self.assertEqual(
+            2332,
             Day18.find_surface_area(raw_input, True)
         )
 
