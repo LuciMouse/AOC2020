@@ -245,7 +245,7 @@ def add_adjacent_cube_side(adjacent_cube, adjacent_side_cube_coord, shared_side_
             adjacent_cube.sides_dict[adjacent_side_coord] = adjacent_side
 
 
-def add_adjacent_cube(adjacent_cube_coord, lava_cube, lava_cubes_ls, max_bounds_tuple, cubes_dict, sides_dict):
+def add_adjacent_cube(adjacent_cube_coord, center_cube, lava_cubes_ls, max_bounds_tuple, cubes_dict, sides_dict):
     if adjacent_cube_coord in cubes_dict:
         adjacent_cube = cubes_dict[adjacent_cube_coord]
     else:
@@ -255,19 +255,25 @@ def add_adjacent_cube(adjacent_cube_coord, lava_cube, lava_cubes_ls, max_bounds_
         )
         cubes_dict[adjacent_cube_coord] = adjacent_cube
     # define shared side
-    shared_side_coord = find_shared_side(lava_cube.coordinates, adjacent_cube_coord)
+    shared_side_coord = find_shared_side(center_cube.coordinates, adjacent_cube_coord)
+    if center_cube.cube_type=='lava':
+        shared_side_type = 'covered' if adjacent_cube.cube_type == 'lava' else 'exposed-unknown'
+    elif center_cube.cube_type=='air':
+        shared_side_type = 'exposed-unknown' if adjacent_cube.cube_type == 'lava' else 'air-unknown'
+    else:
+        raise Exception("center cube type not defined")
     if shared_side_coord in sides_dict:
         shared_side = sides_dict[shared_side_coord]
         if shared_side.side_type == 'unknown':
-            shared_side.side_type = 'covered' if adjacent_cube.cube_type == 'lava' else 'exposed-unknown'
+            shared_side.side_type = shared_side_type
     else:
         shared_side = Side(
             coordinates=shared_side_coord,
-            side_type='covered' if adjacent_cube.cube_type == 'lava' else 'exposed-unknown',
-            flanking_cube_coordinates={lava_cube.coordinates, adjacent_cube_coord}
+            side_type=shared_side_type,
+            flanking_cube_coordinates={center_cube.coordinates, adjacent_cube_coord}
         )
         sides_dict[shared_side_coord] = shared_side
-    lava_cube.sides_dict[shared_side_coord] = shared_side
+    center_cube.sides_dict[shared_side_coord] = shared_side
     adjacent_cube.sides_dict[shared_side_coord] = shared_side
 
     # define other sides of adjacent_cube, but only define the sides, not the cubes
@@ -548,6 +554,24 @@ def update_air_sides(sides_dict, cubes_dict, unknown_air_sides_ls, max_bounds_tu
                         ) > 0:
                             curr_side.side_type = 'air-interior'
                             updated_side = True
+                        else:
+                            #is only one flanking cube defined in cubes_dict? if so, define adjacent cubes to the existing cube
+                            defined_flanking_cubes_ls = [cube for cube in flanking_cubes_coord_ls if cube in cubes_dict]
+                            if len(defined_flanking_cubes_ls) == 1:
+                                existing_cube_coord = defined_flanking_cubes_ls[0]
+                                undefined_adjacent_cube_coords = set(adjacent_cube_generator(existing_cube_coord)).difference(set(cubes_dict))
+                                for adjacent_cube_coord in undefined_adjacent_cube_coords:
+                                    add_adjacent_cube(
+                                        adjacent_cube_coord,
+                                        cubes_dict[existing_cube_coord],
+                                        lava_cubes_ls,
+                                        max_bounds_tuple,
+                                        cubes_dict,
+                                        sides_dict,
+                                    )
+                                updated_side = True
+
+
 
                         # should't be able to have both, but catch it
                         if (
