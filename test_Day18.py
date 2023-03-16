@@ -3305,7 +3305,7 @@ class TestFindSurfaceArea(unittest.TestCase):
             Day18.find_surface_area(raw_input, False)
         )
         self.assertEqual(
-            2332,
+            2188,
             Day18.find_surface_area(raw_input, True)
         )
 

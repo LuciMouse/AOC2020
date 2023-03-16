@@ -338,11 +338,11 @@ def visualize_drop_lava_air(cubes_dict, max_bounds_tuple):
             cube_sides = cube.sides_dict.values()
             cube_side_types_set = set([side.side_type for side in cube_sides])
             if len({'air-exterior', 'exposed-exterior'}.intersection(cube_side_types_set)) > 0:
-                droplet_ls[z_coord - 1][y_coord - 1][x_coord - 1] = 'e'
+                droplet_ls[z_coord - 1][y_coord - 1][x_coord - 1] = '+'
             elif len({'air-interior', 'exposed-interior'}.intersection(cube_side_types_set)) > 0:
-                droplet_ls[z_coord - 1][y_coord - 1][x_coord - 1] = 'i'
+                droplet_ls[z_coord - 1][y_coord - 1][x_coord - 1] = '*'
             else:
-                raise Exception("air cube sides not defined")
+                droplet_ls[z_coord - 1][y_coord - 1][x_coord - 1] = '?'
 
     return droplet_ls
 
@@ -510,7 +510,7 @@ def update_air_sides(sides_dict, cubes_dict, unknown_air_sides_ls, max_bounds_tu
                 smaller_lava_cubes_ls = [cube_coordinates for cube_coordinates in lava_cubes_ls if (
                         (cube_coordinates[stable_indices[0]] == curr_side.coordinates[stable_indices[0]]) and
                         (cube_coordinates[stable_indices[1]] == curr_side.coordinates[stable_indices[1]]) and
-                        (cube_coordinates[axis_index]<min(curr_side.coordinates[axis_index]))
+                        (cube_coordinates[axis_index] < min(curr_side.coordinates[axis_index]))
                 )
                                          ]
                 if not smaller_lava_cubes_ls: #no smaller lava cubes on this axis
@@ -523,7 +523,7 @@ def update_air_sides(sides_dict, cubes_dict, unknown_air_sides_ls, max_bounds_tu
                             (cube_coordinates[axis_index] > max(curr_side.coordinates[axis_index]))
                     )
                                              ]
-                    if not smaller_lava_cubes_ls:  # no smaller lava cubes on this axis
+                    if not larger_lava_cubes_ls:  # no larger lava cubes on this axis
                         curr_side.side_type = 'air-exterior'
                         updated_side = True
                     else:
