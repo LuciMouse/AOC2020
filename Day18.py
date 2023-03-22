@@ -732,4 +732,4 @@ def find_surface_area(raw_input, external_only):
 
 if __name__ == '__main__':
     # print(f"part1 surface area is {find_surface_area(data, False)}")
-    print(f"part2 surface area is {find_surface_area(data, True)}")  # 2130 too low
+    print(f"part2 surface area is {find_surface_area(data, True)}")
