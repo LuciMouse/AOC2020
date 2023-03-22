@@ -694,8 +694,8 @@ def calculate_external_surface_area(lava_cubes_ls):
             sides_dict,
             cubes_dict,
             unknown_air_sides_ls,
-            min_bounds_tuple,
             max_bounds_tuple,
+            min_bounds_tuple,
             lava_cubes_ls
         )
     # look at the lava:air sides that are undefined
@@ -711,6 +711,7 @@ def calculate_external_surface_area(lava_cubes_ls):
     external_sides_ls = [value for key, value in sides_dict.items() if value.side_type == 'exposed-exterior']
     internal_sides_ls = [value for key, value in sides_dict.items() if value.side_type == 'exposed-interior']
 
+    internal_air_cubes_ls = sorted([cube.coordinates for cube in cubes_dict.values() if (set(cube.sides_dict).intersection(set([side.coordinates for side in internal_sides_ls])) and cube.cube_type=='air')],key = lambda x: x[2])
     return len(external_sides_ls)
 
 

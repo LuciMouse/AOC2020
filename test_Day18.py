@@ -3373,6 +3373,26 @@ class TestFindSurfaceArea(unittest.TestCase):
             Day18.find_surface_area(raw_input, True)
         )
 
+    def test_find_external_surface_area_19(self):
+        filter_value = 19
+        lava_cubes_ls = list(map(lambda x: tuple([int(y) for y in x]), [row.split(',') for row in data.split('\n')]))
+        with open(f"Day18_test_input_{filter_value}.txt", "w") as output_file:
+            for curr_cube in lava_cubes_ls:
+                if curr_cube[0] < filter_value and curr_cube[1] < filter_value and curr_cube[2] < filter_value:
+                    output_file.write(f"{curr_cube[0]},{curr_cube[1]},{curr_cube[2]}\n")
+
+        with open(f"Day18_test_input_{filter_value}.txt", "r+") as input_file:
+            raw_input = input_file.read()[:-1] #strip newline
+
+        self.assertEqual(
+            4032,
+            Day18.find_surface_area(raw_input, False)
+        )
+        self.assertEqual(
+            3750,
+            Day18.find_surface_area(raw_input, True)
+        )
+
 
 if __name__ == '__main__':
     unittest.main()
