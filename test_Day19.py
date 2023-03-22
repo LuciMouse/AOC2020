@@ -181,7 +181,28 @@ class TestUpdateBuildOrder(unittest.TestCase):
             "geode": 0
         }
         curr_robot_type = "ore"
-
+        blueprint = Day19.RobotBlueprint(
+            robot_dict={
+                "ore": Day19.Robot(
+                    type="ore",
+                    ore_cost=4
+                ),
+                "clay": Day19.Robot(
+                    type="clay",
+                    ore_cost=2
+                ),
+                "obsidian": Day19.Robot(
+                    type='obsidian',
+                    ore_cost=3,
+                    clay_cost=14,
+                ),
+                "geode": Day19.Robot(
+                    type='geode',
+                    ore_cost=2,
+                    obsidian_cost=7
+                )
+            }
+        )
         self.assertEqual(
             (
                 ["ore", "clay"],
@@ -193,7 +214,11 @@ class TestUpdateBuildOrder(unittest.TestCase):
                 build_order_ls,
                 num_robots_dict,
                 curr_robot_type,
-                max_geodes=0
+                blueprint,
+                num_geodes=0,
+                max_geodes=0,
+                curr_time=1,
+                num_minutes=24
             )
         )
 
@@ -206,7 +231,28 @@ class TestUpdateBuildOrder(unittest.TestCase):
                               "geode": 0
                           }
         curr_robot_type = "ore"
-
+        blueprint = Day19.RobotBlueprint(
+            robot_dict={
+                "ore": Day19.Robot(
+                    type="ore",
+                    ore_cost=4
+                ),
+                "clay": Day19.Robot(
+                    type="clay",
+                    ore_cost=2
+                ),
+                "obsidian": Day19.Robot(
+                    type='obsidian',
+                    ore_cost=3,
+                    clay_cost=14,
+                ),
+                "geode": Day19.Robot(
+                    type='geode',
+                    ore_cost=2,
+                    obsidian_cost=7
+                )
+            }
+        )
         self.assertEqual(
             (
                 ["ore", "geode"],
@@ -220,7 +266,11 @@ class TestUpdateBuildOrder(unittest.TestCase):
                 build_order_ls,
                 num_robots_dict,
                 curr_robot_type,
-                max_geodes=0
+                blueprint,
+                num_geodes=0,
+                max_geodes=0,
+                curr_time=1,
+                num_minutes=24
             )
         )
     def test_update_build_order_ore_add3_curr_robot(self):
@@ -232,14 +282,35 @@ class TestUpdateBuildOrder(unittest.TestCase):
                               "geode": 0
                           }
         curr_robot_type = "obsidian"
-
+        blueprint = Day19.RobotBlueprint(
+            robot_dict={
+                "ore": Day19.Robot(
+                    type="ore",
+                    ore_cost=4
+                ),
+                "clay": Day19.Robot(
+                    type="clay",
+                    ore_cost=2
+                ),
+                "obsidian": Day19.Robot(
+                    type='obsidian',
+                    ore_cost=3,
+                    clay_cost=14,
+                ),
+                "geode": Day19.Robot(
+                    type='geode',
+                    ore_cost=2,
+                    obsidian_cost=7
+                )
+            }
+        )
         self.assertEqual(
             (
                 ["ore", "geode"],
                 [
                     ["ore", "obsidian"],
                     ["ore", "clay"],
-                    ["ore","ore"]
+                    ["ore", "ore"]
 
                 ]
             ),
@@ -247,7 +318,11 @@ class TestUpdateBuildOrder(unittest.TestCase):
                 build_order_ls,
                 num_robots_dict,
                 curr_robot_type,
-                max_geodes=0
+                blueprint,
+                num_geodes=0,
+                max_geodes=0,
+                curr_time=1,
+                num_minutes=24
             )
         )
 class TestCalculateNumGeodes(unittest.TestCase):
@@ -343,13 +418,18 @@ class TestCalculateNumGeodes(unittest.TestCase):
             [
                 ["ore"],
                 ["clay"],
-
+                ['ore', 'ore'],
+                ['ore', 'clay', 'clay'],
+                ['ore', 'clay', 'ore'],
+                ['ore', 'clay', 'obsidian', 'obsidian'],
+                ['ore', 'clay', 'obsidian', 'clay'],
+                ['ore', 'clay', 'obsidian', 'ore'],
             ],
             build_order_lists_ls
         )
 
 class TestDetermineMaxGeodes(unittest.TestCase):
-    def test_determine_max_geodes(self):
+    def test_determine_max_geodes_1(self):
         blueprint_1 = Day19.RobotBlueprint(
             robot_dict={
                 "ore": Day19.Robot(
@@ -375,6 +455,33 @@ class TestDetermineMaxGeodes(unittest.TestCase):
         self.assertEqual(
             9,
             Day19.determine_max_geodes(blueprint_1, 24)
+        )
+    def test_determine_max_geodes_2(self):
+        blueprint_2 = Day19.RobotBlueprint(
+            robot_dict={
+                "ore": Day19.Robot(
+                    type="ore",
+                    ore_cost=2
+                ),
+                "clay": Day19.Robot(
+                    type="clay",
+                    ore_cost=3
+                ),
+                "obsidian": Day19.Robot(
+                    type='obsidian',
+                    ore_cost=3,
+                    clay_cost=8,
+                ),
+                "geode": Day19.Robot(
+                    type='geode',
+                    ore_cost=3,
+                    obsidian_cost=12
+                )
+            }
+        )
+        self.assertEqual(
+            12,
+            Day19.determine_max_geodes(blueprint_2, 24)
         )
 
 

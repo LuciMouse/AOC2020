@@ -79,38 +79,65 @@ def can_build_robot(num_resources_dict, blueprint, curr_robot_type):
         num_resources_dict["ore"] -= ore_cost
         num_resources_dict["clay"] -= clay_cost
         num_resources_dict["obsidian"] -= obsidian_cost
-        print(
-            f"spend {ore_cost} ore, {clay_cost} clay, {obsidian_cost} obsidian to build a {curr_robot_type} robot"
-        )
+        #print(f"spend {ore_cost} ore, {clay_cost} clay, {obsidian_cost} obsidian to build a {curr_robot_type} robot")
         return True, num_resources_dict
     else:
         return False, num_resources_dict
 
 
-def update_build_order(build_order_ls, num_robots_dict, curr_robot,max_geodes):
+def update_build_order(build_order_ls, num_robots_dict, curr_robot_type, blueprint, num_geodes, max_geodes, curr_time,
+                       num_minutes):
     """
 
     :param num_robots_dict: dictionary of built robots
-    :param curr_robot: current robot that's being built
+    :param curr_robot_type: current robot that's being built
     :param build_order_ls: order of robot types to build
     :return:
     """
-    resource_ls = ["ore", "clay", "obsidian", "geode", ]
-    new_build_orders = []
-    for curr_resource in resource_ls[1:][::-1]:
-        # only add if the dependant robots are already built
-        resource_index = resource_ls.index(curr_resource)
-        if all(
-                [(num_robots_dict[dependant_robot] > 0 or dependant_robot == curr_robot) for dependant_robot in
-                 resource_ls[:resource_index]]
-        ):
-            new_build_orders.append(build_order_ls + [curr_resource])
-    new_build_orders.append(build_order_ls + ["ore"])
-    return new_build_orders[0], new_build_orders[1:]
+
+    # is there any way that this can do better than the current max_geodes?
+    optimal_geodes = (num_minutes - curr_time)*(num_robots_dict["geode"]+1) + num_geodes
+    if optimal_geodes <= max_geodes:
+        return build_order_ls, []
+    else:
+        resource_ls = ["ore", "clay", "obsidian", "geode"]
+        new_build_orders = []
+        for curr_resource in resource_ls[1:][::-1]:
+            # only add if the dependant robots are already built
+            resource_index = resource_ls.index(curr_resource)
+            if all(
+                    [(num_robots_dict[dependant_robot] > 0 or dependant_robot == curr_robot_type) for dependant_robot in
+                     resource_ls[:resource_index]]
+            ):
+                # don't add more robots that the max cost
+                if curr_resource == "clay":
+                    max_cost = blueprint.robot_dict["obsidian"].clay_cost
+                elif curr_resource == "obsidian":
+                    max_cost = blueprint.robot_dict["geode"].obsidian_cost
+                else:
+                    max_cost = 100 #unlimited geode robots
+
+                if curr_resource == curr_robot_type:
+                    num_robots = num_robots_dict[curr_resource] + 1
+                else:
+                    num_robots = num_robots_dict[curr_resource]
+
+                if max_cost > num_robots:
+                    new_build_orders.append(build_order_ls + [curr_resource])
+
+        max_ore_cost = max([robot.ore_cost for robot in blueprint.robot_dict.values()])
+        if curr_robot_type == "ore":
+            num_ore_robots = num_robots_dict["ore"] + 1
+        else:
+            num_ore_robots = num_robots_dict["ore"]
+        if max_ore_cost > num_ore_robots:
+            new_build_orders.append(build_order_ls + ["ore"])
+        return new_build_orders[0], new_build_orders[1:]
+
 
 def calculate_num_geodes(build_order_ls,
-                blueprint,
-                num_minutes,
+                         blueprint,
+                         num_minutes,
                          build_order_lists_ls,
                          max_geodes):
     """
@@ -136,20 +163,22 @@ def calculate_num_geodes(build_order_ls,
     build_order_index = 0
     curr_time = 1
     while curr_time <= num_minutes:
-        print(f"\nminute {curr_time}")
+        #print(f"\nminute {curr_time}")
         # can we build a robot
-        curr_robot_type = build_order_ls[build_order_index]
-        new_robot, num_resources_dict = can_build_robot(
-            num_resources_dict,
-            blueprint,
-            curr_robot_type
-        )
+        if build_order_index < len(build_order_ls):
+            curr_robot_type = build_order_ls[build_order_index]
+            new_robot, num_resources_dict = can_build_robot(
+                num_resources_dict,
+                blueprint,
+                curr_robot_type
+            )
+        else:
+            new_robot = False
         # mine
         resource_generator = resource_gen()
         for curr_resource in resource_generator:
             num_resources_dict[curr_resource] += num_robots_dict[curr_resource]
-            print(
-                f"{num_robots_dict[curr_resource]} active {curr_resource}-robots, total is {num_resources_dict[curr_resource]} {curr_resource}")
+            #print(f"{num_robots_dict[curr_resource]} active {curr_resource}-robots, total is {num_resources_dict[curr_resource]} {curr_resource}")
         if new_robot:
             num_robots_dict[curr_robot_type] += 1
             # update build_order
@@ -158,7 +187,11 @@ def calculate_num_geodes(build_order_ls,
                     build_order_ls,
                     num_robots_dict,
                     curr_robot_type,
-                    max_geodes
+                    blueprint,
+                    num_resources_dict["geode"],
+                    max_geodes,
+                    curr_time,
+                    num_minutes
                 )
                 build_order_lists_ls += new_build_order
             build_order_index += 1
