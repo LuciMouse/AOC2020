@@ -96,7 +96,10 @@ def update_build_order(build_order_ls, num_robots_dict, curr_robot_type, bluepri
     """
 
     # is there any way that this can do better than the current max_geodes?
-    optimal_geodes = (num_minutes - curr_time)*(num_robots_dict["geode"]+1) + num_geodes
+    minutes_remaining = num_minutes - curr_time
+    current_num_geode_robots = num_robots_dict["geode"]
+    max_new_geodes = (minutes_remaining * (minutes_remaining+1))/2 #assumes a new geode robot built every minute
+    optimal_geodes = (minutes_remaining * current_num_geode_robots) + max_new_geodes + num_geodes
     if optimal_geodes <= max_geodes:
         return build_order_ls, []
     else:
