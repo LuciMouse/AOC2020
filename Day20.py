@@ -35,12 +35,13 @@ def shift_value(index, node_dict):
     :param number_ls: list to move in
     :return:shifted list
     """
-    print([node.value for node in sorted(node_dict.values(), key=lambda node: node.current_index)]
-          )
-    print([f"node:{node.original_index}, prev:{node.prev_node.original_index}, next:{node.next_node.original_index}" for
-           node in sorted(node_dict.values(), key=lambda node: node.current_index)]
-          )
+
     start_node = node_dict[index]
+
+    value = start_node.value
+    if value == 0:
+        return node_dict
+
     # excise start_node
 
     prev_node = start_node.prev_node
@@ -51,23 +52,19 @@ def shift_value(index, node_dict):
 
     # find new position for start_node
 
-    value = start_node.value
-    if value == 0:
-        return node_dict
-
     max_index = len(node_dict) - 1
     target_index = new_index(start_node.current_index, value, max_index)
     if target_index == 0:
         target_index = max_index  # wraps
 
-    num_shifts = abs(target_index - index)
+    num_shifts = abs(target_index - start_node.current_index)
     curr_node = start_node
-    if target_index > index:  # shift right
+    if target_index > start_node.current_index:  # shift right
         for i in range(num_shifts):
             next_node = curr_node.next_node
             next_node.current_index = new_index(next_node.current_index, -1, max_index)
             curr_node = next_node
-    elif target_index < index:  # shift left
+    elif target_index < start_node.current_index:  # shift left
         for i in range(num_shifts):
             prev_node = curr_node.prev_node
             prev_node.current_index = new_index(prev_node.current_index, 1, max_index)
@@ -133,7 +130,8 @@ def find_grove_coordinates(raw_input, num_times):
     """
     number_ls = [int(x) for x in raw_input.split("\n")]
     node_dict = make_dict(number_ls)
-    mixed_file = mix_file(node_dict, num_times)
+    mix_file(node_dict, num_times)
+    mixed_file = [node.value for node in sorted(node_dict.values(), key=lambda node: node.current_index)]
 
     zero_index = mixed_file.index(0)
     grove_coords = [mixed_file[(x + zero_index) % len(number_ls)] for x in [1000, 2000, 3000]]
@@ -141,4 +139,4 @@ def find_grove_coordinates(raw_input, num_times):
 
 
 if __name__ == '__main__':
-    print(f"part1: {find_grove_coordinates(data, 1)}")  # 253 too low
+    print(f"part1: {find_grove_coordinates(data, 1)}")  # 4237 too low
