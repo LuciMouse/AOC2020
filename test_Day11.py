@@ -4,20 +4,20 @@ import Day11
 
 class TestMonkey(unittest.TestCase):
     def test_new_monkey(self):
-        monkey_0 = Day11.monkey(
+        monkey_0 = Day11.Monkey(
             0,
             [79, 98],
             "old * 19",
             (23, 1, 3)
         )
 
-        monkey_2 = Day11.monkey(
+        monkey_2 = Day11.Monkey(
             2,
             [79, 60, 97],
             "old * old",
 
         )
-        monkey_3 = Day11.monkey(
+        monkey_3 = Day11.Monkey(
             3,
             [79, 98],
             "old + 3",
@@ -32,7 +32,7 @@ class TestMonkey(unittest.TestCase):
 
 class TestMakeMonkey(unittest.TestCase):
     def test_make_monkey(self):
-        monkey_0 = Day11.monkey(
+        monkey_0 = Day11.Monkey(
             0,
             [79, 98],
             "old * 19",
@@ -49,25 +49,25 @@ class TestMakeMonkey(unittest.TestCase):
 class TestMonkeyTurn(unittest.TestCase):
     def test_monkey_turn(self):
         monkey_ls = [
-            Day11.monkey(
+            Day11.Monkey(
                 0,
                 [79, 98],
                 "old * 19",
                 (23, 2, 3)
             ),
-            Day11.monkey(
+            Day11.Monkey(
                 1,
                 [54, 65, 75, 74],
                 "old + 6",
                 (19, 2, 0)
             ),
-            Day11.monkey(
+            Day11.Monkey(
                 2,
                 [79, 60, 97],
                 "old * old",
                 (13, 1, 3)
             ),
-            Day11.monkey(
+            Day11.Monkey(
                 3,
                 [74],
                 "old + 3",
@@ -87,25 +87,25 @@ class TestMonkeyTurn(unittest.TestCase):
 class TestRoundImplementer(unittest.TestCase):
     def test_round_implementer(self):
         monkey_ls = [
-            Day11.monkey(
+            Day11.Monkey(
                 0,
                 [79, 98],
                 "old * 19",
                 (23, 2, 3)
             ),
-            Day11.monkey(
+            Day11.Monkey(
                 1,
                 [54, 65, 75, 74],
                 "old + 6",
                 (19, 2, 0)
             ),
-            Day11.monkey(
+            Day11.Monkey(
                 2,
                 [79, 60, 97],
                 "old * old",
                 (13, 1, 3)
             ),
-            Day11.monkey(
+            Day11.Monkey(
                 3,
                 [74],
                 "old + 3",
