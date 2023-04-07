@@ -88,4 +88,4 @@ def monkey_math(raw_data):
 
 
 if __name__ == '__main__':
-    print(f"{data[4]}")
+    print(f"part1:{monkey_math(data)}")
