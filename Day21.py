@@ -72,7 +72,9 @@ def parse_monkey_list(monkey_names_to_parse_ls, parsed_monkey_dict,
                     human_path_ls.append(potential_child_monkey)
                 curr_monkey_name = child_path_ls[0]
                 child_path_ls = child_path_ls[1:]
-            parsed_monkey_dict[curr_monkey.name] = curr_monkey
+            #put back into parsed dict so it doesn't get caught again
+            parsed_monkey_dict["humn"] = curr_monkey
+            del unparsed_monkey_dict["humn"]
             monkey_names_to_parse_ls = monkey_names_to_parse_ls[1:]
         else:
             new_unparsed_monkey_ls = parse_monkey(
@@ -128,7 +130,7 @@ def monkey_math2(raw_data):
             unparsed_monkey_dict,
             monkey_name
         )
-    # move humn from dict
+    # move humn from parsed_dict so that it can be caught by parse_monkey_list()
 
     humn_monkey = parsed_monkey_dict["humn"]
     del parsed_monkey_dict["humn"]
