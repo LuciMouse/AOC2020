@@ -72,19 +72,17 @@ def parse_monkey_list(monkey_names_to_parse_ls, parsed_monkey_dict,
                     human_path_ls.append(potential_child_monkey)
                 curr_monkey_name = child_path_ls[0]
                 child_path_ls = child_path_ls[1:]
+            parsed_monkey_dict[curr_monkey.name] = curr_monkey
             monkey_names_to_parse_ls = monkey_names_to_parse_ls[1:]
         else:
-            if curr_monkey not in human_path_ls:
-                new_unparsed_monkey_ls = parse_monkey(
-                    parsed_monkey_dict,
-                    unparsed_monkey_dict,
-                    curr_monkey
-                )
-                if new_unparsed_monkey_ls:
-                    monkey_names_to_parse_ls = new_unparsed_monkey_ls + monkey_names_to_parse_ls
-                else:  # this monkey was parsed
-                    monkey_names_to_parse_ls = monkey_names_to_parse_ls[1:]
-            else:
+            new_unparsed_monkey_ls = parse_monkey(
+                parsed_monkey_dict,
+                unparsed_monkey_dict,
+                curr_monkey
+            )
+            if new_unparsed_monkey_ls:
+                monkey_names_to_parse_ls = new_unparsed_monkey_ls + monkey_names_to_parse_ls
+            else:  # this monkey was parsed
                 monkey_names_to_parse_ls = monkey_names_to_parse_ls[1:]
     return human_path_ls
 
