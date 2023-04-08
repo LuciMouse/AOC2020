@@ -137,21 +137,46 @@ def monkey_math2(raw_data):
     unparsed_monkey_dict["humn"] = humn_monkey
 
     # who are roots's parents?
-    root_children = unparsed_monkey_dict["root"].parents
+    root_parents = unparsed_monkey_dict["root"].parents
 
-    first_parent = parse_monkey_list(
-        [root_children[0]],
+    parsed_parents_ls = [parse_monkey_list(
+        [monkey],
         parsed_monkey_dict,
         unparsed_monkey_dict
-    )
+    ) for monkey in root_parents]
+    second_parent_index = parsed_parents_ls.index([])
 
-    second_parent = parse_monkey_list(
-        [root_children[1]],
-        parsed_monkey_dict,
-        unparsed_monkey_dict
-    )
-    return parsed_monkey_dict["root"].value
+    #first parent is the branch that contains "humn"
+    first_parent_index = 1-second_parent_index
+    first_parent = parsed_parents_ls[first_parent_index]
+    first_parent.reverse()
+    curr_total = parsed_monkey_dict[root_parents[second_parent_index]].value
+
+    path_monkey_names_ls = [monkey.name for monkey in first_parent]+["humn"]
+    for monkey in first_parent:
+        operator = raw_monkey_dict[monkey.name].split(" ")[1]
+        parent_name = [monkey_name for monkey_name in monkey.parents if monkey_name not in path_monkey_names_ls][0]
+        parent_value = parsed_monkey_dict[parent_name].value
+        parent_index = monkey.parents.index(parent_name)
+        if operator == "/":
+            if parent_index == 1:
+                curr_total = curr_total * parent_value
+            elif parent_index == 0:
+                curr_total = parent_value / curr_total
+        elif operator == "-":
+            if parent_index == 1:
+                curr_total = curr_total + parent_value
+            elif parent_index == 0:
+                curr_total = parent_value - curr_total
+        elif operator == "+":
+            curr_total = curr_total - parent_value
+        elif operator == "*":
+            curr_total = curr_total / parent_value
+
+
+    return curr_total
 
 
 if __name__ == '__main__':
     print(f"part1:{monkey_math1(data)}")
+    print(f"part2:{monkey_math2(data)}")
