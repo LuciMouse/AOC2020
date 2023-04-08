@@ -315,14 +315,21 @@ class TestParseMonkey(unittest.TestCase):
             [(monkey.name, monkey.value) for monkey in unparsed_monkey_dict.values()]
         )
 
-class TestMonkeyMath(unittest.TestCase):
+class TestMonkeyMath1(unittest.TestCase):
     def test_monkey_math(self):
         with open("Day21_test_input.txt", "r") as input_file:
             raw_data = input_file.read()
         self.assertEqual(
             152,
-            Day21.monkey_math(raw_data))
+            Day21.monkey_math1(raw_data))
 
+class TestMonkeyMath2(unittest.TestCase):
+    def test_monkey_math2(self):
+        with open("Day21_test_input.txt", "r") as input_file:
+            raw_data = input_file.read()
+        self.assertEqual(
+            301,
+            Day21.monkey_math2(raw_data))
 
 if __name__ == '__main__':
     unittest.main()
