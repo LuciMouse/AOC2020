@@ -3,6 +3,11 @@ import re
 
 
 def parse_input(raw_input):
+    """
+    splits input data into the map and directions
+    :param raw_input: raw puzzle input
+    :return: list of map configuration and directions
+    """
     split_data = raw_input.splitlines()
     map_ls = split_data[:-2]
     max_length = max(len(row) for row in map_ls)
@@ -12,31 +17,61 @@ def parse_input(raw_input):
     return map_ls, directions_ls
 
 
-def first_open_tile_x(map_ls, row_index):
+def first_tile_x(map_ls, row_index):
+    """
+    identifies the first tile in the given row
+    :param map_ls: list of map configuration with each list representing a row
+    :param row_index: index of row that we need to analyze
+    :return: index of the first tile
+    """
     curr_row = map_ls[row_index]
     index = [x == " " for x in curr_row].index(False)
     return index
 
 
-def last_open_tile_x(map_ls, row_index):
+def last_tile_x(map_ls, row_index):
+    """
+        identifies the last tile in the given row
+        :param map_ls: list of map configuration with each list representing a row
+        :param row_index: index of row that we need to analyze
+        :return: index of the last tile
+        """
     curr_row = map_ls[row_index][::-1]
     index = [x == " " for x in curr_row].index(False)
     return len(curr_row) - index - 1
 
 
-def first_open_tile_y(map_ls, col_index):
+def first_tile_y(map_ls, col_index):
+    """
+        identifies the first tile in the given column
+        :param map_ls: list of map configuration with each list representing a row
+        :param col_index: index of col that we need to analyze
+        :return: index of the first tile
+        """
     curr_col = [row[col_index] for row in map_ls]
     index = [x == " " for x in curr_col].index(False)
     return index
 
 
-def last_open_tile_y(map_ls, col_index):
+def last_tile_y(map_ls, col_index):
+    """
+            identifies the last tile in the given column
+            :param map_ls: list of map configuration with each list representing a row
+            :param col_index: index of col that we need to analyze
+            :return: index of the last tile
+            """
     curr_col = [row[col_index] for row in map_ls][::-1]
     index = [x == " " for x in curr_col].index(False)
     return len(curr_col) - index - 1
 
 
 def new_facing(curr_facing, turn_dir):
+    """
+    given the current facing and the turn_dir, determines the new facing
+    :param curr_facing: one of [0,1,2,3] (right, down, left, right)
+    :param turn_dir: one of [1,-1] (clockwise, counter-clockwise)
+    :return: new facing
+    """
     result = curr_facing + turn_dir
     if result < 0:
         return 3
@@ -47,6 +82,13 @@ def new_facing(curr_facing, turn_dir):
 
 
 def parse_next_posn(path_ls, next_posn, next_posn_value):
+    """
+    determines if the next postion is open (.) or a wall (#) and updates the path accordingly
+    :param path_ls: sequence of visited positions so far
+    :param next_posn: next position to consider
+    :param next_posn_value: value of next position
+    :return: updated path_ls
+    """
     if next_posn_value == "#":
         return True, path_ls
     elif next_posn_value == ".":
@@ -56,45 +98,51 @@ def parse_next_posn(path_ls, next_posn, next_posn_value):
 
 
 def take_step(map_ls, path_ls):
+    """
+    processes a single step of the instruction
+    :param map_ls: list of map configuration with each list representing a row
+    :param path_ls: sequence of visited positions so far
+    :return: updated path_ls
+    """
     curr_posn, curr_facing = path_ls[-1]
     if curr_facing == 0:  # right
         new_x = curr_posn[1] + 1
         if new_x == len(map_ls[0]):
-            new_x = first_open_tile_x(map_ls, curr_posn[0])
+            new_x = first_tile_x(map_ls, curr_posn[0])
         next_posn = (curr_posn[0], new_x)
         next_posn_value = map_ls[next_posn[0]][next_posn[1]]
         if next_posn_value == ' ':  # wrap off right
-            new_x = first_open_tile_x(map_ls, curr_posn[0])
+            new_x = first_tile_x(map_ls, curr_posn[0])
             next_posn = (curr_posn[0], new_x)
             next_posn_value = map_ls[next_posn[0]][next_posn[1]]
     elif curr_facing == 2:  # left
         new_x = curr_posn[1] - 1
         if new_x < 0:
-            new_x = last_open_tile_x(map_ls, curr_posn[0])
+            new_x = last_tile_x(map_ls, curr_posn[0])
         next_posn = (curr_posn[0], new_x)
         next_posn_value = map_ls[next_posn[0]][next_posn[1]]
         if next_posn_value == ' ':  # wrap off left
-            new_x = last_open_tile_x(map_ls, curr_posn[0])
+            new_x = last_tile_x(map_ls, curr_posn[0])
             next_posn = (curr_posn[0], new_x)
             next_posn_value = map_ls[next_posn[0]][next_posn[1]]
     elif curr_facing == 1:  # down
         new_y = curr_posn[0] + 1
         if new_y == len(map_ls):
-            new_y = first_open_tile_y(map_ls, curr_posn[1])
+            new_y = first_tile_y(map_ls, curr_posn[1])
         next_posn = (new_y, curr_posn[1])
         next_posn_value = map_ls[next_posn[0]][next_posn[1]]
         if next_posn_value == ' ':  # wrap off bottom
-            new_y = first_open_tile_y(map_ls, curr_posn[1])
+            new_y = first_tile_y(map_ls, curr_posn[1])
             next_posn = (new_y, curr_posn[1])
             next_posn_value = map_ls[next_posn[0]][next_posn[1]]
     elif curr_facing == 3:  # up
         new_y = curr_posn[0] - 1
         if new_y < 0:
-            new_y = last_open_tile_y(map_ls, curr_posn[1])
+            new_y = last_tile_y(map_ls, curr_posn[1])
         next_posn = (new_y, curr_posn[1])
         next_posn_value = map_ls[next_posn[0]][next_posn[1]]
         if next_posn_value == ' ':  # wrap off bottom
-            new_y = last_open_tile_y(map_ls, curr_posn[1])
+            new_y = last_tile_y(map_ls, curr_posn[1])
             next_posn = (new_y, curr_posn[1])
             next_posn_value = map_ls[next_posn[0]][next_posn[1]]
 
@@ -102,6 +150,13 @@ def take_step(map_ls, path_ls):
 
 
 def implement_instruction(path_ls, map_ls, instruction):
+    """
+    Implements a single instruction (# steps + 1 turn)
+    :param path_ls: sequence of visited positions so far
+    :param map_ls: list of map configuration with each list representing a row
+    :param instruction: instruction to proccess
+    :return: updated path_ls
+    """
     num_steps = instruction[0]
     blocked = False
     # move
@@ -119,6 +174,12 @@ def implement_instruction(path_ls, map_ls, instruction):
 
 
 def print_path(map_ls, path_ls):
+    """
+    helper function to visualize path_ls
+    :param sequence of visited positions so far
+    :param map_ls: list of map configuration with each list representing a row
+    :return: printable map
+    """
     working_map_ls = [[*row] for row in map_ls]
     facing_dict = {0: ">", 1: "V", 2: "<", 3: "^"}
     for node in path_ls:
@@ -131,6 +192,11 @@ def print_path(map_ls, path_ls):
 
 
 def calculate_password(position):
+    """
+    given the final location, calculates the password
+    :param position: final position as ((row,col), facing)
+    :return: password
+    """
     row = position[0][0] + 1
     col = position[0][1] + 1
     facing = position[1]
@@ -139,9 +205,14 @@ def calculate_password(position):
 
 
 def monkey_map_1(raw_input):
+    """
+    calculates the password given part1 parameters
+    :param raw_input: raw puzzle input
+    :return: password
+    """
     map_ls, directions_ls = parse_input(raw_input)
     facing = 0
-    curr_index = first_open_tile_x(map_ls, 0)
+    curr_index = first_tile_x(map_ls, 0)
     curr_posn = (0, curr_index)
     path_ls = [(curr_posn, facing)]
 

@@ -24,7 +24,7 @@ class TestFirstOpenTileX(unittest.TestCase):
         ]
         self.assertEqual(
             8,
-            Day22.first_open_tile_x(map_ls, 0)
+            Day22.first_tile_x(map_ls, 0)
         )
     def test_first_open_tile_x_2(self):
         map_ls = [
@@ -33,7 +33,7 @@ class TestFirstOpenTileX(unittest.TestCase):
         ]
         self.assertEqual(
             8,
-            Day22.first_open_tile_x(map_ls, 1)
+            Day22.first_tile_x(map_ls, 1)
         )
 
 
@@ -45,7 +45,7 @@ class TestLastOpenTileX(unittest.TestCase):
         ]
         self.assertEqual(
             10,
-            Day22.last_open_tile_x(map_ls, 1)
+            Day22.last_tile_x(map_ls, 1)
         )
     def test_last_open_tile_x_2(self):
         map_ls = [
@@ -54,7 +54,7 @@ class TestLastOpenTileX(unittest.TestCase):
         ]
         self.assertEqual(
             11,
-            Day22.last_open_tile_x(map_ls, 0)
+            Day22.last_tile_x(map_ls, 0)
         )
 
 
@@ -66,7 +66,7 @@ class TestFirstOpenTileY(unittest.TestCase):
         ]
         self.assertEqual(
             1,
-            Day22.first_open_tile_y(map_ls, 7)
+            Day22.first_tile_y(map_ls, 7)
         )
 
     def test_first_open_tile_y_2(self):
@@ -76,7 +76,7 @@ class TestFirstOpenTileY(unittest.TestCase):
         ]
         self.assertEqual(
             0,
-            Day22.first_open_tile_y(map_ls, 9)
+            Day22.first_tile_y(map_ls, 9)
         )
 
     def test_first_open_tile_y_3(self):
@@ -86,7 +86,7 @@ class TestFirstOpenTileY(unittest.TestCase):
         ]
         self.assertEqual(
             0,
-            Day22.first_open_tile_y(map_ls, 10)
+            Day22.first_tile_y(map_ls, 10)
         )
 
 
@@ -98,7 +98,7 @@ class TestLastOpenTileY(unittest.TestCase):
         ]
         self.assertEqual(
             0,
-            Day22.last_open_tile_y(map_ls, 10)
+            Day22.last_tile_y(map_ls, 10)
         )
 
     def test_last_open_tile_y_2(self):
@@ -108,7 +108,7 @@ class TestLastOpenTileY(unittest.TestCase):
         ]
         self.assertEqual(
             1,
-            Day22.last_open_tile_y(map_ls, 9)
+            Day22.last_tile_y(map_ls, 9)
         )
 
     def test_last_open_tile_y_3(self):
@@ -118,7 +118,7 @@ class TestLastOpenTileY(unittest.TestCase):
         ]
         self.assertEqual(
             1,
-            Day22.last_open_tile_y(map_ls, 7)
+            Day22.last_tile_y(map_ls, 7)
         )
 
 
