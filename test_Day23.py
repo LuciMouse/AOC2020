@@ -34,13 +34,10 @@ class TestFindSurroundingElves(unittest.TestCase):
             (4, 2),
             (4, 3),
         ]
-        elf_position_map = Day23.ElfLocationMap(
-            elf_position_ls=elf_position_ls,
-            bounding_rectangle_ls=[(0, 0), (0, 5), (6, 5), (6, 0)]
-        )
+
         self.assertEqual(
             [0, 0, 1, 0, 1, 0, 0, 0],
-            Day23.find_surrounding_elves(0, elf_position_map)
+            Day23.find_surrounding_elves(0, elf_position_ls)
         )
 
 
@@ -64,24 +61,6 @@ class TestDetermineProposedMove(unittest.TestCase):
             )
         )
 
-    def test_determine_proposed_move_2(self):
-        #no surrounding elves -> no move
-        curr_elf_position = (1, 2)
-        surrounding_elves_ls = [0, 0, 0, 0, 0, 0, 0, 0]
-        directions_ls = [
-            ((7, 0, 1), (-1, 0)),
-            ((3, 4, 5), (1, 0)),
-            ((5, 6, 7), (0, 1)),
-            ((1, 2, 3), (0, -1))
-        ]
-        self.assertEqual(
-            (1, 2),
-            Day23.determine_proposed_move(
-                curr_elf_position,
-                surrounding_elves_ls,
-                directions_ls
-            )
-        )
 
     def test_determine_proposed_move_3(self):
         # first move blocked
@@ -112,6 +91,12 @@ class TestMoveElves(unittest.TestCase):
             (4, 2),
             (4, 3),
         ]
+        directions_ls = [
+            ((7, 0, 1), (-1, 0)),
+            ((3, 4, 5), (1, 0)),
+            ((5, 6, 7), (0, 1)),
+            ((1, 2, 3), (0, -1))
+        ]
 
         updated_elf_position_ls = [
             (0, 2),
@@ -124,7 +109,7 @@ class TestMoveElves(unittest.TestCase):
             updated_elf_position_ls,
             Day23.move_elves(
                 elf_position_ls,
-                proposed_moves_ls
+                directions_ls
             )
         )
 

@@ -32,7 +32,7 @@ def parse_input(raw_data):
     )
 
 
-def find_surrounding_elves(curr_index, elf_position_map):
+def find_surrounding_elves(curr_index, elf_position_ls):
     """
     determines the number and positions of elves in the eight surrounding positions
 
@@ -40,7 +40,7 @@ def find_surrounding_elves(curr_index, elf_position_map):
     [N,NE,E,SE,S,SW,W,NW]
 
     :param curr_index: index of current elf in elf_position_ls
-    :param elf_position_map: current positions of each elf
+    :param elf_position_ls: current positions of each elf
     :return: array of positions of elves in surrounding positions
     """
     position_array = [
@@ -53,7 +53,6 @@ def find_surrounding_elves(curr_index, elf_position_map):
         (0, -1),
         (-1, -1)
     ]
-    elf_position_ls = elf_position_map.elf_position_ls
     curr_elf_position = elf_position_ls[curr_index]
     surrounding_elves_ls = []
     for curr_position_diff in position_array:
@@ -77,8 +76,6 @@ def determine_proposed_move(curr_elf_position, surrounding_elves_ls, direction_l
     :param surrounding_elves_ls: list of surrounding elves
     :return: proposed move for the current elf
     """
-    if sum(surrounding_elves_ls) == 0:
-        return None
 
     for curr_direction in direction_ls:
         if sum([surrounding_elves_ls[index] for index in curr_direction[0]]) == 0:
@@ -86,14 +83,26 @@ def determine_proposed_move(curr_elf_position, surrounding_elves_ls, direction_l
     return curr_elf_position
 
 
-def move_elves(elf_position_ls):
+def move_elves(elf_position_ls, directions_ls):
     """
     given the list of proposed moves for each elf, updates position of each elf
     :param elf_position_ls: current positions of each elf
+    :param directions_ls: order of index directions to consider. in (index, diff) tuple where index are the
+    indices that correspond with that direction (e.g. N -> N, NE, NW) and diff is the corresponding adjustment in position
     :return: updated elf_position_ls
     """
     proposed_moves_ls = []
     updated_elf_positions = []
+    conflicting_positions = []
+
+    for curr_index in range(len(elf_position_ls)):
+        surrounding_elves_ls = find_surrounding_elves(curr_index, elf_position_ls)
+        if sum(surrounding_elves_ls)>0:
+            proposed_move = determine_proposed_move(
+                elf_position_ls[curr_index],
+                surrounding_elves_ls,
+                directions_ls,
+            )
 
     return [
         elf_position_ls[index] if proposed_moves_ls.count(proposed_moves_ls[index]) > 1 else proposed_moves_ls[index]
@@ -189,7 +198,7 @@ def main(raw_data, num_rounds):
     elf_position_map = parse_input(raw_data)
     print_elf_positions(elf_position_map)
     for curr_round in range(num_rounds):
-
+        "foo"
     return "foo"
 
 
