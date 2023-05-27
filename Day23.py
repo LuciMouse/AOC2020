@@ -208,7 +208,7 @@ def main(raw_data, num_rounds):
     :return: number of empty ground tiles
     """
     elf_position_map = parse_input(raw_data)
-    print_elf_positions(elf_position_map)
+    #print_elf_positions(elf_position_map)
     directions_ls = [
         ((7, 0, 1), (-1, 0)),
         ((3, 4, 5), (1, 0)),
@@ -219,7 +219,7 @@ def main(raw_data, num_rounds):
         for curr_round in range(num_rounds):
             elf_position_map.elf_position_ls = move_elves(elf_position_map.elf_position_ls, directions_ls)
             directions_ls = update_direction_list(directions_ls)
-            print_elf_positions(elf_position_map)
+            #print_elf_positions(elf_position_map)
     else:
         ...
 
@@ -227,4 +227,4 @@ def main(raw_data, num_rounds):
 
 
 if __name__ == '__main__':
-    print(f"{data[4]}")
+    print(f"part 1:{main(data,10)}")
