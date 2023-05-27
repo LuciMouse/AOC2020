@@ -233,8 +233,8 @@ def main(raw_data, num_rounds):
                 elf_position_map.elf_position_ls = new_elf_positions_ls
                 directions_ls = update_direction_list(directions_ls)
                 num_rounds += 1
-
-
+            if num_rounds % 10 == 0:
+                print(num_rounds)
 
 
 if __name__ == '__main__':
