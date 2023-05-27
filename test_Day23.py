@@ -37,13 +37,13 @@ class TestFindSurroundingElves(unittest.TestCase):
 
         self.assertEqual(
             [0, 0, 1, 0, 1, 0, 0, 0],
-            Day23.find_surrounding_elves(0, elf_position_ls)
+            Day23.find_surrounding_elves((1, 2), elf_position_ls)
         )
 
 
 class TestDetermineProposedMove(unittest.TestCase):
     def test_determine_proposed_move_1(self):
-        #first direction unblocked
+        # first direction unblocked
         curr_elf_position = (1, 2)
         surrounding_elves_ls = [0, 0, 1, 0, 1, 0, 0, 0]
         directions_ls = [
@@ -60,7 +60,6 @@ class TestDetermineProposedMove(unittest.TestCase):
                 directions_ls
             )
         )
-
 
     def test_determine_proposed_move_3(self):
         # first move blocked
@@ -83,6 +82,13 @@ class TestDetermineProposedMove(unittest.TestCase):
 
 
 class TestMoveElves(unittest.TestCase):
+    directions_ls = [
+        ((7, 0, 1), (-1, 0)),
+        ((3, 4, 5), (1, 0)),
+        ((5, 6, 7), (0, 1)),
+        ((1, 2, 3), (0, -1))
+    ]
+
     def test_move_elves(self):
         elf_position_ls = [
             (1, 2),
@@ -90,12 +96,6 @@ class TestMoveElves(unittest.TestCase):
             (2, 2),
             (4, 2),
             (4, 3),
-        ]
-        directions_ls = [
-            ((7, 0, 1), (-1, 0)),
-            ((3, 4, 5), (1, 0)),
-            ((5, 6, 7), (0, 1)),
-            ((1, 2, 3), (0, -1))
         ]
 
         updated_elf_position_ls = [
@@ -109,7 +109,7 @@ class TestMoveElves(unittest.TestCase):
             updated_elf_position_ls,
             Day23.move_elves(
                 elf_position_ls,
-                directions_ls
+                self.directions_ls
             )
         )
 
@@ -169,6 +169,7 @@ class TestVisualizeElfPositions(unittest.TestCase):
             Day23.visualize_elf_positions(elf_position_map)
         )
 
+
 class TestMain(unittest.TestCase):
     def test_main_small(self):
         with open("Day23_test_input_small.txt") as input_file:
@@ -177,6 +178,7 @@ class TestMain(unittest.TestCase):
             25,
             Day23.main(raw_data, 3)
         )
+
 
 if __name__ == '__main__':
     unittest.main()
