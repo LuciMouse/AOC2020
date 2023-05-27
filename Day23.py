@@ -1,28 +1,53 @@
 from aocd import data
 
 
+class ElfLocationMap():
+    def __init__(self, elf_position_ls, bounding_rectangle_ls):
+        self.elf_position_ls = elf_position_ls
+        self.bounding_rectangle_ls = bounding_rectangle_ls
+
+
 def parse_input(raw_data):
     """
     takes the raw puzzle input and transforms it into an array representing the positions of all the elves
-    0,0 is the lower left (SW) corner of the defined rectangle
+    (row, column)
+    0,0 is the upper left (NW) corner of the defined rectangle
     :param raw_data: raw puzzle input
-    :return: array of elf locations
+    :return: ElfLocationMap object
     """
-    ...
+    elf_positions_ls = []
+    split_data = raw_data.split('\n')
+    for row_index in range(len(split_data)):
+        for col_index in range(len(split_data[row_index])):
+            if split_data[row_index][col_index] == "#":
+                elf_positions_ls.append((row_index, col_index))
+
+
+    return elf_positions_ls
 
 
 def find_surrounding_elves(curr_index, elf_position_ls):
     """
-    deterimes the number and positions of elves in the eight surrounding positions
+    determines the number and positions of elves in the eight surrounding positions
 
-    postion_array is is the following order:
+    position_array is is the following order:
     [N,NE,E,SE,S,SW,W,NW]
 
-    :param curr_index:
-    :param elf_position_ls: the postion of the central elf
+    :param curr_index: index of current elf in elf_position_ls
+    :param elf_position_ls: current positions of each elf
     :return: array of positions of elves in surrounding positions
     """
-    ...
+    position_array = [
+        (-1, 0),
+        (-1, 1),
+        (0, 1),
+        (1, 1),
+        (1, 0),
+        (1, -1),
+        (0, -1),
+        (-1, -1)
+    ]
+    curr_elf_position = elf_position_ls[curr_index]
 
 
 def determine_proposed_move(surrounding_elves_ls, direction_ls):
@@ -38,7 +63,7 @@ def determine_proposed_move(surrounding_elves_ls, direction_ls):
 def move_elves(elf_position_ls, proposed_moves_ls):
     """
     given the list of proposed moves for each elf, updates position of each elf
-    :param elf_position_ls: current postions of each elf
+    :param elf_position_ls: current positions of each elf
     :param proposed_moves_ls: proposed move for each elf
     :return: updated elf_position_ls
     """
@@ -58,7 +83,7 @@ def determine_smallest_rectangle(elf_position_ls):
     """
     given the position of all elves, determines the coordinates of the smallest rectangle that contains all elves
     :param elf_position_ls: position of each elf
-    :return: list containing the coordinates of the smallest bounding rectangle
+    :return: list containing the coordinates of the smallest bounding rectangle as defined by [NE, NW,
     """
     ...
 
