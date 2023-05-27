@@ -92,8 +92,8 @@ def move_elves(elf_position_ls, directions_ls):
     :return: updated elf_position_ls
     """
     proposed_moves_ls = [None for x in range(len(elf_position_ls))]
-    updated_elf_positions = [None for x in range(len(elf_position_ls))]
-    conflicting_positions = []
+    updated_elf_positions_ls = [None for x in range(len(elf_position_ls))]
+    conflicting_positions_ls = []
 
     for curr_index in range(len(elf_position_ls)):
         curr_position = elf_position_ls[curr_index]
@@ -104,19 +104,21 @@ def move_elves(elf_position_ls, directions_ls):
                 surrounding_elves_ls,
                 directions_ls,
             )
-            if proposed_move in conflicting_positions: #already defined conflicting position
-                updated_elf_positions[curr_index] = curr_position
+            if proposed_move in conflicting_positions_ls:  # already defined conflicting position
+                updated_elf_positions_ls[curr_index] = curr_position
             else:
                 try:
                     conflicting_index = proposed_moves_ls.index(proposed_move)
-                    updated_elf_positions[conflicting_index] = elf_position_ls[conflicting_index]
-                    updated_elf_positions[curr_index] = curr_position
-                    conflicting_positions.append(proposed_move)
+                    updated_elf_positions_ls[conflicting_index] = elf_position_ls[conflicting_index]
+                    updated_elf_positions_ls[curr_index] = curr_position
+                    conflicting_positions_ls.append(proposed_move)
                 except ValueError:
                     proposed_moves_ls[curr_index] = proposed_move
-                    updated_elf_positions[curr_index] = proposed_move
+                    updated_elf_positions_ls[curr_index] = proposed_move
+        else:
+            updated_elf_positions_ls[curr_index] = curr_position
 
-    return updated_elf_positions
+    return updated_elf_positions_ls
 
 
 def update_direction_list(direction_ls):
@@ -196,7 +198,7 @@ def print_elf_positions(elf_position_map):
     visualized_elves_ls = visualize_elf_positions(elf_position_map)
     for row in visualized_elves_ls:
         print(row)
-
+    print("\n\n")
 
 def main(raw_data, num_rounds):
     """
@@ -207,9 +209,21 @@ def main(raw_data, num_rounds):
     """
     elf_position_map = parse_input(raw_data)
     print_elf_positions(elf_position_map)
-    for curr_round in range(num_rounds):
-        "foo"
-    return "foo"
+    directions_ls = [
+        ((7, 0, 1), (-1, 0)),
+        ((3, 4, 5), (1, 0)),
+        ((5, 6, 7), (0, -1)),
+        ((1, 2, 3), (0, 1))
+    ]
+    if num_rounds > 0:
+        for curr_round in range(num_rounds):
+            elf_position_map.elf_position_ls = move_elves(elf_position_map.elf_position_ls, directions_ls)
+            directions_ls = update_direction_list(directions_ls)
+            print_elf_positions(elf_position_map)
+    else:
+        ...
+
+    return count_empty_ground_tiles(elf_position_map.elf_position_ls)
 
 
 if __name__ == '__main__':

@@ -82,12 +82,6 @@ class TestDetermineProposedMove(unittest.TestCase):
 
 
 class TestMoveElves(unittest.TestCase):
-    directions_ls = [
-        ((7, 0, 1), (-1, 0)),
-        ((3, 4, 5), (1, 0)),
-        ((5, 6, 7), (0, 1)),
-        ((1, 2, 3), (0, -1))
-    ]
 
     def test_move_elves(self):
         elf_position_ls = [
@@ -97,7 +91,12 @@ class TestMoveElves(unittest.TestCase):
             (4, 2),
             (4, 3),
         ]
-
+        directions_ls = [
+            ((7, 0, 1), (-1, 0)),
+            ((3, 4, 5), (1, 0)),
+            ((5, 6, 7), (0, 1)),
+            ((1, 2, 3), (0, -1))
+        ]
         updated_elf_position_ls = [
             (0, 2),
             (0, 3),
@@ -109,9 +108,34 @@ class TestMoveElves(unittest.TestCase):
             updated_elf_position_ls,
             Day23.move_elves(
                 elf_position_ls,
-                self.directions_ls
+                directions_ls
             )
         )
+
+    def test_move_elves_2(self):
+        elf_position_ls = [
+            (0, 2),
+            (0, 3),
+            (2, 2),
+            (4, 2),
+            (3, 3)
+        ]
+        directions_ls = [((3, 4, 5), (1, 0)), ((5, 6, 7), (0, -1)), ((1, 2, 3), (0, 1)), ((7, 0, 1), (-1, 0))]
+        updated_elf_position_ls = [
+            (1, 2),
+            (1, 3),
+            (2, 1),
+            (5, 2),
+            (3, 4)
+        ]
+        self.assertEqual(
+            updated_elf_position_ls,
+            Day23.move_elves(
+                elf_position_ls,
+                directions_ls
+            )
+        )
+
 
 
 class TestDetermineSmallestRectangle(unittest.TestCase):
