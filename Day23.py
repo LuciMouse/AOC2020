@@ -78,7 +78,7 @@ def determine_proposed_move(curr_elf_position, surrounding_elves_ls, direction_l
     :return: proposed move for the current elf
     """
     if sum(surrounding_elves_ls) == 0:
-        return curr_elf_position
+        return None
 
     for curr_direction in direction_ls:
         if sum([surrounding_elves_ls[index] for index in curr_direction[0]]) == 0:
@@ -86,13 +86,15 @@ def determine_proposed_move(curr_elf_position, surrounding_elves_ls, direction_l
     return curr_elf_position
 
 
-def move_elves(elf_position_ls, proposed_moves_ls):
+def move_elves(elf_position_ls):
     """
     given the list of proposed moves for each elf, updates position of each elf
     :param elf_position_ls: current positions of each elf
-    :param proposed_moves_ls: proposed move for each elf
     :return: updated elf_position_ls
     """
+    proposed_moves_ls = []
+    updated_elf_positions = []
+
     return [
         elf_position_ls[index] if proposed_moves_ls.count(proposed_moves_ls[index]) > 1 else proposed_moves_ls[index]
         for index in range(len(elf_position_ls))]

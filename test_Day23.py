@@ -113,14 +113,6 @@ class TestMoveElves(unittest.TestCase):
             (4, 3),
         ]
 
-        proposed_moves_ls = [
-            (0, 2),
-            (0, 3),
-            (3, 2),
-            (3, 2),
-            (3, 3)
-        ]
-
         updated_elf_position_ls = [
             (0, 2),
             (0, 3),
