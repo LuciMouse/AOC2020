@@ -26,14 +26,13 @@ def parse_input(raw_data):
             if split_data[row_index][col_index] == "#":
                 elf_positions_ls.append((row_index, col_index))
 
-
     return ElfLocationMap(
         elf_position_ls=elf_positions_ls,
         bounding_rectangle_ls=[(0, 0), (0, num_cols), (num_rows, num_cols), (num_rows, 0)]
     )
 
 
-def find_surrounding_elves(curr_index, elf_position_ls):
+def find_surrounding_elves(curr_index, elf_position_map):
     """
     determines the number and positions of elves in the eight surrounding positions
 
@@ -41,7 +40,7 @@ def find_surrounding_elves(curr_index, elf_position_ls):
     [N,NE,E,SE,S,SW,W,NW]
 
     :param curr_index: index of current elf in elf_position_ls
-    :param elf_position_ls: current positions of each elf
+    :param elf_position_map: current positions of each elf
     :return: array of positions of elves in surrounding positions
     """
     position_array = [
@@ -54,17 +53,34 @@ def find_surrounding_elves(curr_index, elf_position_ls):
         (0, -1),
         (-1, -1)
     ]
+    elf_position_ls = elf_position_map.elf_position_ls
     curr_elf_position = elf_position_ls[curr_index]
+    surrounding_elves_ls = []
+    for curr_position_diff in position_array:
+        surrounding_position = (
+            curr_elf_position[0] + curr_position_diff[0],
+            curr_elf_position[1] + curr_position_diff[1]
+        )
+        if surrounding_position in elf_position_ls:
+            surrounding_elves_ls.append(1)
+        else:
+            surrounding_elves_ls.append(0)
+    return surrounding_elves_ls
 
 
-def determine_proposed_move(surrounding_elves_ls, direction_ls):
+def determine_proposed_move(curr_elf_position, surrounding_elves_ls, direction_ls):
     """
-    given the list of surrounding elves, determines the proposed move for the
-    :param direction_ls: order of directions to consider
+    given the list of surrounding elves, determines the proposed move for the elf
+    :param curr_elf_position: position of current elf
+    :param direction_ls: order of index directions to consider. in (index, diff) tuple where index are the
+    indices that correspond with that direction (e.g. N -> N, NE, NW) and diff is the corresponding adjustment in position
     :param surrounding_elves_ls: list of surrounding elves
     :return: proposed move for the current elf
     """
-    ...
+    for curr_direction in direction_ls:
+        if sum([surrounding_elves_ls[index] for index in curr_direction[0]]) == 0:
+            return curr_elf_position[0] + curr_direction[1][0], curr_elf_position[1] + curr_direction[1][1]
+        return curr_elf_position
 
 
 def move_elves(elf_position_ls, proposed_moves_ls):
@@ -74,7 +90,9 @@ def move_elves(elf_position_ls, proposed_moves_ls):
     :param proposed_moves_ls: proposed move for each elf
     :return: updated elf_position_ls
     """
-    ...
+    return [
+        elf_position_ls[index] if proposed_moves_ls.count(proposed_moves_ls[index]) > 1 else proposed_moves_ls[index]
+        for index in range(len(elf_position_ls))]
 
 
 def update_direction_list(direction_ls):
