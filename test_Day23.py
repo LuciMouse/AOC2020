@@ -1,5 +1,6 @@
 import unittest
 import Day23
+from aocd import data
 
 
 class TestParseInput(unittest.TestCase):
@@ -137,7 +138,6 @@ class TestMoveElves(unittest.TestCase):
         )
 
 
-
 class TestDetermineSmallestRectangle(unittest.TestCase):
     def test_determine_smallest_rectangle(self):
         elf_position_ls = [
@@ -202,12 +202,35 @@ class TestMain(unittest.TestCase):
             25,
             Day23.main(raw_data, 3)
         )
+
     def test_main(self):
         with open("Day23_test_input.txt") as input_file:
             raw_data = input_file.read()
         self.assertEqual(
             110,
             Day23.main(raw_data, 10)
+        )
+
+    def test_part1(self):
+        self.assertEqual(
+            4049,
+            Day23.main(data, 10)
+        )
+
+    def test_main_small_part2(self):
+        with open("Day23_test_input_small.txt") as input_file:
+            raw_data = input_file.read()
+        self.assertEqual(
+            4,
+            Day23.main(raw_data, 0)
+        )
+
+    def test_main_part2(self):
+        with open("Day23_test_input.txt") as input_file:
+            raw_data = input_file.read()
+        self.assertEqual(
+            20,
+            Day23.main(raw_data, 0)
         )
 
 

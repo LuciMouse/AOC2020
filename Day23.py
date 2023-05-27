@@ -200,15 +200,16 @@ def print_elf_positions(elf_position_map):
         print(row)
     print("\n\n")
 
+
 def main(raw_data, num_rounds):
     """
     main function
     :param num_rounds: number of rounds to simulate, 0 = simulate to end of process
     :param raw_data:raw puzzle input
-    :return: number of empty ground tiles
+    :return: number of empty ground tiles (if num_rounds >0)or first round where no elf moves (if num_rounds ==0)
     """
     elf_position_map = parse_input(raw_data)
-    #print_elf_positions(elf_position_map)
+    # print_elf_positions(elf_position_map)
     directions_ls = [
         ((7, 0, 1), (-1, 0)),
         ((3, 4, 5), (1, 0)),
@@ -219,12 +220,23 @@ def main(raw_data, num_rounds):
         for curr_round in range(num_rounds):
             elf_position_map.elf_position_ls = move_elves(elf_position_map.elf_position_ls, directions_ls)
             directions_ls = update_direction_list(directions_ls)
-            #print_elf_positions(elf_position_map)
+            # print_elf_positions(elf_position_map)
+        return count_empty_ground_tiles(elf_position_map.elf_position_ls)
     else:
-        ...
+        num_rounds = 1
+        while True:
 
-    return count_empty_ground_tiles(elf_position_map.elf_position_ls)
+            new_elf_positions_ls = move_elves(elf_position_map.elf_position_ls, directions_ls)
+            if elf_position_map.elf_position_ls == new_elf_positions_ls:
+                return num_rounds
+            else:
+                elf_position_map.elf_position_ls = new_elf_positions_ls
+                directions_ls = update_direction_list(directions_ls)
+                num_rounds += 1
+
+
 
 
 if __name__ == '__main__':
-    print(f"part 1:{main(data,10)}")
+    # print(f"part 1:{main(data, 10)}")
+    print(f"part 2:{main(data, 0)}")
