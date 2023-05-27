@@ -202,6 +202,13 @@ class TestMain(unittest.TestCase):
             25,
             Day23.main(raw_data, 3)
         )
+    def test_main(self):
+        with open("Day23_test_input.txt") as input_file:
+            raw_data = input_file.read()
+        self.assertEqual(
+            110,
+            Day23.main(raw_data, 10)
+        )
 
 
 if __name__ == '__main__':
