@@ -13,9 +13,15 @@ class TestParseInput(unittest.TestCase):
             (4, 2),
             (4, 3),
         ]
+        expected_elf_location_map = Day23.ElfLocationMap(
+            elf_position_ls=elf_position_ls,
+            bounding_rectangle_ls=[(0, 0), (0, 5), (6, 5), (6, 0)]
+        )
+        actual_elf_location_map = Day23.parse_input(raw_data)
+
         self.assertEqual(
-            elf_position_ls,
-            Day23.parse_input(raw_data),
+            [expected_elf_location_map.elf_position_ls, expected_elf_location_map.bounding_rectangle_ls],
+            [actual_elf_location_map.elf_position_ls, actual_elf_location_map.bounding_rectangle_ls],
         )
 
 

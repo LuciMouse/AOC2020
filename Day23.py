@@ -12,18 +12,25 @@ def parse_input(raw_data):
     takes the raw puzzle input and transforms it into an array representing the positions of all the elves
     (row, column)
     0,0 is the upper left (NW) corner of the defined rectangle
+
+    bounding rectangle as defined by [NE, NW, SW, SE] corners
     :param raw_data: raw puzzle input
     :return: ElfLocationMap object
     """
     elf_positions_ls = []
     split_data = raw_data.split('\n')
-    for row_index in range(len(split_data)):
-        for col_index in range(len(split_data[row_index])):
+    num_rows = len(split_data)
+    num_cols = len(split_data[0])
+    for row_index in range(num_rows):
+        for col_index in range(num_cols):
             if split_data[row_index][col_index] == "#":
                 elf_positions_ls.append((row_index, col_index))
 
 
-    return elf_positions_ls
+    return ElfLocationMap(
+        elf_position_ls=elf_positions_ls,
+        bounding_rectangle_ls=[(0, 0), (0, num_cols), (num_rows, num_cols), (num_rows, 0)]
+    )
 
 
 def find_surrounding_elves(curr_index, elf_position_ls):
@@ -83,7 +90,7 @@ def determine_smallest_rectangle(elf_position_ls):
     """
     given the position of all elves, determines the coordinates of the smallest rectangle that contains all elves
     :param elf_position_ls: position of each elf
-    :return: list containing the coordinates of the smallest bounding rectangle as defined by [NE, NW,
+    :return: list containing the coordinates of the smallest bounding rectangle as defined by [NE, NW, SW, SE] corners
     """
     ...
 
